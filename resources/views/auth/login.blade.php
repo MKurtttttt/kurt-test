@@ -33,7 +33,7 @@
         <!-- Login Button -->
         <div class="mb-2">
             <x-primary-button class="login-btn w-full">
-                <span class="text-center">{{ __('Log in') }}</span>
+                <span class="text-center text-white hover:text-black">{{ __('Log in') }}</span>
             </x-primary-button>
         </div>
 
@@ -56,7 +56,7 @@
          <hr class="my-4">  
         <div class="mb-4 mt-4">
             @if (Route::has('password.request'))
-                <a class="text-sm text-#70121D dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 block" href="{{ route('password.request') }}">
+                <a class="text-sm text-#70121D dark:text-gray-800 hover:text-gray-900 dark:hover:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 block" href="{{ route('password.request') }}">
                     {{ __('Forgot your password?') }}
                 </a>
             @endif
