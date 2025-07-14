@@ -120,7 +120,7 @@ $mname = '';
         </div> 
     </div> 
     <div class = "navigation-cards">
-        <div class = "navigation-cards-box-4">
+        <div class = "navigation-cards-box-5">
             <!-- a card slot  -->
             <a href = "{{route('portal.certifications')}}">
                 <div class = "nav-card"> 
@@ -160,14 +160,6 @@ $mname = '';
 
             <!-- end of card slot  -->
 
-        </div> 
-    </div> 
-
-    <div class = "navigation-cards">
-        <div class = "navigation-cards-box-4">
-
-        <!-- a card slot  -->
-            
             <!-- a card slot  -->
             <a href = "{{route('portal.employment')}}">
                 <div class = "nav-card"> 
@@ -178,6 +170,11 @@ $mname = '';
 
             <!-- end of card slot  -->
 
+        </div> 
+    </div> 
+
+    <div class = "navigation-cards">
+        <div class = "navigation-cards-box-4">
 
             <!-- a card slot  -->
             <a href = "{{route('portal.dependencies')}}">
@@ -210,7 +207,15 @@ $mname = '';
 
             <!-- end of card slot  -->
 
+            <!-- a card slot  -->
+                <a href = "{{route('sharepoint-sites.dashboard')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/sharepoint.png')}}" class = "w-24 h-24"/> </div>
+                        <div class  = "nav-card-title"> <h3>SharePoint Sites</h3> </div> 
+                    </div> 
+                </a> 
 
+                <!-- end of card slot  -->
 
         </div> 
     </div> 

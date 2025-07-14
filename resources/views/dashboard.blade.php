@@ -27,7 +27,7 @@ $mname = '';
                     <div class = "flex flex-col justify-center leading-[1.5rem]">
                         <h3 class = "bg-red-900 text-white font-semibold rounded-lg py-1 px-1 w-[20%] text-center mb-2"> {{Auth::user()-> id}}</h3>
                         <h1 class = "text-[3rem] font-extrabold mb-1">{{$userInfo->emp_fname}}</h1>
-                        <h2 class = "text-[1.2rem] font-semibold mt-1">{{$userInfo->emp_mname ?? ' '}}{{$userInfo->emp_lname}} </h2>
+                        <h2 class = "text-[1.2rem] font-semibold mt-1">{{$userInfo->emp_mname ?? ' '}} {{$userInfo->emp_lname}} </h2>
                         
                     
                         @if(session('dept')==true)
@@ -61,8 +61,7 @@ $mname = '';
         <div class = "navigation-cards">
             @if (Auth::user()->role !== 'Employee' && Auth::user()->role !== 'Dean' && Auth::user()->role !== 'HR Admin') 
             <div class = "navigation-cards-box">
-
-            <!-- a card slot  -->
+                <!-- a card slot  -->
                 <a href = "{{route('manage-emps.dashboard')}}">
                     <div class = "nav-card"> 
                         <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/employees.png')}}"/> </div>
@@ -74,7 +73,7 @@ $mname = '';
 
 
                 <!-- a card slot  -->
-                <a href = "{{route('construction')}}">
+                <a href = "{{route('scholarship-grants.dashboard')}}">
                     <div class = "nav-card"> 
                         <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/scholarships.png')}}"/> </div>
                         <div class  = "nav-card-title"> <h3> Scholarships and Grants</h3> </div> 
@@ -115,6 +114,7 @@ $mname = '';
 
                 <!-- end of card slot  -->
 
+
                 <!-- a card slot  -->
                 <a href = "{{route('admin.prc')}}">
                     <div class = "nav-card"> 
@@ -126,10 +126,18 @@ $mname = '';
                 <!-- end of card slot  -->
 
 
+                <!-- a card slot  -->
+                <a href = "{{route('sharepoint-sites.dashboard')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/sharepoint.png')}}" class = "w-24 h-24"/> </div>
+                        <div class  = "nav-card-title"> <h3> SharePoint Sites</h3> </div> 
+                    </div> 
+                </a> 
 
-            </div> 
+                <!-- end of card slot  -->
+            </div>
             @else
-            <div class = "relative w-[85%] h-[85%] rounded-[15px] grid grid-cols-5 overflow-hidden">
+            <div class = "relative w-[85%] h-[85%] rounded-[15px] grid grid-cols- overflow-hidden">
 
             <!-- a card slot  -->
                 <a href = "{{route('manage-emps.dashboard')}}">
@@ -179,6 +187,16 @@ $mname = '';
                     <div class = "nav-card"> 
                         <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/research.png')}}"/> </div>
                         <div class  = "nav-card-title"> <h3> Research</h3> </div> 
+                    </div> 
+                </a> 
+
+                <!-- end of card slot  -->
+
+                <!-- a card slot  -->
+                <a href = "{{route('sharepoint-sites.dashboard')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/sharepoint.png')}}"/> </div>
+                        <div class  = "nav-card-title"> <h3> SharePoint Sites</h3> </div> 
                     </div> 
                 </a> 
 
@@ -324,16 +342,20 @@ $mname = '';
         
     }
 
+    .navigation-cards + .navigation-cards {
+        margin-top: -50px;
+    }
+
     .navigation-cards-box { 
         position: relative;
 
-        width: 85%; 
+        width: 95%; 
         height: 85%;
         border-radius: 15px;
    
         /* background-color: white; */
         display: grid; 
-        grid-template-columns: repeat(6, 1fr); 
+        grid-template-columns: repeat(7, 1fr); 
         /* box-shadow: 5px 5px 5px rgb(0,0,0,0.1); */
         overflow: hidden;
     }
@@ -365,9 +387,4 @@ $mname = '';
     .nav-card:hover { 
         background-color: #8B2B39;
     }
-
-
-
-    
-
 </style> 

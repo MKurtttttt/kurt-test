@@ -6,6 +6,7 @@ use App\Http\Controllers\LoadsImportController;
 use App\Http\Controllers\PendingController;
 use App\Http\Controllers\SubjectsController;
 use App\Http\Controllers\ManageCertificateController;
+use App\Http\Controllers\SharepointController;
 use App\Models\certifications;
 use App\Models\Departments;
 use App\Models\Employee;
@@ -177,6 +178,26 @@ Route::middleware(['admin','revalidate'])->group(function() {
     // Update Certificate - Submit the edit form
     Route::put('manage-emps/certifications/update/{id}', [IssueCertController::class, 'update'])->name('admin.certs.update');
 
-        
+
+   /******************** SHAREPOINT LINKS ********************/
+    // Add sharepoint link (form)
+    Route::get('sharepoint-sites/add', [SharepointController::class, 'create'])->name('sharepoint-sites.add');
+
+    // Store new sharepoint link
+    Route::post('sharepoint-sites/store', [SharepointController::class, 'store'])->name('sharepoint-sites.store');
+
+    // Edit sharepoint link (form)
+    Route::get('sharepoint-sites/edit/{id}', [SharepointController::class, 'edit'])->name('sharepoint-sites.edit'); 
+    Route::get('sharepoint-sites/edit', [SharepointController::class, 'editList'])->name('sharepoint-sites.edit-list'); 
+
+    // Select link to edit (optional if used separately)
+    Route::get('sharepoint-sites/select', [SharepointController::class, 'selectForm'])->name('sharepoint-sites.select-form');
+    Route::post('sharepoint-sites/select', [SharepointController::class, 'select'])->name('sharepoint-sites.select');
+
+    // Update sharepoint link
+    Route::put('sharepoint-sites/update/{id}', [SharepointController::class, 'update'])->name('sharepoint-sites.update');
+
+    // Delete sharepoint link
+    Route::delete('sharepoint-sites/delete/{id}', [SharepointController::class, 'destroy'])->name('sharepoint-sites.delete');
     });
 ?> 

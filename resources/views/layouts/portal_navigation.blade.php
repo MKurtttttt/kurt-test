@@ -1,5 +1,5 @@
 <div class="sidebar h-screen dark:bg-gray-800">
-    <!-- Sidebar for employees -->
+    <!-- Sidebar for employees / employee sidebar -->
     <aside class="bg-white dark:bg-gray-900 w-64 md:w-80 border-r border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center flex-shrink-0 main gap-0 leading-tight">
 
     <div class = "w-full flex flex-col items-center mt-8"> 
@@ -211,7 +211,20 @@
                             <h3>Filing Application</h3>
                      
                     </div>
+                </a>
+
+                <!-- A LINK NAVIGATION  -->
+                 <a href="{{ route('sharepoint-sites.dashboard') }}" class="{{ request()->routeIs('sharepoint-sites*') ? 'font-semibold' : '' }}">
+                    <div class="nav-link">
+                        
+                            <img src="{{ asset('images/icons/nav/sharepoint.svg') }}" />
+                    
+                     
+                            <h3>SharePoint Sites</h3>
+                     
+                    </div>
                 </a> 
+
          @if(Auth::user()->role !== 'Employee')
         <!-- A LINK NAVIGATION  -->
         <div class="w-full flex justify-center my-4">

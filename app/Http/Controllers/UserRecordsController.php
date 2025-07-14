@@ -567,7 +567,7 @@ class UserRecordsController extends Controller
                 case 'login':
                     $request->validate([
                         'email' => 'required|email|max:255|unique:tbl_login,email,'.$employee->emp_id.',id',
-                        'role'  => 'required|string|in:Employee,SuperAdmin,HR Admin,Dean',
+                        'role'  => 'required|string|in:Employee,SuperAdmin,HR Admin,Dean,ScholarManager',
                         // The password is optional. If given, it must be confirmed.
                         'password' => 'nullable|string|min:6|confirmed',
                     ]);

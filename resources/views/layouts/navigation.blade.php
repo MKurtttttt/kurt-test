@@ -106,6 +106,17 @@
                             <h3>PRC Results</h3>
                   
                     </div>
+                </a>
+
+                <!-- A LINK NAVIGATION  -->
+                 <a href="{{ route('sharepoint-sites.dashboard') }}" class="{{ request()->routeIs('sharepoint-sites*') ? 'active' : '' }}">
+                    <div class="nav-link">
+                        
+                            <img src="{{ asset('images/icons/nav/sharepoint.svg') }}" class = "w-24 h-24"/>
+                        
+                            <h3>SharePoint Sites</h3>
+                      
+                    </div>
                 </a> 
                 @endif
 

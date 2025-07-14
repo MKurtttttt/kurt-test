@@ -31,6 +31,7 @@ use App\Http\Controllers\TrainingsController;
 use App\Http\Controllers\certificationController;
 use App\Http\Controllers\UpdatesController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SharepointController;
 
 //
 // All routes are protected by the "auth" middleware.
@@ -501,5 +502,9 @@ Route::middleware('auth','revalidate')->group(function () {
     // Change Profile Picture View (different from update action)
     Route::get('profile/change-profile-picture', [ProfileController::class, 'changepic'])
         ->name('profile.changepic');
-
+    
+    /*------------------------------------------------------------------
+    | 17. SharePoint Sites
+    |------------------------------------------------------------------*/
+    Route::get('sharepoint-sites/dashboard', [SharepointController::class, 'index'])->name('sharepoint-sites.dashboard');
 });
