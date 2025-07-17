@@ -51,7 +51,7 @@
 
 
                  <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('scholarship-grants.dashboard') }}" class="{{ request()->routeIs('scholarships-grants*') ? 'active' : '' }}">
+                 <a href="{{ route('construction') }}" class="{{ request()->routeIs('scholarships-grants*') ? 'active' : '' }}">
                     <div class="nav-link">
                         
                             <img src="{{ asset('images/icons/nav/scholarships.svg') }}" />
