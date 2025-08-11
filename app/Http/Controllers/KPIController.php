@@ -38,7 +38,7 @@ class KpiController extends Controller
             })
             ->get();
 
-        return view('kpis.kpi-dashboard', compact('kpis', 'sortBy'));
+        return view('kpis.kpi-dashboard', compact('kpis', 'sortBy', 'search'));
     }
 
     /**
@@ -206,7 +206,7 @@ class KpiController extends Controller
         })
         ->get();
 
-        return view('kpis.kpi-search', compact('kpis'));
+        return view('kpis.kpi-search', compact('kpis', 'search'));
     }
 
     /**
