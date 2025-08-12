@@ -20,7 +20,7 @@
                 <form class="flex-col w-full px-8" action="{{ route('kpis.store') }}" method="POST">
                     @csrf
 
-                    <!-- Row 1 -->
+                    <!-- Row 1: Measure Code & Measure Owner -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">MEASURE CODE <span class="font-bold text-red-500">*</span></h1>
@@ -32,7 +32,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 2 -->
+                    <!-- Row 2: Measure Name & Measure Type -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">MEASURE NAME <span class="font-bold text-red-500">*</span></h1>
@@ -44,7 +44,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 10: Description -->
+                    <!-- Row 3: Description -->
                     <div class="mt-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">DESCRIPTION</h1>
@@ -52,7 +52,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 3 -->
+                    <!-- Row 4: Lead/Lag & Polarity -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">LEAD/LAG</h1>
@@ -72,7 +72,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 4 -->
+                    <!-- Row 5: Formula & Unit Type -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">FORMULA</h1>
@@ -84,7 +84,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 5 -->
+                    <!-- Row 6: Data Provider & Data Source -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">DATA PROVIDER</h1>
@@ -96,7 +96,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 6 -->
+                    <!-- Row 7: Collection Frequency & Reporting Frequency -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">COLLECTION FREQUENCY</h1>
@@ -108,7 +108,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 7 -->
+                    <!-- Row 8: Verified By & Validated By -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">VERIFIED BY</h1>
@@ -120,7 +120,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 8 -->
+                    <!-- Row 9: Baseline & Target -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">BASELINE</h1>
@@ -132,7 +132,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 9 -->
+                    <!-- Row 10: High Threshold & Low Threshold -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">HIGH THRESHOLD</h1>
@@ -143,8 +143,6 @@
                             <input class="rounded-lg w-full" name="threshold_low" type="text"/>
                         </div>
                     </div>
-
-                    
 
                     <!-- Row 11: Target Rationale -->
                     <div class="mt-4">
@@ -166,7 +164,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 13: Objective & Owner -->
+                    <!-- Row 13: Objective & Objective Owner -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">OBJECTIVE</h1>
@@ -193,10 +191,8 @@
                             <textarea class="rounded-lg w-full" name="intended_results" rows="3"></textarea>
                         </div>
                     </div>
-             
 
-                    <!-- Meta Information -->
-                    <!-- Row 16: Comparator & Author -->
+                    <!-- Row 16: Comparator & Item Author -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div class="flex flex-col">
                             <h1 class="text-gray-500">COMPARATOR</h1>
@@ -215,7 +211,6 @@
                             <input class="rounded-lg w-full" name="date" type="date"/>
                         </div>
                     </div>
-                    
 
                     <!-- Submit Button -->
                     <div class="w-full flex justify-end py-4">

@@ -45,6 +45,24 @@
                     </ul>
                 </div>
 
+                <!-- Search Bar -->
+                <div class="mb-6">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="sharepoint-search"
+                            placeholder="Search SharePoint links..."
+                            class="w-full border border-red-300 rounded-lg px-4 py-3 pr-16 shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                            autocomplete="off"
+                        >
+                        <button type="button" id="clear-sharepoint-search" class="absolute right-2 top-1/2 -translate-y-1/2 bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg text-xs font-semibold transition">Clear</button>
+                    </div>
+                    <div id="search-results" class="hidden mt-4">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Search Results:</h3>
+                        <div id="search-results-content" class="space-y-2"></div>
+                    </div>
+                </div>
+
                 <!-- ISO Tab -->
                 <div id="tab-iso" class="tab-content overflow-y-auto" style="max-height: 70vh;">
                     <div class="w-full flex flex-col gap-8">
@@ -235,6 +253,110 @@
                 });
                 fileList.classList.toggle('hidden');
             });
+        });
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('sharepoint-search');
+    const clearSearchBtn = document.getElementById('clear-sharepoint-search');
+    const searchResults = document.getElementById('search-results');
+    const searchResultsContent = document.getElementById('search-results-content');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    function performSearch() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        
+        if (searchTerm === '') {
+            // Show normal tabs, hide search results
+            searchResults.classList.add('hidden');
+            tabContents.forEach(content => content.style.display = 'block');
+            return;
+        }
+
+        // Hide tab contents, show search results
+        tabContents.forEach(content => content.style.display = 'none');
+        searchResults.classList.remove('hidden');
+        
+        // Clear previous results
+        searchResultsContent.innerHTML = '';
+
+        // Search through all links
+        const allLinks = document.querySelectorAll('a[href*="sharepoint"], a[href*="onedrive"]');
+        let hasResults = false;
+
+        allLinks.forEach(link => {
+            const linkText = link.textContent.toLowerCase();
+            const linkTitle = (link.getAttribute('title') || '').toLowerCase();
+            
+            // Get original case for display
+            const departmentOriginal = link.closest('.space-y-4')?.querySelector('.department-btn')?.textContent || '';
+            const department = departmentOriginal.toLowerCase();
+            
+            // Find the office by looking for the closest office-btn in the parent structure
+            let office = '';
+            let officeOriginal = '';
+            const linkItem = link.closest('li');
+            const parentOfficeList = linkItem?.closest('.file-list')?.previousElementSibling;
+            if (parentOfficeList?.classList.contains('office-btn')) {
+                officeOriginal = parentOfficeList.textContent;
+                office = officeOriginal.toLowerCase();
+            }
+
+            if (linkText.includes(searchTerm) || linkTitle.includes(searchTerm) || 
+                department.includes(searchTerm) || office.includes(searchTerm)) {
+                
+                hasResults = true;
+                
+                // Create result item
+                const resultItem = document.createElement('div');
+                resultItem.className = 'p-3 bg-gray-50 rounded-lg border';
+                resultItem.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <a href="${link.href}" target="_blank" 
+                               class="text-blue-600 hover:text-blue-800 font-medium">
+                                ${highlightText(link.textContent, searchTerm)}
+                            </a>
+                            <div class="text-sm text-gray-600 mt-1">
+                                ${departmentOriginal ? `Department: ${highlightText(departmentOriginal, searchTerm)}` : ''}
+                                ${officeOriginal ? ` | Office: ${highlightText(officeOriginal, searchTerm)}` : ''}
+                            </div>
+                            ${link.getAttribute('title') ? `<div class="text-xs text-gray-500 mt-1">${link.getAttribute('title')}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                searchResultsContent.appendChild(resultItem);
+            }
+        });
+
+        if (!hasResults) {
+            searchResultsContent.innerHTML = '<div class="p-4 text-center text-gray-500">No SharePoint links found matching your search.</div>';
+        }
+    }
+
+    function highlightText(text, searchTerm) {
+        if (!searchTerm) return text;
+        const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        return text.replace(regex, '<span class="bg-yellow-200 text-gray-900 px-1 rounded">$1</span>');
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', performSearch);
+    
+    clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        performSearch();
+        searchInput.focus();
+    });
+
+    // Reset search when switching tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (searchInput.value.trim() !== '') {
+                searchInput.value = '';
+                performSearch();
+            }
         });
     });
 </script>

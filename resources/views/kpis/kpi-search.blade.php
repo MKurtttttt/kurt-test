@@ -6,7 +6,7 @@ function highlightText($text, $search) {
     
     $highlighted = preg_replace(
         '/(' . preg_quote($search, '/') . ')/i',
-        '<span class="bg-yellow-200 text-gray-900 px-1 rounded font-medium">$1</span>',
+        '<mark class="bg-yellow-200 text-gray-900 px-1 rounded">$1</mark>',
         e($text)
     );
     

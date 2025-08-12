@@ -165,7 +165,6 @@
                     <!-- Segmentation Tab -->
                     <div x-show="tab === 'segmentation'">
                         <div class="px-8">
-                            <h2 class="text-xl font-bold text-gray-700 mb-4">Segmentations</h2>
                             <!-- Add New Segmentation Form -->
                             <form x-data="{ showTarget: false, showGoal: false }" action="{{ route('segmentations.store') }}" method="POST" class="mb-6 border p-4 rounded-lg bg-gray-50">
                                 @csrf
@@ -186,11 +185,11 @@
                                 </div>
                                 <div class="mt-2 flex gap-4">
                                     <button type="button" @click="showTarget = !showTarget" class="text-maroon underline focus:outline-none">
-                                        <span x-show="!showTarget">Add Target Level (optional)</span>
+                                        <span x-show="!showTarget">Add Target Level</span>
                                         <span x-show="showTarget">Hide Target Level</span>
                                     </button>
                                     <button type="button" @click="showGoal = !showGoal" class="text-maroon underline focus:outline-none">
-                                        <span x-show="!showGoal">Add Goal (optional)</span>
+                                        <span x-show="!showGoal">Add Goal</span>
                                         <span x-show="showGoal">Hide Goal</span>
                                     </button>
                                 </div>
@@ -234,11 +233,11 @@
                                     </div>
                                     <div class="mt-2 flex gap-4">
                                         <button type="button" @click="showTarget = !showTarget" class="text-maroon underline focus:outline-none">
-                                            <span x-show="!showTarget">Show Target Level (optional)</span>
+                                            <span x-show="!showTarget">Show Target Level</span>
                                             <span x-show="showTarget">Hide Target Level</span>
                                         </button>
                                         <button type="button" @click="showGoal = !showGoal" class="text-maroon underline focus:outline-none">
-                                            <span x-show="!showGoal">Show Goal (optional)</span>
+                                            <span x-show="!showGoal">Show Goal</span>
                                             <span x-show="showGoal">Hide Goal</span>
                                         </button>
                                     </div>
@@ -270,7 +269,6 @@
                     <!-- Dimensions Tab -->
                     <div x-show="tab === 'dimensions'">
                         <div class="px-8">
-                            <h2 class="text-xl font-bold text-gray-700 mb-4">Dimensions</h2>
                             <!-- Add New Dimension Form -->
                             <form action="{{ route('dimensions.store') }}" method="POST" class="mb-6 border p-4 rounded-lg bg-gray-50">
                                 @csrf
