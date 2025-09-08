@@ -88,6 +88,9 @@
         .main-content {
             padding-bottom: 2rem;
         }
+        .main-navigation {
+            margin-left: 3rem !important;
+        }
         @media (max-width: 768px) {
             .nav-mobile {
                 flex-direction: row;
@@ -155,25 +158,25 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-20 nav-mobile">
                     <!-- Left Side: Logo + Navigation -->
-                    <div class="flex items-center space-x-8">
+                    <div class="flex items-center">
                         <!-- Logo Section -->
                         <div class="flex items-center">
                             <a href="/" class="logo-hover">
                                 <img src="{{ asset('images/logo-long.png') }}" alt="HAU Logo" 
-                                     class="h-16 object-contain logo-mobile">
+                                     class="h-12 object-contain logo-mobile">
                             </a>
                         </div>
                         
                         <!-- Main Navigation -->
-                        <div class="hidden md:flex items-center space-x-1 main-navigation")>
+                        <div class="hidden md:flex items-center space-x-1 main-navigation">
                             <a href="/" class="nav-link {{ Request::is('/') ? 'active' : '' }} px-4 py-2 rounded-lg text-sm font-medium text-red-900 hover:bg-red-50 transition-all duration-200">
-                                <i class="fas fa-home mr-1"></i>Home
+                                Home
                             </a>
                             <a href="{{ route('sharepoint.public') }}" class="nav-link {{ Request::is('sharepoint*') ? 'active' : '' }} px-4 py-2 rounded-lg text-sm font-medium text-red-900 hover:bg-red-50 transition-all duration-200">
-                                <i class="fas fa-folder-open mr-1"></i>SharePoint Sites
+                                SharePoint Sites
                             </a>
                             <a href="{{ route('orgchart') }}" class="nav-link {{ Request::is('org-chart*') ? 'active' : '' }} px-4 py-2 rounded-lg text-sm font-medium text-red-900 hover:bg-red-50 transition-all duration-200">
-                                <i class="fas fa-sitemap mr-1"></i>Organizational Chart
+                                Organizational Chart
                             </a>
                         </div>
                     </div>
@@ -182,7 +185,7 @@
                     <div class="flex items-center space-x-3">
                         <!-- User Menu / Login -->
                         <a href="{{ route('login') }}" class="bg-red-700 hover:bg-red-800 text-white px-3 py-2 md:px-4 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md">
-                            <i class="fas fa-sign-in-alt mr-1"></i><span class="hidden sm:inline">Login</span><span class="sm:hidden">Login</span>
+                            <span class="hidden sm:inline">Login</span><span class="sm:hidden">Login</span>
                         </a>
                         
                         <!-- Mobile menu button -->
@@ -196,19 +199,19 @@
                 <div class="md:hidden mobile-menu hidden border-t border-gray-200 bg-white shadow-lg">
                     <div class="px-4 pt-3 pb-4 space-y-2">
                         <a href="/" class="block px-4 py-3 rounded-lg text-base font-medium text-red-900 hover:bg-red-50 transition-colors duration-200 {{ Request::is('/') ? 'bg-red-50 border-l-4 border-red-600' : '' }}">
-                            <i class="fas fa-home mr-3 w-4"></i>Home
+                            Home
                         </a>
                         <a href="{{ route('sharepoint.public') }}" class="block px-4 py-3 rounded-lg text-base font-medium text-red-900 hover:bg-red-50 transition-colors duration-200 {{ Request::is('sharepoint*') ? 'bg-red-50 border-l-4 border-red-600' : '' }}">
-                            <i class="fas fa-folder-open mr-3 w-4"></i>SharePoint Sites
+                            SharePoint Sites
                         </a>
                         <a href="{{ route('orgchart') }}" class="block px-4 py-3 rounded-lg text-base font-medium text-red-900 hover:bg-red-50 transition-colors duration-200 {{ Request::is('org-chart*') ? 'bg-red-50 border-l-4 border-red-600' : '' }}">
-                            <i class="fas fa-sitemap mr-3 w-4"></i>Organizational Chart
+                            Organizational Chart
                         </a>
                         
                         <!-- Mobile Login Button -->
                         <div class="pt-3 border-t border-gray-200 mt-3">
                             <a href="{{ route('login') }}" class="block bg-red-700 hover:bg-red-800 text-white px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 text-center">
-                                <i class="fas fa-sign-in-alt mr-2"></i>Login
+                                Login
                             </a>
                         </div>
                     </div>

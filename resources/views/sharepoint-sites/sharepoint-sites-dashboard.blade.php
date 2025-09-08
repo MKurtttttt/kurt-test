@@ -314,13 +314,13 @@
         // Clear previous results
         searchResultsContent.innerHTML = '';
 
-        // Search through all links
-        const allLinks = document.querySelectorAll('a[href*="sharepoint"], a[href*="onedrive"]');
+        // Search through all links (exclude admin dropdown)
+        const allLinks = document.querySelectorAll('.tab-content a[href*="sharepoint"], .tab-content a[href*="onedrive"], .tab-content a[target="_blank"]');
         let hasResults = false;
 
         allLinks.forEach(link => {
             const linkText = link.textContent.toLowerCase();
-            const linkTitle = (link.getAttribute('title') || '').toLowerCase();
+            // Removed linkTitle from search to exclude descriptions
             
             // Get department information by traversing up the DOM properly
             let departmentOriginal = '';
@@ -353,7 +353,7 @@
                 office = officeOriginal.toLowerCase();
             }
 
-            if (linkText.includes(searchTerm) || linkTitle.includes(searchTerm) || 
+            if (linkText.includes(searchTerm) || 
                 department.includes(searchTerm) || office.includes(searchTerm)) {
                 
                 hasResults = true;

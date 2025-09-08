@@ -20,10 +20,10 @@ function highlightText($text, $search) {
         @forelse($kpis as $kpi)
             <div class="bg-white rounded-xl shadow-lg p-6 flex flex-row items-center justify-between hover:shadow-xl transition border border-red-100 cursor-pointer mb-6" onclick="window.location='{{ route('kpis.show', $kpi->measure_code) }}'">
                 <div class="flex-1 min-w-0">
-                    <h2 class="text-xl font-bold text-red-700 mb-1 truncate">
+                    <h2 class="text-xl font-bold text-red-700 mb-1 line-clamp-2 overflow-hidden">
                         <a href="{{ route('kpis.show', $kpi->measure_code) }}" class="hover:underline">{!! highlightText($kpi->measure_name, $search ?? '') !!}</a>
                     </h2>
-                    <p class="text-gray-600 text-sm mb-2 truncate">{!! highlightText($kpi->description, $search ?? '') !!}</p>
+                    <p class="text-gray-600 text-sm mb-2 line-clamp-2 overflow-hidden">{!! highlightText($kpi->description, $search ?? '') !!}</p>
                     <div class="flex flex-wrap gap-2 mb-2">
                         <span class="bg-red-50 text-red-700 px-2 py-1 rounded text-xs font-semibold">{!! highlightText($kpi->objective, $search ?? '') !!}</span>
                         <span class="bg-red-100 text-gray-700 px-2 py-1 rounded text-xs font-semibold">{!! highlightText($kpi->strategic_theme, $search ?? '') !!}</span>
@@ -33,11 +33,11 @@ function highlightText($text, $search) {
                 </div>
                 @if(Auth::user()->role === 'SuperAdmin')
                     <div class="flex flex-col gap-2 items-end ml-6">
-                        <a href="{{ route('kpis.edit', $kpi->measure_code) }}" class="bg-red-700 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow transition w-16 text-center" onclick="event.stopPropagation();">Edit</a>
+                        <a href="{{ route('kpis.edit', $kpi->measure_code) }}" class="bg-red-700 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow transition w-20 text-center" onclick="event.stopPropagation();">Edit</a>
                         <form action="{{ route('kpis.destroy', $kpi->measure_code) }}" method="POST" onclick="event.stopPropagation();">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg text-xs font-semibold shadow transition w-16" onclick="return confirm('Are you sure you want to delete this KPI? This action cannot be undone.');">Delete</button>
+                            <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg text-xs font-semibold shadow transition w-20" onclick="return confirm('Are you sure you want to delete this KPI? This action cannot be undone.');">Delete</button>
                         </form>
                     </div>
                 @endif
@@ -76,7 +76,7 @@ function highlightText($text, $search) {
         <!-- Search Form -->
         <div class="relative mb-6 sticky top-0 z-20 bg-white" x-data="{ searchTerm: '', sortBy: 'id' }">
             <div class="flex gap-4 items-center">
-                <div class="flex-1 relative">
+                <div class="flex-1 relative relative h-12 flex items-center">
                     <input
                         type="text"
                         name="search"
@@ -215,7 +215,7 @@ function highlightText($text, $search) {
                          }"
                          @click="window.location = `{{ route('kpis.show', '') }}/${kpi.measure_code}`">
                         <div class="flex-1 min-w-0">
-                            <h2 class="text-xl font-bold mb-1 truncate"
+                            <h2 class="text-xl font-bold mb-1 line-clamp-2 overflow-hidden"
                                 :class="{
                                     'text-red-700': activeTab === 'all',
                                     'text-blue-700': activeTab === 'departmental',
@@ -225,7 +225,7 @@ function highlightText($text, $search) {
                                 <a :href="`{{ route('kpis.show', '') }}/${kpi.measure_code}`" class="hover:underline" 
                                    x-html="highlightText(kpi.measure_name, searchTerm)"></a>
                             </h2>
-                            <p class="text-gray-600 text-sm mb-2 truncate" x-text="kpi.description || ''"></p>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-2 overflow-hidden" x-text="kpi.description || ''"></p>
                             <div class="flex flex-wrap gap-2 mb-2">
                                 <span class="px-2 py-1 rounded text-xs font-semibold"
                                       :class="{
@@ -266,7 +266,7 @@ function highlightText($text, $search) {
                         </div>
                         @if(Auth::user()->role === 'SuperAdmin')
                             <div class="flex flex-col gap-2 items-end ml-6">
-                                <a :href="`/kpis/${kpi.measure_code}/edit`" class="px-4 py-2 rounded-lg text-xs font-semibold shadow transition w-16 text-center text-white"
+                                <a :href="`/kpis/${kpi.measure_code}/edit`" class="px-4 py-2 rounded-lg text-xs font-semibold shadow transition w-20 text-center text-white"
                                    :class="{
                                        'bg-red-700 hover:bg-red-600': activeTab === 'all',
                                        'bg-blue-700 hover:bg-blue-600': activeTab === 'departmental',
@@ -277,7 +277,7 @@ function highlightText($text, $search) {
                                 <form :action="`{{ route('kpis.destroy', '') }}/${kpi.measure_code}`" method="POST" @click.stop>
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="px-4 py-2 rounded-lg text-xs font-semibold shadow transition w-16"
+                                    <button type="submit" class="px-4 py-2 rounded-lg text-xs font-semibold shadow transition w-20"
                                             :class="{
                                                 'bg-red-100 hover:bg-red-200 text-red-700': activeTab === 'all',
                                                 'bg-blue-100 hover:bg-blue-200 text-blue-700': activeTab === 'departmental',

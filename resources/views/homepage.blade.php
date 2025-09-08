@@ -4,15 +4,13 @@
 
 @section('content')
     <!-- Image Banner -->
-    <div class="relative bg-gray-100 overflow-hidden" style="z-index: 10; position: relative;">
-        <img src="{{ asset('images/hau-bg.png') }}" alt="HAU Campus Banner" 
-             class="w-full h-64 md:h-80 lg:h-96 object-cover" style="display: block;">
-        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-            <div class="text-center text-white">
-                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">
+    <div class="relative" style="background-image: url('{{ asset('images/hau-bg.png') }}'); background-size: cover; background-position: center; height: 16rem; min-height: 256px; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center;">
+            <div style="text-align: center; color: white;">
+                <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem; color: white;">
                     Office of Institutional Effectiveness
                 </h1>
-                <p class="text-lg md:text-xl opacity-90">
+                <p style="font-size: 1.25rem; opacity: 0.9; color: white;">
                     Institutional Database Management Office
                 </p>
             </div>
