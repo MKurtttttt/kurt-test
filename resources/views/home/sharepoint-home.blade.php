@@ -292,11 +292,15 @@
         // Clear previous results
         searchResultsContent.innerHTML = '';
 
-        // Search through all links
-        const allLinks = document.querySelectorAll('a[href*="sharepoint"], a[href*="onedrive"]');
+        // Search through all links inside the tab content areas (not just those with sharepoint/onedrive in the URL)
+        // This finds links the user actually sees in the lists and avoids accidentally matching unrelated site links.
+        const allLinks = document.querySelectorAll('.tab-content a[href]');
         let hasResults = false;
 
         allLinks.forEach(link => {
+            // Skip links without a usable href (javascript:void, mailto, anchor-only)
+            const href = link.getAttribute('href') || '';
+            if (!href || href.startsWith('javascript:') || href.startsWith('#') || href.startsWith('mailto:')) return;
             const linkText = link.textContent.toLowerCase();
             const linkTitle = (link.getAttribute('title') || '').toLowerCase();
             
@@ -381,12 +385,13 @@
         
         parts.forEach((part, index) => {
             if (index % 2 === 1) {
-                // This is a matched part, create highlighted span
+                // This is a matched part, create highlighted span (pale maroon to contrast with HAU gold)
                 const span = document.createElement('span');
-                span.className = 'bg-yellow-200 text-gray-900 px-1 rounded';
-                span.style.backgroundColor = '#fef3c7';
-                span.style.color = '#111827';
-                span.style.padding = '0.25rem';
+                span.className = 'search-highlight px-1 rounded';
+                // stronger maroon highlight with white text for higher contrast
+                span.style.backgroundColor = '#8B1538'; /* darker maroon */
+                span.style.color = '#ffffff';
+                span.style.padding = '0.15rem 0.25rem';
                 span.style.borderRadius = '0.25rem';
                 span.textContent = part;
                 fragment.appendChild(span);
@@ -402,7 +407,6 @@
         return container.innerHTML;
     }
 
-    // Event listeners
     searchInput.addEventListener('input', performSearch);
     
     clearSearchBtn.addEventListener('click', () => {
@@ -484,11 +488,34 @@
 
     /* Search results styling */
     #search-results-content .text-blue-600 {
-        color: #70121D !important;
+        color: #70121D !important; /* maroon */
     }
-    
+
     #search-results-content .text-blue-600:hover {
+        color: #8B1538 !important; /* darker maroon on hover */
+    }
+
+    /* Highlight used for matched search terms */
+    .search-highlight {
+        background-color: #8B1538; /* darker maroon for visibility */
+        color: #ffffff !important;
+        padding: 0.15rem 0.25rem;
+        border-radius: 0.25rem;
+    }
+
+    /* Remove HAU gold background for links inside search results so they appear clean */
+    #search-results-content a[href] {
+        background-color: transparent !important;
+        color: #70121D !important;
+        padding: 0; /* let highlight spans handle padding */
+        border-radius: 0;
+        text-decoration: none; /* remove underline */
+    }
+
+    #search-results-content a[href]:hover {
+        background-color: transparent !important;
         color: #8B1538 !important;
+        text-decoration: none;
     }
 
     /* Custom Scrollbar Styles for Tab Content Areas - No Track Background */
