@@ -16,21 +16,13 @@
     <!-- Tabs -->
     <div class="mb-6">
         <ul class="flex border-b justify-start" id="tabs">
-            <li class="-mb-px mr-2">
-                <button class="tab-btn active" data-tab="tab-iso">
-                    ISO
-                </button>
-            </li>
-            <li class="-mb-px mr-2">
-                <button class="tab-btn" data-tab="tab-planning">
-                    Planning and Review
-                </button>
-            </li>
-            <li class="-mb-px mr-2">
-                <button class="tab-btn" data-tab="tab-quality">
-                    Quality Assurance
-                </button>
-            </li>
+            @foreach ($categories as $i => $cat)
+                <li class="-mb-px mr-2">
+                    <button class="tab-btn {{ $i === 0 ? 'active' : '' }}" data-tab="tab-{{ Str::slug($cat, '-') }}">
+                        {{ $cat }}
+                    </button>
+                </li>
+            @endforeach
         </ul>
     </div>
 
@@ -53,24 +45,34 @@
                     </div>
                 </div>
 
-                <!-- ISO Tab -->
-                <div id="tab-iso" class="tab-content" style="border: 2px solid #70121D; border-radius: 0.75rem; padding: 1rem;">
-                    <div class="w-full flex flex-col gap-8">
-                        <ul id="departments-list" class="space-y-4">
-                            @foreach ($isoLinks as $department => $deptLinks)
-                                <li>
-                                    <button type="button" class="department-btn w-full text-left font-bold px-4 py-2 rounded transition">
-                                        {{ $department ?? 'Uncategorized Department' }}
-                                    </button>
-                                    @php $offices = $deptLinks->groupBy('office'); @endphp
-                                    <ul class="ml-6 mt-2 hidden office-list">
-                                        @foreach ($offices as $office => $officeLinks)
-                                            <li>
-                                                @if ($office)
-                                                    <button type="button" class="office-btn w-full text-left font-semibold px-3 py-1 rounded">
-                                                        {{ $office }}
-                                                    </button>
-                                                    <ul class="ml-6 mt-1 hidden file-list">
+                @foreach ($categories as $i => $cat)
+                    <div id="tab-{{ Str::slug($cat, '-') }}" class="tab-content {{ $i === 0 ? '' : 'hidden' }}" style="border: 2px solid #70121D; border-radius: 0.75rem; padding: 1rem;">
+                        <div class="w-full flex flex-col gap-8">
+                            <ul class="space-y-4">
+                                @foreach (($linksByCategory[$cat] ?? []) as $department => $deptLinks)
+                                    <li>
+                                        <button type="button" class="department-btn w-full text-left font-bold px-4 py-2 rounded transition">
+                                            {{ $department ?? 'Uncategorized Department' }}
+                                        </button>
+                                        @php $offices = $deptLinks->groupBy('office'); @endphp
+                                        <ul class="ml-6 mt-2 hidden office-list">
+                                            @foreach ($offices as $office => $officeLinks)
+                                                <li>
+                                                    @if ($office)
+                                                        <button type="button" class="office-btn w-full text-left font-semibold px-3 py-1 rounded">
+                                                            {{ $office }}
+                                                        </button>
+                                                        <ul class="ml-6 mt-1 hidden file-list">
+                                                            @foreach ($officeLinks as $link)
+                                                                <li class="mb-2">
+                                                                    <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}" 
+                                                                        class="inline-block px-3 py-1 rounded transition">
+                                                                        {{ $link->label }}
+                                                                    </a>
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    @else
                                                         @foreach ($officeLinks as $link)
                                                             <li class="mb-2">
                                                                 <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}" 
@@ -79,121 +81,16 @@
                                                                 </a>
                                                             </li>
                                                         @endforeach
-                                                    </ul>
-                                                @else
-                                                    @foreach ($officeLinks as $link)
-                                                        <li class="mb-2">
-                                                            <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}" 
-                                                                class="inline-block px-3 py-1 rounded transition">
-                                                                {{ $link->label }}
-                                                            </a>
-                                                        </li>
-                                                    @endforeach
-                                                @endif
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </li>
-                            @endforeach
-                        </ul>
+                                                    @endif
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Planning and Review Tab -->
-                <div id="tab-planning" class="tab-content hidden" style="border: 2px solid #70121D; border-radius: 0.75rem; padding: 1rem;">
-                    <div class="w-full flex flex-col gap-8">
-                        <ul class="space-y-4">
-                            @foreach ($planningLinks as $department => $deptLinks)
-                                <li>
-                                    <button type="button" class="department-btn w-full text-left font-bold px-4 py-2 rounded transition">
-                                        {{ $department ?? 'Uncategorized Department' }}
-                                    </button>
-                                    @php $offices = $deptLinks->groupBy('office'); @endphp
-                                    <ul class="ml-6 mt-2 hidden office-list">
-                                        @foreach ($offices as $office => $officeLinks)
-                                            <li>
-                                                @if ($office)
-                                                    <button type="button" class="office-btn w-full text-left font-semibold px-3 py-1 rounded">
-                                                        {{ $office }}
-                                                    </button>
-                                                    <ul class="ml-6 mt-1 hidden file-list">
-                                                        @foreach ($officeLinks as $link)
-                                                            <li class="mb-2">
-                                                                <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}" 
-                                                                    class="inline-block px-3 py-1 rounded transition"
-                                                                    >
-                                                                    {{ $link->label }}
-                                                                </a>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @else
-                                                    @foreach ($officeLinks as $link)
-                                                        <li class="mb-2">
-                                                            <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}" 
-                                                                class="inline-block px-3 py-1 rounded transition"
-                                                                >
-                                                                {{ $link->label }}
-                                                            </a>
-                                                        </li>
-                                                    @endforeach
-                                                @endif
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Quality Assurance Tab -->
-                <div id="tab-quality" class="tab-content hidden" style="border: 2px solid #70121D; border-radius: 0.75rem; padding: 1rem;">
-                    <div class="w-full flex flex-col gap-8">
-                        <ul class="space-y-4">
-                            @foreach ($qaLinks as $department => $deptLinks)
-                                <li>
-                                    <button type="button" class="department-btn w-full text-left font-bold text-red-900 px-4 py-2 bg-gray-100 rounded hover:bg-gray-200">
-                                        {{ $department ?? 'Uncategorized Department' }}
-                                    </button>
-                                    @php $offices = $deptLinks->groupBy('office'); @endphp
-                                    <ul class="ml-6 mt-2 hidden office-list">
-                                        @foreach ($offices as $office => $officeLinks)
-                                            <li>
-                                                @if ($office)
-                                                    <button type="button" class="office-btn w-full text-left font-semibold px-3 py-1 rounded">
-                                                        {{ $office }}
-                                                    </button>
-                                                    <ul class="ml-6 mt-1 hidden file-list">
-                                                        @foreach ($officeLinks as $link)
-                                                            <li class="mb-2">
-                                                                <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}" 
-                                                                    class="inline-block px-3 py-1 rounded transition"
-                                                                    >
-                                                                    {{ $link->label }}
-                                                                </a>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @else
-                                                    @foreach ($officeLinks as $link)
-                                                        <li class="mb-2">
-                                                            <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}" 
-                                                                class="inline-block px-3 py-1 rounded transition"
-                                                                >
-                                                                {{ $link->label }}
-                                                            </a>
-                                                        </li>
-                                                    @endforeach
-                                                @endif
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
+                @endforeach
 
     <!-- Login Link -->
     <div class="mt-8 text-center">
@@ -438,13 +335,13 @@
         background-color: #e5e5e5 !important;
     }
 
-    /* SharePoint Links with HAU gold */
+    /* SharePoint Links with HAU gold - applies everywhere except search results */
     a[href*="sharepoint"], a[href*="onedrive"] {
         background-color: #ffe066 !important;
         color: #70121D !important;
         transition: all 0.3s ease;
     }
-    
+
     a[href*="sharepoint"]:hover, a[href*="onedrive"]:hover {
         background-color: #ffd700 !important;
         color: #70121D !important;

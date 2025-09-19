@@ -3,6 +3,20 @@
     <div class="min-h-screen bg-gray-50">
         <div class="w-full flex justify-center py-8">
             <div class="w-[95%] flex flex-col bg-white rounded-lg px-8 py-8 shadow-lg">
+                @if(session('success'))
+                    <div id="success-msg-popup" style="position:fixed;top:90px;left:50%;transform:translateX(-50%);z-index:9999;min-width:300px;max-width:90vw;box-shadow:0 2px 12px rgba(0,0,0,0.15);background:#d1fae5;border:2px solid #10b981;color:#065f46;padding:18px 32px;font-size:1.1rem;border-radius:12px;text-align:center;transition:opacity 0.7s;">
+                        <strong>Success!</strong> {{ session('success') }}
+                    </div>
+                    <script>
+                        setTimeout(function() {
+                            var msg = document.getElementById('success-msg-popup');
+                            if (msg) {
+                                msg.style.opacity = '0';
+                                setTimeout(function() { msg.style.display = 'none'; }, 700);
+                            }
+                        }, 3000);
+                    </script>
+                @endif
                 <div class="flex justify-between items-center mb-6">
                     <h1 class="text-2xl font-bold text-red-900">Dashboard</h1>
                     @if(Auth::user()->role === 'SuperAdmin')
@@ -27,21 +41,13 @@
                 <!-- Tabs -->
                 <div class="mb-6">
                     <ul class="flex border-b" id="tabs">
-                        <li class="-mb-px mr-2">
-                            <button class="tab-btn active" data-tab="tab-iso">
-                                ISO
-                            </button>
-                        </li>
-                        <li class="-mb-px mr-2">
-                            <button class="tab-btn" data-tab="tab-planning">
-                                Planning and Review
-                            </button>
-                        </li>
-                        <li class="-mb-px mr-2">
-                            <button class="tab-btn" data-tab="tab-quality">
-                                Quality Assurance
-                            </button>
-                        </li>
+                        @foreach ($category as $i => $cat)
+                            <li class="-mb-px mr-2">
+                                <button class="tab-btn {{ $i === 0 ? 'active' : '' }}" data-tab="tab-{{ Str::slug($cat, '-') }}">
+                                    {{ $cat }}
+                                </button>
+                            </li>
+                        @endforeach
                     </ul>
                 </div>
 
@@ -71,74 +77,36 @@
                     </div>
                 </div>
 
-                <!-- ISO Tab -->
-                <div id="tab-iso" class="tab-content">
-                    <div class="w-full flex flex-col gap-8">
-                        <ul id="departments-list" class="space-y-4">
-                            @foreach ($isoLinks as $department => $deptLinks)
-                                <li>
-                                    <button type="button" class="department-btn w-full text-left font-bold text-red-900 px-4 py-2 bg-gray-100 rounded hover:bg-gray-200">
-                                        {{ $department ?? 'Uncategorized Department' }}
-                                    </button>
-                                    @php $offices = $deptLinks->groupBy('office'); @endphp
-                                    <ul class="ml-6 mt-2 hidden office-list">
-                                        @foreach ($offices as $office => $officeLinks)
-                                            <li>
-                                                @if ($office)
-                                                    <button type="button" class="office-btn w-full text-left font-semibold text-gray-800 px-3 py-1 bg-gray-50 rounded hover:bg-gray-100">
-                                                        {{ $office }}
-                                                    </button>
-                                                    <ul class="ml-6 mt-1 hidden file-list">
-                                                        @foreach ($officeLinks as $link)
-                                                            <li class="mb-2">
-                                                                        <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}"
-                                                                            style="display:inline-block; background-color:#bfdbfe; padding:6px 12px; border-radius:6px; color:#2563eb !important; text-decoration:none; cursor:pointer;"
-                                                                            onmouseover="this.style.backgroundColor='#93c5fd';"
-                                                                            onmouseout="this.style.backgroundColor='#bfdbfe';">
-                                                                            {{ $link->label }}
-                                                                        </a>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @else
-                                                    @foreach ($officeLinks as $link)
-                                                        <li class="mb-2">
-                                                            <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}"
-                                                                style="display:inline-block; background-color:#bfdbfe; padding:6px 12px; border-radius:6px; color:#2563eb !important; text-decoration:none; cursor:pointer;"
-                                                                onmouseover="this.style.backgroundColor='#93c5fd';"
-                                                                onmouseout="this.style.backgroundColor='#bfdbfe';">
-                                                                {{ $link->label }}
-                                                            </a>
-                                                        </li>
-                                                    @endforeach
-                                                @endif
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Planning and Review Tab -->
-                <div id="tab-planning" class="tab-content hidden">
-                    <div class="w-full flex flex-col gap-8">
-                        <ul class="space-y-4">
-                            @foreach ($planningLinks as $department => $deptLinks)
-                                <li>
-                                    <button type="button" class="department-btn w-full text-left font-bold text-red-900 px-4 py-2 bg-gray-100 rounded hover:bg-gray-200">
-                                        {{ $department ?? 'Uncategorized Department' }}
-                                    </button>
-                                    @php $offices = $deptLinks->groupBy('office'); @endphp
-                                    <ul class="ml-6 mt-2 hidden office-list">
-                                        @foreach ($offices as $office => $officeLinks)
-                                            <li>
-                                                @if ($office)
-                                                    <button type="button" class="office-btn w-full text-left font-semibold text-gray-800 px-3 py-1 bg-gray-50 rounded hover:bg-gray-100">
-                                                        {{ $office }}
-                                                    </button>
-                                                    <ul class="ml-6 mt-1 hidden file-list">
+                @foreach ($category as $i => $cat)
+                    <div id="tab-{{ Str::slug($cat, '-') }}" class="tab-content {{ $i === 0 ? '' : 'hidden' }}">
+                        <div class="w-full flex flex-col gap-8">
+                            <ul class="space-y-4">
+                                @foreach (collect($linksByCategory[$cat] ?? [])->sortKeys() as $department => $deptLinks)
+                                    <li>
+                                        <button type="button" class="department-btn w-full text-left font-bold text-red-900 px-4 py-2 bg-gray-100 rounded hover:bg-gray-200">
+                                            {{ $department ?? 'Uncategorized Department' }}
+                                        </button>
+                                        @php $offices = $deptLinks->groupBy('office')->sortKeys(); @endphp
+                                        <ul class="ml-6 mt-2 hidden office-list">
+                                            @foreach ($offices as $office => $officeLinks)
+                                                <li>
+                                                    @if ($office)
+                                                        <button type="button" class="office-btn w-full text-left font-semibold text-gray-800 px-3 py-1 bg-gray-50 rounded hover:bg-gray-100">
+                                                            {{ $office }}
+                                                        </button>
+                                                        <ul class="ml-6 mt-1 hidden file-list">
+                                                            @foreach ($officeLinks as $link)
+                                                                <li class="mb-2">
+                                                                    <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}"
+                                                                        style="display:inline-block; background-color:#bfdbfe; padding:6px 12px; border-radius:6px; color:#2563eb !important; text-decoration:none; cursor:pointer;"
+                                                                        onmouseover="this.style.backgroundColor='#93c5fd';"
+                                                                        onmouseout="this.style.backgroundColor='#bfdbfe';">
+                                                                        {{ $link->label }}
+                                                                    </a>
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    @else
                                                         @foreach ($officeLinks as $link)
                                                             <li class="mb-2">
                                                                 <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}"
@@ -149,77 +117,16 @@
                                                                 </a>
                                                             </li>
                                                         @endforeach
-                                                    </ul>
-                                                @else
-                                                    @foreach ($officeLinks as $link)
-                                                        <li class="mb-2">
-                                                            <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}"
-                                                                style="display:inline-block; background-color:#bfdbfe; padding:6px 12px; border-radius:6px; color:#2563eb !important; text-decoration:none; cursor:pointer;"
-                                                                onmouseover="this.style.backgroundColor='#93c5fd';"
-                                                                onmouseout="this.style.backgroundColor='#bfdbfe';">
-                                                                {{ $link->label }}
-                                                            </a>
-                                                        </li>
-                                                    @endforeach
-                                                @endif
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </li>
-                            @endforeach
-                        </ul>
+                                                    @endif
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Quality Assurance Tab -->
-                <div id="tab-quality" class="tab-content hidden">
-                    <div class="w-full flex flex-col gap-8">
-                        <ul class="space-y-4">
-                            @foreach ($qaLinks as $department => $deptLinks)
-                                <li>
-                                    <button type="button" class="department-btn w-full text-left font-bold text-red-900 px-4 py-2 bg-gray-100 rounded hover:bg-gray-200">
-                                        {{ $department ?? 'Uncategorized Department' }}
-                                    </button>
-                                    @php $offices = $deptLinks->groupBy('office'); @endphp
-                                    <ul class="ml-6 mt-2 hidden office-list">
-                                        @foreach ($offices as $office => $officeLinks)
-                                            <li>
-                                                @if ($office)
-                                                    <button type="button" class="office-btn w-full text-left font-semibold text-gray-800 px-3 py-1 bg-gray-50 rounded hover:bg-gray-100">
-                                                        {{ $office }}
-                                                    </button>
-                                                    <ul class="ml-6 mt-1 hidden file-list">
-                                                        @foreach ($officeLinks as $link)
-                                                            <li class="mb-2">
-                                                                <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}"
-                                                                    style="display:inline-block; background-color:#bfdbfe; padding:6px 12px; border-radius:6px; color:#2563eb !important; text-decoration:none; cursor:pointer;"
-                                                                    onmouseover="this.style.backgroundColor='#93c5fd';"
-                                                                    onmouseout="this.style.backgroundColor='#bfdbfe';">
-                                                                    {{ $link->label }}
-                                                                </a>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @else
-                                                    @foreach ($officeLinks as $link)
-                                                        <li class="mb-2">
-                                                            <a href="{{ $link->url }}" target="_blank" title="{{ $link->description }}"
-                                                                style="display:inline-block; background-color:#bfdbfe; padding:6px 12px; border-radius:6px; color:#2563eb !important; text-decoration:none; cursor:pointer;"
-                                                                onmouseover="this.style.backgroundColor='#93c5fd';"
-                                                                onmouseout="this.style.backgroundColor='#bfdbfe';">
-                                                                {{ $link->label }}
-                                                            </a>
-                                                        </li>
-                                                    @endforeach
-                                                @endif
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
+                @endforeach
 
             </div>
         </div>

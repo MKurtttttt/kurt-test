@@ -57,24 +57,38 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Category</label>
-                        <select name="category" required class="mt-1 block w-full border border-gray-300 rounded p-2">
+                        <select id="category-select-edit" class="rounded-lg w-full">
                             <option value="">Select Category</option>
-                            <option value="ISO" {{ $link->category == 'ISO' ? 'selected' : '' }}>ISO</option>
-                            <option value="Planning and Review" {{ $link->category == 'Planning and Review' ? 'selected' : '' }}>Planning and Review</option>
-                            <option value="Quality Assurance" {{ $link->category == 'Quality Assurance' ? 'selected' : '' }}>Quality Assurance</option>
+                            @if(isset($categories) && is_array($categories))
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat }}" {{ $link->category == $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                                @endforeach
+                            @else
+                                <option value="ISO" {{ $link->category == 'ISO' ? 'selected' : '' }}>ISO</option>
+                                <option value="Planning and Review" {{ $link->category == 'Planning and Review' ? 'selected' : '' }}>Planning and Review</option>
+                                <option value="Quality Assurance" {{ $link->category == 'Quality Assurance' ? 'selected' : '' }}>Quality Assurance</option>
+                            @endif
                         </select>
+                        <input id="category-input-edit" type="text" name="category" value="{{ $link->category }}" class="mt-2 block w-full border border-gray-300 rounded p-2" placeholder="Enter Category">
+                        <small class="text-gray-400">Select an existing category or type a new one.</small>
                     </div>
 
-                    <div>
+                    <div class="flex flex-col">
                         <label class="block text-sm font-medium text-gray-700">Department</label>
-                        <input type="text" name="department" value="{{ $link->department }}" required
-                            class="mt-1 block w-full border border-gray-300 rounded p-2">
+                        <select id="department-select-edit" class="rounded-lg w-full">
+                            <option value="">Select Department</option>
+                        </select>
+                        <input id="department-input-edit" class="rounded-lg w-full mt-2" name="department" type="text" placeholder="Enter Department" value="{{ $link->department }}"/>
+                        <small class="text-gray-400">Select an existing department or type a new one.</small>
                     </div>
 
-                    <div>
+                    <div class="flex flex-col">
                         <label class="block text-sm font-medium text-gray-700">Office</label>
-                        <input type="text" name="office" value="{{ $link->office }}"
-                            class="mt-1 block w-full border border-gray-300 rounded p-2">
+                        <select id="office-select-edit" class="rounded-lg w-full">
+                            <option value="">Select Office</option>
+                        </select>
+                        <input id="office-input-edit" class="rounded-lg w-full mt-2" name="office" type="text" placeholder="Enter Office" value="{{ $link->office }}"/>
+                        <small class="text-gray-400">Select an existing office or type a new one.</small>
                     </div>
                 </div>
 
@@ -99,4 +113,139 @@
 
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get departments by category and offices by department from PHP
+            const departmentsByCategory = @json($departmentsByCategory ?? []);
+            const officesByDepartment = @json($officesByDepartment ?? []);
+
+            // Category dropdown/input sync
+            const categorySelect = document.getElementById('category-select-edit');
+            const categoryInput = document.getElementById('category-input-edit');
+            const departmentSelect = document.getElementById('department-select-edit');
+            const departmentInput = document.getElementById('department-input-edit');
+            const officeSelect = document.getElementById('office-select-edit');
+            const officeInput = document.getElementById('office-input-edit');
+
+            function updateDepartmentDropdown(selectedCategory) {
+                departmentSelect.innerHTML = '<option value="">Select Department</option>';
+                if (departmentsByCategory[selectedCategory]) {
+                    departmentsByCategory[selectedCategory].forEach(function(dept) {
+                        const opt = document.createElement('option');
+                        opt.value = dept;
+                        opt.textContent = dept;
+                        departmentSelect.appendChild(opt);
+                    });
+                }
+                departmentSelect.disabled = false;
+                departmentInput.disabled = false;
+                // Reset office dropdown/input when category changes
+                updateOfficeDropdown('');
+            }
+
+            function updateOfficeDropdown(selectedDepartment) {
+                officeSelect.innerHTML = '<option value="">Select Office</option>';
+                if (officesByDepartment[selectedDepartment]) {
+                    officesByDepartment[selectedDepartment].forEach(function(office) {
+                        const opt = document.createElement('option');
+                        opt.value = office;
+                        opt.textContent = office;
+                        officeSelect.appendChild(opt);
+                    });
+                }
+                officeSelect.disabled = false;
+                officeInput.disabled = false;
+            }
+
+            // Initial population based on current link values
+            if (categoryInput.value) {
+                updateDepartmentDropdown(categoryInput.value);
+                if (departmentInput.value) {
+                    updateOfficeDropdown(departmentInput.value);
+                }
+            } else {
+                departmentSelect.disabled = true;
+                departmentInput.disabled = true;
+                officeSelect.disabled = true;
+                officeInput.disabled = true;
+            }
+
+            // Category dropdown/input sync
+            categorySelect.addEventListener('change', function() {
+                if (this.value) {
+                    categoryInput.value = this.value;
+                    updateDepartmentDropdown(this.value);
+                } else {
+                    categoryInput.value = '';
+                    updateDepartmentDropdown('');
+                }
+            });
+            categoryInput.addEventListener('input', function() {
+                const inputValue = this.value;
+                let found = false;
+                for (let i = 0; i < categorySelect.options.length; i++) {
+                    if (categorySelect.options[i].value === inputValue) {
+                        categorySelect.selectedIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    categorySelect.selectedIndex = 0;
+                }
+                updateDepartmentDropdown(inputValue);
+            });
+
+            // Department dropdown/input sync
+            if (departmentSelect && departmentInput) {
+                departmentSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        departmentInput.value = this.value;
+                        updateOfficeDropdown(this.value);
+                    } else {
+                        departmentInput.value = '';
+                        updateOfficeDropdown('');
+                    }
+                });
+                departmentInput.addEventListener('input', function() {
+                    const inputValue = this.value;
+                    let found = false;
+                    for (let i = 0; i < departmentSelect.options.length; i++) {
+                        if (departmentSelect.options[i].value === inputValue) {
+                            departmentSelect.selectedIndex = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        departmentSelect.selectedIndex = 0;
+                    }
+                    updateOfficeDropdown(inputValue);
+                });
+            }
+
+            // Office dropdown/input sync
+            if (officeSelect && officeInput) {
+                officeSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        officeInput.value = this.value;
+                    }
+                });
+                officeInput.addEventListener('input', function() {
+                    const inputValue = this.value;
+                    let found = false;
+                    for (let i = 0; i < officeSelect.options.length; i++) {
+                        if (officeSelect.options[i].value === inputValue) {
+                            officeSelect.selectedIndex = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        officeSelect.selectedIndex = 0;
+                    }
+                });
+            }
+        });
+    </script>
 </x-app-layout>

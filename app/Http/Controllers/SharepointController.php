@@ -15,10 +15,15 @@ class SharepointController extends Controller
     {
         $allLinks = SharepointLinks::orderBy('id')->get();
 
+        $categories = $allLinks->pluck('category')->unique()->filter(function($v){return !empty($v);})->sort()->values()->toArray();
+        $linksByCategory = [];
+        foreach ($categories as $cat) {
+            $linksByCategory[$cat] = $allLinks->where('category', $cat)->groupBy('department');
+        }
+
         return view('home.sharepoint-home', [
-            'isoLinks'      => $allLinks->where('category', 'ISO')->groupBy('department'),
-            'planningLinks' => $allLinks->where('category', 'Planning and Review')->groupBy('department'),
-            'qaLinks'       => $allLinks->where('category', 'Quality Assurance')->groupBy('department'),
+            'categories' => $categories,
+            'linksByCategory' => $linksByCategory,
         ]);
     }
 
@@ -29,10 +34,18 @@ class SharepointController extends Controller
     {
         $allLinks = SharepointLinks::orderBy('id')->get();
 
+        // Get all unique categories
+        $category = $allLinks->pluck('category')->unique()->filter()->values();
+
+        // Group links by category, then by department
+        $linksByCategory = [];
+        foreach ($category as $cat) {
+            $linksByCategory[$cat] = $allLinks->where('category', $cat)->groupBy('department');
+        }
+
         return view('sharepoint-sites.sharepoint-sites-dashboard', [
-            'isoLinks'      => $allLinks->where('category', 'ISO')->groupBy('department'),
-            'planningLinks' => $allLinks->where('category', 'Planning and Review')->groupBy('department'),
-            'qaLinks'       => $allLinks->where('category', 'Quality Assurance')->groupBy('department'),
+            'category' => $category,
+            'linksByCategory' => $linksByCategory,
         ]);
     }
 
@@ -41,7 +54,32 @@ class SharepointController extends Controller
      */
     public function create()
     {
-        return view('sharepoint-sites.sharepoint-sites-add');
+    $categories = collect(SharepointLinks::pluck('category')->unique()->filter(function($v){return !empty($v);})->values()->toArray())->sort()->values()->toArray();
+
+        // Group departments by category
+        $departmentsByCategory = [];
+        foreach ($categories as $cat) {
+            $departmentsByCategory[$cat] = collect(
+                SharepointLinks::where('category', $cat)
+                    ->pluck('department')->unique()->filter(function($v){return !empty($v);})->values()->toArray()
+            )->sort()->values()->toArray();
+        }
+
+        // Group offices by department
+        $officesByDepartment = [];
+        $allDepartments = collect(SharepointLinks::pluck('department')->unique()->filter(function($v){return !empty($v);})->values()->toArray())->sort()->values()->toArray();
+        foreach ($allDepartments as $dept) {
+            $officesByDepartment[$dept] = collect(
+                SharepointLinks::where('department', $dept)
+                    ->pluck('office')->unique()->filter(function($v){return !empty($v);})->values()->toArray()
+            )->sort()->values()->toArray();
+        }
+
+        return view('sharepoint-sites.sharepoint-sites-add', [
+            'categories' => $categories,
+            'departmentsByCategory' => $departmentsByCategory,
+            'officesByDepartment' => $officesByDepartment,
+        ]);
     }
 
     /**
@@ -53,19 +91,16 @@ class SharepointController extends Controller
             'label'      => 'required|string|max:255',
             'url'        => 'required|url|max:255',
             'description'=> 'nullable|string|max:1000',
-            'category'   => 'required|string|max:100',
-            'department' => 'required|string|max:100',
+            'category'   => 'nullable|string|max:100',
+            'department' => 'nullable|string|max:100',
             'office'     => 'nullable|string|max:100',
         ]);
 
         $validated['created_by'] = Auth::id();
 
-        if (SharepointLinks::create($validated)) {
-            return redirect()->route('sharepoint-sites.dashboard')
-                             ->with('msg', 'New SharePoint link added.');
-        }
+    SharepointLinks::create($validated);
 
-        return back()->withErrors(['error' => 'Failed to add link.']);
+    return redirect()->route('sharepoint-sites.dashboard')->with('success', 'SharePoint link added successfully!');
     }
 
     /**
@@ -83,7 +118,35 @@ class SharepointController extends Controller
     public function edit($id)
     {
         $link = SharepointLinks::findOrFail($id);
-        return view('sharepoint-sites.sharepoint-sites-edit', compact('link'));
+
+        // Get all unique categories
+        $categories = collect(SharepointLinks::pluck('category')->unique()->filter(function($v){return !empty($v);})->values()->toArray())->sort()->values()->toArray();
+
+        // Group departments by category
+        $departmentsByCategory = [];
+        foreach ($categories as $cat) {
+            $departmentsByCategory[$cat] = collect(
+                SharepointLinks::where('category', $cat)
+                    ->pluck('department')->unique()->filter(function($v){return !empty($v);})->values()->toArray()
+            )->sort()->values()->toArray();
+        }
+
+        // Group offices by department
+        $allDepartments = collect(SharepointLinks::pluck('department')->unique()->filter(function($v){return !empty($v);})->values()->toArray())->sort()->values()->toArray();
+        $officesByDepartment = [];
+        foreach ($allDepartments as $dept) {
+            $officesByDepartment[$dept] = collect(
+                SharepointLinks::where('department', $dept)
+                    ->pluck('office')->unique()->filter(function($v){return !empty($v);})->values()->toArray()
+            )->sort()->values()->toArray();
+        }
+
+        return view('sharepoint-sites.sharepoint-sites-edit', [
+            'link' => $link,
+            'categories' => $categories,
+            'departmentsByCategory' => $departmentsByCategory,
+            'officesByDepartment' => $officesByDepartment,
+        ]);
     }
 
     /**
@@ -97,15 +160,15 @@ class SharepointController extends Controller
             'label'      => 'required|string|max:255',
             'url'        => 'required|url|max:255',
             'description'=> 'nullable|string|max:1000',
-            'category'   => 'required|string|max:100',
-            'department' => 'required|string|max:100',
+            'category'   => 'nullable|string|max:100',
+            'department' => 'nullable|string|max:100',
             'office'     => 'nullable|string|max:100',
         ]);
 
         $link->update($validated);
 
-        return redirect()->route('sharepoint-sites.dashboard')
-                         ->with('msg', 'SharePoint link updated successfully.');
+    return redirect()->route('sharepoint-sites.edit-list')
+             ->with('msg', 'SharePoint link updated successfully.');
     }
 
     /**
@@ -116,8 +179,8 @@ class SharepointController extends Controller
         $link = SharepointLinks::findOrFail($id);
         $link->delete();
 
-        return redirect()->route('sharepoint-sites.dashboard')
-                         ->with('msg', 'SharePoint link deleted successfully.');
+    return redirect()->route('sharepoint-sites.edit-list')
+             ->with('msg', 'SharePoint link deleted successfully.');
     }
 
     /**

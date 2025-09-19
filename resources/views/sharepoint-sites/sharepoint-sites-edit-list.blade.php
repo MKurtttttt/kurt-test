@@ -1,6 +1,20 @@
 <x-app-layout>
     <!-- This is where the table of links to choose which one to edit -->
     <div class="p-6">
+        @if(session('msg'))
+            <div id="success-msg-popup" style="position:fixed;top:90px;left:50%;transform:translateX(-50%);z-index:9999;min-width:300px;max-width:90vw;box-shadow:0 2px 12px rgba(0,0,0,0.15);background:#d1fae5;border:2px solid #10b981;color:#065f46;padding:18px 32px;font-size:1.1rem;border-radius:12px;text-align:center;transition:opacity 0.7s;">
+                <strong>Success!</strong> {{ session('msg') }}
+            </div>
+            <script>
+                setTimeout(function() {
+                    var msg = document.getElementById('success-msg-popup');
+                    if (msg) {
+                        msg.style.opacity = '0';
+                        setTimeout(function() { msg.style.display = 'none'; }, 700);
+                    }
+                }, 3000);
+            </script>
+        @endif
         <h1 class="text-2xl font-bold mb-4">Select a Link to Edit</h1>
 
         <!-- Back Button -->
