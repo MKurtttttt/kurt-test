@@ -64,7 +64,7 @@
                 {
                     id: "president",
                     name: "Mr. Leopoldo Jaime N. Valdes",
-                    title: "OIC - President",
+                    title: "President",
                     x: width / 2,
                     y: 80 * scaleFactor,
                     image: "{{ asset('images/profiles/president.jpg') }}"
@@ -79,7 +79,7 @@
                     parent: "president",
                     image: "{{ asset('images/profiles/director.jpg') }}"
                 },
-                // Second level - Department heads (moved down further)
+                // Third level - Department heads (moved down further)
                 {
                     id: "qa",
                     name: "Dr. Alma Theresa D. Manaloto",
@@ -116,11 +116,11 @@
                     parent: "director",
                     image: "{{ asset('images/profiles/document.jpg') }}"
                 },
-                // Third level - Staff (moved down further)
+                // Fourth level - Staff (moved down further)
                 {
                     id: "staff1",
                     name: "Ms. Bianca Ysabel L. Navarro",
-                    title: "Staff, Institutional Planning, Research and Publications Office",
+                    title: "Coordinator, Institutional Planning, Research and Publications Office",
                     x: width * 0.40,
                     y: 500 * scaleFactor + verticalShift,
                     parent: "planning",
