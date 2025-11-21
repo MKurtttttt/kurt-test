@@ -428,15 +428,26 @@
         // Update hidden input
         document.getElementById('documents_json').value = JSON.stringify(documents);
 
-        if (documents.length === 0){
+        if(documents.length === 0){
             emptyRow.style.display = 'table-row';
+            // Remove all rows except empty row
+            Array.from(tbody.children).forEach(row => {
+                if (row.id !== 'empty_row'){
+                    row.remove();
+                }
+            });
             return;
         }
-
         emptyRow.style.display = 'none';
 
-        // Clear and rebuild table
-        tbody.innerHTML = '';
+        // Clear all rows except empty row
+        Array.from(tbody.children).forEach(row => {
+            if (row.id !== 'empty_row'){
+                row.remove();
+            }
+        });
+
+        // Rebuild table
         documents.forEach(doc => {
             const row = document.createElement('tr');
             row.className = "border-t";
@@ -452,10 +463,10 @@
                         ${classLabel}
                     </span>
                 </td>
-                <td class="px-3 py-2">${sourceLabel}</td>
-                <td class="px-3 py-2 text-center">
-                    <button type="button" onclick="removeDocument(${doc.id})" class="text-red-600 hover:text-red-800 text-sm">
-                        Remove
+                <td class="px-2 py-2">${sourceLabel}</td>
+                <td class="px-2 py-2" text-center">
+                    <button type="button" onclick="removeDocument(${doc.id})" class="text-red-600" hover:text-red-800 text-sm">
+                     Remove
                     </button>
                 </td>
             `;
