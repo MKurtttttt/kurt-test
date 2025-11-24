@@ -532,4 +532,13 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('iso.document');
     Route::post('/iso/document/store', [IsoDocumentController::class,'storeDocument'])
         ->name('iso.document.store');
+
+    // the {ticket} here means that Laravel automatically converts to a model instance.
+    Route::get('/iso/document/{ticket}/edit', [IsoDocumentController::class,'editDocument'])
+        ->name('iso.document.edit');
+    Route::put('/iso/document/{ticket}', [IsoDocumentController::class,'updateDocument'])
+        ->name('iso.document.update');
+
+    Route::delete('/iso/document/{ticket}', [isoDocumentController::class,'destroyDocument'])
+        ->name('iso.document.destroy');
 });
