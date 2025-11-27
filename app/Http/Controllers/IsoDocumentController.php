@@ -210,4 +210,24 @@ class IsoDocumentController extends Controller
 
         return view('iso.idc-dashboard', compact('tickets', 'statusFilter', 'search'));
     }
+
+    /**
+     * Update ticket status (IDC action)
+     */
+    public function updateTicketStatus(Request $request, IsoTicket $ticket){
+        // Validate incoming data
+        $validated = $request->validate([
+            'status' => ['required', 'in:submitted_to_idc,with_qmr,approved,on_hold'],
+            'notes' => ['nullable', 'string', 'max:1000']
+        ]);
+
+        // Update the ticket status
+        $ticket->update([
+            'status' => $validated['status']
+        ]);
+        // TODO: Add save notes to comments
+
+        return redirect()->route('iso.idc.dashboard')
+            ->with('msg','Ticket Status updated successfully!');
+    }
 }

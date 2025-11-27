@@ -186,6 +186,7 @@ function getStatusColor($status){
         </div>
     </div>
 </div>
+<!-- View Details modal -->
 <div id="details_modal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
@@ -246,6 +247,46 @@ function getStatusColor($status){
                 <p class="text-gray-800 whitespace-pre-wrap" id="detail_message"></p>
             </div>
         </div>
+    </div>
+</div>
+<!-- Change Status Modal -->
+<div id="status_modal" class="modal-overlay">
+    <div class="modal-content max-w-md">
+        <div class="modal-header">
+            <h2 class="text-xl font-bold text-purple-700">Change Ticket Status</h2>
+            <button id="close_status_modal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <form id="status_form" method="POST" class="modal-body">
+            @csrf
+            @method('PATCH')
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Current Status: <span id="current_status" class="font-bold text-purple-600"></span>
+                </label>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    New Status <span class="text-red-500">*</span>
+                </label>
+                <select name="status" id="new_status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+                    <option value="">Select new status...</option>
+                    <option value="submitted_to_idc">Submitted to IDC</option>
+                    <option value="with_qmr">Send to QMR</option>
+                    <option value="approved">Approved</option>
+                    <option value="on_hold">Put On Hold</option>
+                </select>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" id="cancel_status_btn" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-md font-semibold">
+                    Update Status
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 </x-app-layout>
@@ -452,4 +493,40 @@ function getStatusColor($status){
         };
         return colors[classification] || 'bg-gray-200 text-gray-800';
     }
+
+    // ============================================
+    // CHANGE STATUS MODAL
+    // ============================================
+    const statusModal = document.getElementById('status_modal');
+    const closeStatusBtn = document.getElementById('close_status_modal');
+    const cancelStatusBtn = document.getElementById('cancel_status_btn');
+    const statusForm = document.getElementById('status_form');
+
+    function openStatusModal(ticketId, currentStatus){
+        // Format current status for display
+        const formattedStatus = currentStatus.replace(/_/g, ' ').toUpperCase();
+        document.getElementById('current_status').textContent = formattedStatus;
+
+        // Set form action URL
+        statusForm.action = `/iso/idc/${ticketId}/update-status`;
+
+        // Show modal
+        statusModal.classList.add('active');
+    }
+    // Close Modal
+    closeStatusBtn.addEventListener('click', ()=>{
+        statusModal.classList.remove('active');
+    })
+
+    cancelStatusBtn.addEventListener('click', ()=>{
+        statusModal.classList.remove('active');
+    })
+
+    // Close Modal when clicking outside
+    statusModal.addEventListener('click', (e)=>{
+        if(e.target === statusModal){
+            statusModal.classList.remove('active');
+        }
+    })
+
 </script>

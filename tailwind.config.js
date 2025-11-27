@@ -23,7 +23,7 @@ export default {
         // Font and weight
         'font-bold', 'font-semibold', 'font-medium', 'font-thin',
         // Utility
-        'cursor-pointer', 'hover:shadow-lg', 'hover:shadow-xl', 'hover:bg-red-600', 'hover:bg-red-200', 'hover:bg-blue-600', 'hover:bg-blue-200', 'hover:bg-green-600', 'hover:bg-green-200', 'hover:bg-purple-600', 'hover:bg-purple-200', 'hover:bg-yellow-600','hover:underline', 'transition', 'transition-colors', 'truncate', 'line-clamp-2', 'drop-shadow', 'sticky', 'top-0', 'z-20', 'hover:bg-gray-600',
+        'cursor-pointer', 'hover:shadow-lg', 'hover:shadow-xl', 'hover:bg-red-600', 'hover:bg-red-200', 'hover:bg-blue-600', 'hover:bg-blue-200', 'hover:bg-green-600', 'hover:bg-green-200', 'hover:bg-purple-600', 'hover:bg-purple-200', 'hover:bg-yellow-600','hover:underline', 'transition', 'transition-colors', 'truncate', 'line-clamp-2', 'drop-shadow', 'sticky', 'top-0', 'z-20', 'hover:bg-gray-600', 'hover:bg-gray-50'
     ],
     theme: {
         extend: {
