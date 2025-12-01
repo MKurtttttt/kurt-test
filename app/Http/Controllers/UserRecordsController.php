@@ -567,7 +567,7 @@ class UserRecordsController extends Controller
                 case 'login':
                     $request->validate([
                         'email' => 'required|email|max:255|unique:tbl_login,email,'.$employee->emp_id.',id',
-                        'role'  => 'required|string|in:Employee,SuperAdmin,HR Admin,Dean,ScholarManager',
+                        'role'  => 'required|string|in:Employee,SuperAdmin,HR Admin,Dean,ScholarManager,IDC Admin,IDC Document Handler',
                         // The password is optional. If given, it must be confirmed.
                         'password' => 'nullable|string|min:6|confirmed',
                     ]);
@@ -679,7 +679,7 @@ class UserRecordsController extends Controller
             'email' => 'required|email|unique:tbl_login,email',
             'password' => 'required|string|confirmed',
             'password_confirmation' => 'required|string|same:password',
-            'role' => 'required|string|in:Employee,SuperAdmin,HR Admin,Dean',
+            'role' => 'required|string|in:Employee,SuperAdmin,HR Admin,Dean,IDC Admin, IDC Document Handler',
         ]);
 
         try {
@@ -895,7 +895,7 @@ class UserRecordsController extends Controller
             if (empty($role)) {
                 $rowErrors[] = "Row {$currentRow}, Column I (Role) is required.";
             } elseif (!in_array($role, ['Employee', 'SuperAdmin', 'HR Admin', 'Dean', 'IDC Admin', 'IDC Document Handler'])) {
-                $rowErrors[] = "Row {$currentRow}, Column I (Role) must be either Employee, SuperAdmin, HR Admin, or Dean.";
+                $rowErrors[] = "Row {$currentRow}, Column I (Role) must be either Employee, SuperAdmin, HR Admin, Dean, IDC Admin or IDC Document Handler.";
             }
 
             if (!empty($rowErrors)) {

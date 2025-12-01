@@ -12,6 +12,8 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $table = 'tbl_login';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -21,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'role', //For IDC Admin Filtering
     ];
 
     /**
@@ -41,4 +44,9 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // Relationship to IDC Document Handling Tickets
+    public function tickets(){
+        return $this->hasMany(IsoTicket::class, 'created_by');
+    }
 }

@@ -12,7 +12,21 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+
+// Debug: Remove this
+Route::get('/test-email', function(){
+    try{
+        Mail::raw("Test email from Laravel!", function($message){
+            $message->to('mqmallari@student.hau.edu.ph')
+                ->subject('Test email');
+        });
+        return 'Email sent successfully! Check your inbox';
+    } catch (\Exception $e){
+        return 'Error: '. $e->getMessage();
+    }
+});
 
 
 Route::post('/reset-password', function (Request $request) {
