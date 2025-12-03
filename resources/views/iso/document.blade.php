@@ -284,6 +284,15 @@ function getStatusColor($status){
                         <option value="">Select...</option>
                     </select>
                 </div>
+                <!-- Custom Source Input (for "Others") -->
+                <div id="custom_source_section" class="form-group mb-2 col-span-2" style="display: none;">
+                    <label class="form-label text-sm">Specify Type <span class="text-red-500">*</span></label>
+                    <input type="text"
+                            id="doc_custom_source"
+                            class="form-input"
+                            placeholder="Enter custom source type...">
+                    <small class="text-gray-500">Required when "Others" is selected</small>
+                </div>
 
                 <button type="button" id="add_document_btn" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 mt-2">
                     + Add Document to List
@@ -414,7 +423,7 @@ function getStatusColor($status){
 <!-- EDIT TICKET MODAL -->
 <!-- ============================================ -->
 <div id="edit_modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] m-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] m-4 overflow-y-auto">
         <!-- Modal Header -->
         <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
             <h2 class="text-xl font-bold text-gray-800">Edit Ticket</h2>
@@ -503,14 +512,23 @@ function getStatusColor($status){
                                 </select>
                             </div>
                         </div>
+                        <!-- Specific Type (shown only when Source Type is "EOMS Manual" or "Records Management") -->
                         <div id="edit_specific_type_section" style="display: none;" class="mb-3">
                             <label class="block text-xs text-gray-600 mb-1">Specific Type</label>
                             <select id="edit_doc_specific_type" class="w-full px-2 py-1 border rounded text-sm">
                                 <option value="">Select...</option>
                             </select>
                         </div>
+                        <!-- Custom Source input for Edit modal -->
+                        <div id="edit_custom_source_section" style="display: none;" class="col-span-2 mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">Specify Source Type <span class="text-red-500">*</span></label>
+                            <input type="text"
+                                    id="edit_doc_custom_source"
+                                    class="w-full px-2 py-1 border rounded text-sm"
+                                    placeholder="Enter custom source type...">
+                        </div>
                         <button type="button" id="edit_add_document_btn" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
-                            Add Document
+                            Add Document to List
                         </button>
                     </div>
 
@@ -705,12 +723,17 @@ function getStatusColor($status){
         ]
     };
 
+    // Add reference to custom source section at the top with the other references
+    const customSourceSection = document.getElementById('custom_source_section');
+    const customSourceInput = document.getElementById('doc_custom_source');
+
     // Show/hide specific type dropdown
     docSource.addEventListener('change', () => {
         const source = docSource.value;
 
         if (source === 'eoms' || source === 'records'){
             specificTypeSection.style.display = 'block';
+            customSourceSection.style.display = 'none';
             specificTypeSelect.innerHTML = `<option value="">Select... </option>`;
 
             const options = sourceTypeOptions[source];
@@ -720,9 +743,16 @@ function getStatusColor($status){
                 option.textContent = opt.label;
                 specificTypeSelect.appendChild(option);
             });
+        } else if (source === 'others'){
+            specificTypeSection.style.display = 'none';
+            customSourceSection.style.display = 'block';
+            specificTypeSelect.value = '';
+            customSourceInput.value = '';
         } else {
             specificTypeSection.style.display = 'none';
+            customSourceSection.style.display = 'none';
             specificTypeSelect.value = '';
+            customSourceInput.value = '';
         }
     });
 
@@ -733,8 +763,9 @@ function getStatusColor($status){
         const classification = document.getElementById('doc_classification').value;
         const source = document.getElementById('doc_source').value;
         const specificType = document.getElementById('doc_specific_type').value;
+        const customSource = document.getElementById('doc_custom_source').value.trim();
 
-        if (!validationCheckForm(code, title, classification, source, specificType)) {
+        if (!validationCheckForm(code, title, classification, source, specificType, customSource)) {
             return;
         }
 
@@ -744,7 +775,7 @@ function getStatusColor($status){
             title,
             classification,
             source,
-            specificType: specificType || null,
+            specificType: source === 'others' ? customSource : (specificType || null),
             id: Date.now() //Give a unique ID for removal
         };
         documents.push(doc);
@@ -844,7 +875,10 @@ function getStatusColor($status){
         document.getElementById('doc_classification').value = '';
         document.getElementById('doc_source').value = '';
         document.getElementById('doc_specific_type').value = '';
+        document.getElementById('doc_custom_source').value = '';
+
         specificTypeSection.style.display = 'none';
+        customSourceSection.style.display = 'none';
     }
 
     //Form submission Validation
@@ -915,7 +949,7 @@ function getStatusColor($status){
                 return;
             }
             
-            // // Parse the documents JSON string into an array
+            // // Parse the documents JSON string into an array TODO: REMOVE THIS WHEN SENDING EMAIL
             // const documents = JSON.parse(documentsJson);
             
             // Fill the modal with the data
@@ -988,7 +1022,9 @@ function getStatusColor($status){
     const cancelEditBtn = document.getElementById('cancel_edit_btn');
     const editDocSource = document.getElementById('edit_doc_source');
     const editSpecificTypeSection = document.getElementById('edit_specific_type_section');
+    const editCustomSourceSection = document.getElementById('edit_custom_source_section');
     const editSpecificTypeSelect = document.getElementById('edit_doc_specific_type');
+    const editCustomSourceInput = document.getElementById('edit_doc_custom_source');
 
     // Close edit modal
     closeEditBtn.addEventListener('click', ()=> {
@@ -1019,32 +1055,41 @@ function getStatusColor($status){
     editDocSource.addEventListener('change', () => {
         const source = editDocSource.value;
 
-        if(source === 'eoms' || source === 'records'){
-            editSpecificTypeSection.style.display = 'block';
-            editSpecificTypeSelect.innerHTML = `<option value="">Select...</option>`;
+        // Always reset custom source input value on change
+        editCustomSourceInput.value = '';
+        editSpecificTypeSelect.innerHTML = '<option value="">Select...</option>';
 
+        if (source === 'eoms' || source === 'records') {
+            editSpecificTypeSection.style.display = 'block';
+            editCustomSourceSection.style.display = 'none';
             const options = sourceTypeOptions[source];
-            options.forEach(opt => {
-                const option = document.createElement('option');
-                option.value = opt.value;
-                option.textContent = opt.label;
-                editSpecificTypeSelect.appendChild(option);
-            });
+            if (Array.isArray(options)) {
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    editSpecificTypeSelect.appendChild(option);
+                });
+            }
+        } else if (source === 'others') {
+            editSpecificTypeSection.style.display = 'none';
+            editCustomSourceSection.style.display = 'block';
+            editSpecificTypeSelect.value = '';
         } else {
             editSpecificTypeSection.style.display = 'none';
+            editCustomSourceSection.style.display = 'none';
             editSpecificTypeSelect.value = '';
         }
     });
-
-    // Add document to Edit List
     document.getElementById('edit_add_document_btn').addEventListener('click', () => {
         const code = document.getElementById('edit_doc_code').value.trim();
         const title =document.getElementById('edit_doc_title').value.trim();
         const classification = document.getElementById('edit_doc_classification').value;
         const source = document.getElementById('edit_doc_source').value;
         const specificType = document.getElementById('edit_doc_specific_type').value;
+        const customSource = document.getElementById('edit_doc_custom_source').value.trim();
 
-        if (!validationCheckForm(code, title, classification, source, specificType)) {
+        if (!validationCheckForm(code, title, classification, source, specificType, customSource)) {
             return;
         }
 
@@ -1055,7 +1100,7 @@ function getStatusColor($status){
             title,
             classification,
             source,
-            specificType: specificType || null,
+            specificType: source === 'others' ? customSource : (specificType || null),
             id: Date.now() + Math.random()
         };
 
@@ -1176,7 +1221,9 @@ function getStatusColor($status){
         document.getElementById('edit_doc_classification').value = '';
         document.getElementById('edit_doc_source').value = '';
         document.getElementById('edit_doc_specific_type').value = '';
+        document.getElementById('edit_doc_custom_source').value = '';
         editSpecificTypeSection.style.display = 'none';
+        editCustomSourceSection.style.display = 'none';
     }
 
     // Reset Entire edit form
@@ -1235,14 +1282,20 @@ function getStatusColor($status){
     }
 
     // Validation function - both on edit and creating ticket
-    function validationCheckForm(code, title, classification, source, specificType){
+    function validationCheckForm(code, title, classification, source, specificType, customSource){
         // Validation/Make sure the user has an input, no blank answers
         if (!code || !title || !classification || !source){
             alert('Please fill in all Document details (Code, Title, Classification, and Source).');
             return false;
         }
+        // Make sure EOMS/Records has a specific type
         if((source === 'eoms' || source === 'records') && !specificType){
             alert('Please select a specific type');
+            return false;
+        }
+        // Make sure Others has input
+        if((source === 'others' && !customSource)){
+            alert('Please specify the type of file')
             return false;
         }
         return true;

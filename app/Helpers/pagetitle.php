@@ -295,7 +295,10 @@ class pagetitle
             // ISO Document Management
             case 'iso.document':
                 $curr_page = 'ISO Document Management';
-
+                break;
+            case 'iso.idc.dashboard':
+                $curr_page = 'ISO Admin Document Management';
+                break;
 
         
         }

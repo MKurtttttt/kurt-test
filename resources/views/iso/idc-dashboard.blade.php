@@ -37,7 +37,7 @@ function getStatusColor($status){
             <div class="w-[95%] px-4 flex my-4 items-center">
                 <img src="{{ asset('images/logos/school/soc_logo.png') }}"class="w-[100px] h-[100px] mr-2"/>
                 <div class="w-full flex flex-col justify-center">
-                    <h1 class="text-[1.5rem] font-bold leading-tight text-purple-700">IDC Management Dashboard</h1>
+                    <h1 class="text-[1.5rem] font-bold leading-tight text-purple-700">IDC Admin Management Dashboard</h1>
                     <span class="text-gray-500 text-sm">Institutional Document Controller - Ticket Management</span>
                 </div>
                 <!-- TODO: Remove this in the future (Just for debugging purposes) -->
