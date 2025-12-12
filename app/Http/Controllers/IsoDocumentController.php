@@ -40,7 +40,7 @@ class IsoDocumentController extends Controller
         $this->searchFilter($query, $search);
 
         // Execute the query with document count and ordering
-        $tickets = $query->with('documents')
+        $tickets = $query->with('documents', 'creator.user')
             ->withCount('documents')
             ->orderBy('created_at','desc')
             ->get();
@@ -212,7 +212,7 @@ class IsoDocumentController extends Controller
         ], $statusCounts);
 
         // Start building the query - IDC should see all the tickets
-        $query = IsoTicket::with(['documents', 'creator']);
+        $query = IsoTicket::with(['documents', 'creator.user']);
 
         // Build query
         if ($statusFilter !== 'all'){

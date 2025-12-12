@@ -231,7 +231,7 @@
                  <a href="{{ route('iso.document') }}" class="{{ request()->routeIs('iso*') ? 'font-semibold' : '' }}">
                     <div class="nav-link">
                         
-                            <img src="{{ asset('images/icons/portal_nav/iso.svg') }}" />
+                            <img src="{{ asset('images/icons/portal_nav/iso.png') }}" />
                     
                      
                             <h3>Iso Document Handling</h3>

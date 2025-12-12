@@ -116,6 +116,21 @@
                     </div>
                 </a> 
                 @endif
+
+                <!-- TODO: fix the if statements here to fit on the role available for the ISO Document Handlers and Admin -->
+                @if(Auth::user()->role !== 'Employee')
+                <!-- A LINK NAVIGATION  -->
+                 <a href="{{ route('iso.document') }}" class="{{ request()->routeIs('iso*') ? 'font-semibold' : '' }}">
+                    <div class="nav-link">
+                        
+                            <img src="{{ asset('images/icons/portal_nav/iso.png') }}" />
+                    
+                     
+                            <h3>Iso Document Handling</h3>
+                     
+                    </div>
+                </a> 
+                @endif 
     </div> 
 
     <div class="navigation-links">

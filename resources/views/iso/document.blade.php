@@ -1,4 +1,5 @@
 <x-app-layout>
+    <!-- ISO DOCUMENT HANDLER VIEW -->
 @php
 function getStatusColor($status){
     $colors = [
@@ -40,7 +41,7 @@ function getStatusColor($status){
             </div>
             <!-- DEBUG PURPOSES TODO: REMOVE IN THE FUTURE -->
             <a href="{{ route('iso.idc.dashboard') }}" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold">
-                Switch to IDC view
+                Switch to Admin view
             </a>
         </div>
         <hr class="w-full opacity-100">

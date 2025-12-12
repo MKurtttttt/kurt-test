@@ -11,10 +11,12 @@ class Employee_Login extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    public function user(){  
-        return $this-> belongsTo(Employee::class, 'id' ,'emp_id'); 
+    public function user(){
+        return $this->belongsTo(Employee::class, 'id', 'emp_id');
     }
-
+    public function getNameAttribute(){
+        return $this->user ? $this->user->full_name : 'Unknown';
+    }
 
     protected $table = 'tbl_login'; 
 

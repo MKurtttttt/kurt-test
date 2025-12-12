@@ -45,16 +45,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    // public function getNameAttribute(){
-    //     // Combine first, middle, last name
-    //     $fullName = $this->emp_fname;
-    //     if($this->emp_mname){
-    //         $fullName .= ' '.$this->emp_mname;
-    //     }
-
-    //     $fullName .= ' '.$this->emp_lname;
-    //     return $fullName;
-    // }
+    public function user(){
+        return $this->belongsTo(Employee::class, 'id', 'emp_id');
+    }
+    public function getNameAttribute(){
+        return $this->user ? $this->user->full_name : 'Unknown';
+    }
 
     // Relationship to IDC Document Handling Tickets
     public function tickets(){

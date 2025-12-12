@@ -1,4 +1,5 @@
 <x-app-layout>
+    <!-- IDC ADMIN MANAGEMENT DASHBOARD-->
 @php
 function getStatusColor($status){
     $colors = [
