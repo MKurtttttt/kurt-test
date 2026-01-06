@@ -222,7 +222,9 @@ function getStatusColor($status){
 </div>
 </div>
 
-<!-- Modal for creating new Ticket -->
+<!-- ============================================ -->
+<!-- CREATE TICKET MODAL -->
+<!-- ============================================ -->
 <div id="ticket_modal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
@@ -232,39 +234,39 @@ function getStatusColor($status){
         
         <form id="ticket_form" action="{{ route('iso.document.store') }}" method="POST" class="modal-body">
             @csrf
-            <!-- Originating Section -->
-            <div class="form-group">
-                <label class="form-label">Originating Section (Department) <span class="text-red-500">*</span></label>
-                <input type="text" name="originating_section" class="form-input" placeholder="e.g., Human Resources, IT Department" required>
-            </div>
+            <!-- New Originating Section (Cluster)-->
+                    <div class="form-group mb-2">
+                        <label class="form-label text-sm">Originating Section (Cluster/Department) <span class="text-red-500">*</span></label>
+                        <select id="ticket_cluster" class="form-input">
+                            <option value="">Select Cluster/Department...</option>
+                            <option value="aac">Academic Affairs Cluster (AAC)</option>
+                            <option value="aie">Institute for Academic Innovation & Entrepreneurship (AIE)</option>
+                            <option value="cfs">Institute for Christian Formation & Social Integration (CFS)</option>
+                            <option value="csd">Campus Services & Development Office (CSD)</option>
+                            <option value="eac">External Affairs Cluster (EAC)</option>
+                            <option value="frm">Finance & Resources Management Services (FRM)</option>
+                            <option value="hro">Human Resource Management Office (HRO)</option>
+                            <option value="oie">Office of Institutional Effectiveness (OIE)</option>
+                            <option value="oop">Office of the President (OOP)</option>
+                            <option value="rss">Records Services & Affairs (RSS)</option>
+                            <option value="ssa">Student Services & Affairs (SSA)</option>
+                        </select>
+                    </div>
+                    <!-- New Originating Section (Office) (Conditional) -->
+                    <!-- Based from the doc_cluster id -->
+                    <div class="form-group">
+                        <label class="form-label text-sm">Specific Office<span class="text-red-500">*</span></label>
+                        <select id="ticket_office" name="originating_section" class="form-input" required disabled>
+                            <option value="">Select a Department first...</option>
+                        </select>
+                    </div>
 
             <hr class="my-4">
 
             <!-- Add Document Section -->
             <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                <h3 class="font-semibold mb-3 text-gray-700">Add Documents to Ticket.</h3>
+                <h3 class="font-semibold mb-3 text-gray-700">Add Documents to Ticket</h3>
                 <div class="grid grid-cols-2 gap-3">
-                    <!-- Document Code -->
-                    <div class="form-group mb-2">
-                        <label class="form-label text-sm">Document Code</label>
-                        <input type="text" id="doc_code" class="form-input" placeholder="Enter Document Code">
-                    </div>
-                    <!-- Document Title -->
-                    <div class="form-group mb-2">
-                        <label class="form-label text-sm">Document Title</label>
-                        <input type="text" id="doc_title" class="form-input" placeholder="Enter Document Title">
-                    </div>
-                    <!-- Classification -->
-                    <div class="form-group mb-2">
-                        <label class="form-label text-sm">Classification</label>
-                        <select id="doc_classification" class="form-input">
-                            <option value="">Select...</option>
-                            <option value="revision">For revision</option>
-                            <option value="addition">Addition</option>
-                            <option value="deletion">Deletion</option>
-                        </select>
-                    </div>
-
                     <!-- Source Document Type -->
                     <div class="form-group mb-2">
                         <label class="form-label text-sm">Source Document</label>
@@ -276,6 +278,26 @@ function getStatusColor($status){
                             <option value="records">Records Management Manual</option>
                             <option value="others">Others</option>
                         </select>
+                    </div>
+                    <!-- Classification / Nautre of Document Modification -->
+                    <div class="form-group mb-2">
+                        <label class="form-label text-sm">Nature of Document Modification</label>
+                        <select id="doc_classification" class="form-input">
+                            <option value="">Select...</option>
+                            <option value="revision">For revision</option>
+                            <option value="addition">Addition</option>
+                            <option value="deletion">Deletion</option>
+                        </select>
+                    </div>
+                    <!-- Document Code -->
+                    <div class="form-group mb-2">
+                        <label class="form-label text-sm">Document Code</label>
+                        <input type="text" id="doc_code" class="form-input" placeholder="Enter Document Code">
+                    </div>
+                    <!-- Document Title -->
+                    <div class="form-group mb-2">
+                        <label class="form-label text-sm">Document Title</label>
+                        <input type="text" id="doc_title" class="form-input" placeholder="Enter Document Title">
                     </div>
                 </div>
                 <!-- Specific Type (conditional) -->
@@ -309,7 +331,7 @@ function getStatusColor($status){
                             <tr>
                                 <th class="px-3 py-2 text-left">Code</th>
                                 <th class="px-3 py-2 text-left">Title</th>
-                                <th class="px-3 py-2 text-left">Classification</th>
+                                <th class="px-3 py-2 text-left">Nature of Document Modification</th>
                                 <th class="px-3 py-2 text-left">Source</th>
                                 <th class="px-3 py-2 text-center">Action</th>
                             </tr>
@@ -341,17 +363,19 @@ function getStatusColor($status){
                 <textarea name="message_to_idc" class="form-input" rows="4" placeholder="Write a message to the Institutional Document Controller..." required></textarea>
             </div>
 
-            <!-- Submit Button -->
+            <!-- Create Ticket button -->
             <div class="form-group">
                 <button type="submit" class="w-full bg-green-600 text-white py-3 rounded hover:bg-green-700 font-semibold">
-                    Submit Ticket to IDC
+                    Create Ticket
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal for Viewing Ticket Details -->
+<!-- ============================================ -->
+<!-- VIEW DETAILS TICKET MODAL -->
+<!-- ============================================ -->
 <div id="details_modal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
@@ -400,7 +424,7 @@ function getStatusColor($status){
                             <tr>
                                 <th class="px-3 py-2 text-left">Code</th>
                                 <th class="px-3 py-2 text-left">Title</th>
-                                <th class="px-3 py-2 text-left">Classification</th>
+                                <th class="px-3 py-2 text-left">Nature of Document Modification</th>
                                 <th class="px-3 py-2 text-left">Source</th>
                             </tr>
                         </thead>
@@ -438,7 +462,7 @@ function getStatusColor($status){
                 @method('PUT')
                 
                 <!-- Originating Section -->
-                <div class="mb-4">
+                <!-- <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Originating Section <span class="text-red-500">*</span>
                     </label>
@@ -447,6 +471,39 @@ function getStatusColor($status){
                            name="originating_section"
                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                            required>
+                </div> -->
+                <!-- Originating Section - New Dropdown -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Originating Section <span class="text-red-500">*</span>
+                    </label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Cluster/Department</label>
+                            <select id="edit_ticket_cluster" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                                <option value="">Select Cluster...</option>
+                                <option value="oop">Office of the President (OOP)</option>
+                                <option value="aac">Academic Affairs Cluster (AAC)</option>
+                                <option value="oie">Office of Institutional Effectiveness (OIE)</option>
+                                <option value="cfs">Institute for Christian Formation & Social Integration (CFS)</option>
+                                <option value="hro">Human Resource Management Office (HRO)</option>
+                                <option value="frm">Finance & Resources Management Services (FRM)</option>
+                                <option value="rss">Records Services & Affairs (RSS)</option>
+                                <option value="ssa">Student Services & Affairs (SSA)</option>
+                                <option value="eac">External Affairs Cluster (EAC)</option>
+                                <option value="csd">Campus Services & Development Office (CSD)</option>
+                                <option value="aie">Institute for Academic Innovation & Entrepreneurship (AIE)</option>
+                            </select>
+                        </div>
+
+                        <!-- Office Dropdown -->
+                         <div>
+                            <label class="block text-xs text-gray-600 mb-1">Specific Office</label>
+                            <select id="edit_ticket_office" name="originating_section" class="w-full px-3 py-2 border border-gray-300 rounded-md" required disabled>
+                                <option value="">Select cluster first...</option>
+                            </select>
+                         </div>
+                    </div>
                 </div>
 
                 <!-- SharePoint Link -->
@@ -493,7 +550,7 @@ function getStatusColor($status){
                                 <input type="text" id="edit_doc_title" class="w-full px-2 py-1 border rounded text-sm">
                             </div>
                             <div>
-                                <label class="block text-xs text-gray-600 mb-1">Classification</label>
+                                <label class="block text-xs text-gray-600 mb-1">Nature of Document Modification</label>
                                 <select id="edit_doc_classification" class="w-full px-2 py-1 border rounded text-sm">
                                     <option value="">Select...</option>
                                     <option value="revision">Revision</option>
@@ -540,7 +597,7 @@ function getStatusColor($status){
                                 <tr>
                                     <th class="px-3 py-2 text-left">Code</th>
                                     <th class="px-3 py-2 text-left">Title</th>
-                                    <th class="px-3 py-2 text-left">Class</th>
+                                    <th class="px-3 py-2 text-left">Nature of Document Modification</th>
                                     <th class="px-3 py-2 text-left">Source</th>
                                     <th class="px-3 py-2 text-center">Action</th>
                                 </tr>
@@ -685,7 +742,9 @@ function getStatusColor($status){
 </style>
 
 <script>
-    // Modal Handling - Creation of ticket
+    // ============================================
+    // CREATE TICKET MODAL
+    // ============================================
     const modal = document.getElementById('ticket_modal');
     const createBtn = document.getElementById('create_ticket_btn');
     const closeBtn = document.getElementById('close_modal');
@@ -723,6 +782,122 @@ function getStatusColor($status){
             { value: '4.0', label: '4.0 Definition and Records Series Title'}
         ]
     };
+
+    // Specific Office options
+    const specificOfficeOptions = {
+        oop: [
+            "(OOP) Office of the President",
+            "(OOP-AVI) Aviation Insitute",
+            "(OOP-CKS) Center for Kapampangan Studies",
+            "(OOP-DPO) Data Privacy Office",
+            "(OOP-ITC) Institutional Testing and Evaluation Center",
+            "(OOP-ITS) Information Technology Systems & Services",
+            "(OOP-OIA) Office of International Affairs",
+            "(OOP-TRO) Treasury Office",
+            "(OOP-UCO) University Chaplain Office"
+        ],
+        aac: [
+            '(AAC) Academic Affairs Office',
+            '(AAC-BED) School of Basic Education',
+            '(AAC-CJE) College of Criminal Justice Education & Forensics',
+            '(AAC-CTL) Center for Teaching & Learning',
+            '(AAC-GSR) Graduate Studies & Research',
+            '(AAC-IRB) Institutional Review Board',
+            '(AAC-LIB) Library Department',
+            '(AAC-LMS) Learning Management System',
+            '(AAC-SAS) School of Arts & Sciences',
+            '(AAC-SBA) School of Business & Accountancy',
+            '(AAC-SEA) School of Engineering & Architecture',
+            '(AAC-SED) School of Education',
+            '(AAC-SNA) SChool of Nursing & Allied MEdical Sciences',
+            '(AAC-SOC) School of Computing',
+            '(AAC-STM) School of Hospitality & Tourism Management',
+            '(AAC-URO) University Research Office'
+        ],
+        oie: [
+            '(OIE-DMO) Institutional Database Management Office',
+            '(OIE-IDC) Insitutional Document Controller',
+            '(OIE-IPR) Institutional Research, Planning & Publications Office',
+            '(OIE-QAO) Quality Assurance Office'
+        ],
+        cfs: [
+            '(CFS-CES) Office of the Community Extension Services',
+            '(CFS-CLE) Christian Living Education',
+            '(CFS-CMO) Campus Ministry Office'
+        ],
+        hro: [
+            '(HRO-HRD) Human Resource Development',
+            '(HRO-HRM) Recruitment and Maintenance'
+        ],
+        frm: [
+            '(FRM) Finance and Resource Management Office',
+            '(FRM-ACC) Accounts & Collection',
+            '(FRM-ASE) Ancillary Services',
+            '(FRM-ATO) Accounting',
+            '(FRM-GRT) Grants Accounttant',
+            '(FRM-PAO) Payroll'
+        ],
+        rss: [
+            '(RSS-ADO) Admissions Office'
+        ],
+        ssa: [
+            '(SSA-CPO) Career and Placement Office',
+            '(SSA-MDS) Medical and Dental Services',
+            '(SSA-SAO) Student Affairs',
+            '(SSA-SGO) Scholarships & Grants',
+            '(SSA-UGC) University Guidance Center',
+            '(SSA-USO) University Sports'
+        ],
+        eac: [
+            '(EAC) External Affairs Office',
+            '(EAC-ARO) Alumni Relations Office',
+            '(EAC-CRE) Creative Services',
+            '(EAC-PAM) Performing Arts and Events Management',
+            '(EAC-PRO) Public Relations Office'
+        ],
+        csd: [
+            '(CSD-CSO) Campus Services Office',
+            '(CSD-ECM) Engineering Construction and Maintenance',
+            '(CSD-MCM) Motorpool/Campus Maintenance',
+            '(CSD-PCO) Property Custodianship Office',
+            '(CSD-PUO) Purchasing Office',
+            '(CSD-SEC) Campus Security',
+            '(CSD-VLO) Venues and Logistics Office'
+        ],
+        aie: [
+            '(AIE-ETA) Expanded Tertiary Education, Equivalency & Accreditation',
+            '(AIE-SPL) School of Professional Education and Lifelong Learning',
+            '(AIE-TBI) Technology Business Incubator - KITTO'
+        ]
+    }
+    // Cluster and Office Logic
+    const ticketClusterDropdown = document.getElementById('ticket_cluster');
+    const ticketOfficeDropdown = document.getElementById('ticket_office');
+
+    ticketClusterDropdown.addEventListener('change', ()=> {
+        const selectedCluster = ticketClusterDropdown.value;
+
+        // Reset office dropdown when choosing a department
+        ticketOfficeDropdown.innerHTML = '<option value="">Select Office...</option>';
+        ticketOfficeDropdown.disabled = true;
+
+        // If a cluser is selected, populate the office choices
+        if (selectedCluster && specificOfficeOptions[selectedCluster]){
+            const offices = specificOfficeOptions[selectedCluster];
+
+            offices.forEach(office => {
+                const option = document.createElement('option');
+                option.value = office;
+                option.textContent = office;
+                ticketOfficeDropdown.appendChild(option);
+            });
+
+            ticketOfficeDropdown.disabled = false;
+            if(offices.length === 1){
+                ticketOfficeDropdown.value = offices[0];
+            }
+        }
+    });
 
     // Add reference to custom source section at the top with the other references
     const customSourceSection = document.getElementById('custom_source_section');
@@ -1300,6 +1475,15 @@ function getStatusColor($status){
             return false;
         }
         return true;
+    }
+        // Helper function for finding cluster by office
+    function findClusterByOffice(officeName){
+        for(const [cluster, offices] of Object.entries(specificOfficeOptions)){
+            if(offices.includes(officeName)){
+                return cluster;
+            }
+        }
+        return null;
     }
 
 </script>
