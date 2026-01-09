@@ -248,6 +248,17 @@ function getStatusColor($status){
                         <tr>
                             <th class="px-3 py-2 text-left">Code</th>
                             <th class="px-3 py-2 text-left">Title</th>
+                            <th class="px-3 py-2 text-left">Modification Type</th>
+                            <th class="px-3 py-2 text-left">Source</th>
+                            <th class="px-3 py-2 text-left">Status</th>
+                            <th class="px-3 py-2 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detail_documents_list">
+                        <!-- Documents will be populated here via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
                 </div>
             </div>
 
@@ -373,6 +384,8 @@ function getStatusColor($status){
 </style>
 
 <script>
+    // TODO: Make a helper function js for both idc admin and document handler same functions
+    // import {formatStatusText, getStatusColor} from '../../../js/helpers/helpers'
     // Auto-hide messages after 5 seconds
     setTimeout(() => {
         const msgElement = document.getElementById('msg');
@@ -461,7 +474,7 @@ function getStatusColor($status){
                     <td class="px-3 py-2">${sourceLabel}</td>
 
                     <td class="px-3 py-2">
-                        <span class="inline-block px-2 py-1 text-xs rounded ${getStatusColorJS(status)}">
+                        <span class="inline-block px-2 py-1 text-xs rounded ${getStatusColorJS(doc.status)}">
                             ${formatStatusText(doc.status)}
                         </span>
                     </td>

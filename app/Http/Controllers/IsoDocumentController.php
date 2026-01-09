@@ -296,6 +296,8 @@ class IsoDocumentController extends Controller
         $ticket = $document->ticket;
         $this->recalculateTicketStatus($ticket);
 
+        $ticket->refresh();
+
         return response()->json([
             'success' => true,
             'message' => 'Document status updated',
@@ -322,7 +324,7 @@ class IsoDocumentController extends Controller
             return $doc->status === 'approved';
         });
 
-        if ($allApproved && $documents->every() > 0){
+        if ($allApproved && $documents->count() > 0){
             $ticket->status = 'approved';
             $ticket->save();
             return;

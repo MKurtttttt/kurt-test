@@ -426,6 +426,7 @@ function getStatusColor($status){
                                 <th class="px-3 py-2 text-left">Title</th>
                                 <th class="px-3 py-2 text-left">Nature of Document Modification</th>
                                 <th class="px-3 py-2 text-left">Source</th>
+                                <th class="px-3 py-2 text-left">Status</th>
                             </tr>
                         </thead>
                         <tbody id="detail_documents_list">
@@ -1165,6 +1166,12 @@ function getStatusColor($status){
                         </span>
                     </td>
                     <td class="px-3 py-2">${sourceLabel}</td>
+
+                    <td class="px-3 py-2">
+                        <span class="inline-block px-2 py-1 text-xs rounded ${getStatusColorJS(doc.status)}">
+                            ${formatStatusText(doc.status)}
+                        </span>
+                    </td>
                 `;
                 
                 documentsList.appendChild(row);
@@ -1174,18 +1181,6 @@ function getStatusColor($status){
             detailsModal.classList.add('active');
         }
     });
-
-    // Helper function for status colors in JavaScript
-    function getStatusColorJS(status) {
-        const colors = {
-            'pending': 'bg-yellow-100 text-yellow-800',
-            'submitted_to_idc': 'bg-blue-100 text-blue-800',
-            'with_qmr': 'bg-purple-100 text-purple-800',
-            'approved': 'bg-green-100 text-green-800',
-            'on_hold': 'bg-red-100 text-red-800',
-        };
-        return colors[status] || 'bg-gray-100 text-gray-800';
-    }
 
 // ============================================
 // EDIT TICKET FUNCTIONALITY
@@ -1522,7 +1517,28 @@ function getStatusColor($status){
         }
         return true;
     }
-        // Helper function for finding cluster by office
+    
+    // ============================================
+    // Helper Functions
+    // ============================================
+    // Formatting Status Texts
+    function formatStatusText(status){
+        const text = status.replace(/_/g, ' ');
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+    // Helper function for status colors in JavaScript
+    function getStatusColorJS(status) {
+        const colors = {
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'submitted_to_idc': 'bg-blue-100 text-blue-800',
+            'with_qmr': 'bg-purple-100 text-purple-800',
+            'approved': 'bg-green-100 text-green-800',
+            'on_hold': 'bg-red-100 text-red-800',
+        };
+        return colors[status] || 'bg-gray-100 text-gray-800';
+    }
+
+    // Helper function for finding cluster by office
     function findClusterByOffice(officeName){
         for(const [cluster, offices] of Object.entries(specificOfficeOptions)){
             if(offices.includes(officeName)){
@@ -1531,5 +1547,4 @@ function getStatusColor($status){
         }
         return null;
     }
-
 </script>
