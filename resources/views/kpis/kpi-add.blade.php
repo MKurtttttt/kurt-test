@@ -233,6 +233,7 @@
             </div>
         </div>
     </div>
+    <x-back-top-button />
 </x-app-layout>
 
 <style>

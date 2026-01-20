@@ -26,94 +26,206 @@
             @endif
         </div>
 
-        <!-- Scorecard -->
+        {{-- Scorecard --}}
         <h1 class="text-xl font-bold mb-4">Balanced Scorecard KPI Dictionary for {{ $kpi->measure_code }}</h1>
-        <div class="mb-4">
-            <div class="grid grid-cols-9 border border-gray-300">
-                <!-- Header -->
-                <div class="col-span-9 border border-gray-300 bg-gray-100 text-yellow-600 py-2 text-center font-bold">
-                    HOLY ANGEL UNIVERSITY<br>
-                    BALANCED SCORECARD Performance Measures Information Card
+        
+        <div class="hidden lg:block">
+            <div class="mb-4">
+                <div class="grid grid-cols-9 border border-gray-300">
+                    {{-- Header --}}
+                    <div class="col-span-9 border border-gray-300 bg-gray-100 text-yellow-600 py-2 text-center font-bold">
+                        HOLY ANGEL UNIVERSITY<br>
+                        BALANCED SCORECARD Performance Measures Information Card
+                    </div>
+                    
+                    {{-- Row 1 --}}
+                    <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Perspective</div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Measure Code</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->measure_code }}</div>
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Measure Owner</div>
+                    <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->measure_owner }}</div>
+                    
+                    {{-- Row 2 --}}
+                    <div class="col-span-3 border border-gray-300 p-2 content-center">{{ $kpi->perspective }}</div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Measure Name</div>
+                    <div class="col-span-5 border border-gray-300 p-2 font-bold content-center">{{ $kpi->measure_name }}</div>
+                    
+                    {{-- Row 3 and 4 --}}
+                    <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Strategic Theme</div>
+                    <div class="row-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Description</div>
+                    <div class="col-span-5 row-span-2 border border-gray-300 p-2 content-center">{{ $kpi->description }}</div>
+                    <div class="col-span-3 border border-gray-300 bg-red-900 text-white px-2 py-10 font-semibold content-center">{{ $kpi->strategic_theme }}</div>
+                    
+                    {{-- Row 5 --}}
+                    <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Objective</div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Measure Type</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->measure_type }}</div>
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Lead/Lag</div>
+                    <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->lead_lag }}</div>
+
+                    {{-- Row 6 and 7 --}}
+                    <div class="col-span-3 border border-gray-300 p-2">{{ $kpi->objective }}</div>
+                    <div class="row-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Formula</div>                
+                    <div class="col-span-5 row-span-2 border border-gray-300 p-2 content-center">{{ $kpi->formula }}</div>
+                    <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Objective Owner</div>
+                    
+                    {{-- Row 8--}}
+                    <div class="col-span-3 border border-gray-300 p-2 content-center">{{ $kpi->objective_owner }}</div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Unit Type</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->unit_type }}</div>
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Polarity</div>
+                    <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->polarity }}</div>
+
+                    {{-- Row 9 --}}
+                    <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Objective Intended Results</div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Data Provider</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->data_provider }}</div>
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Data Source</div>
+                    <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->data_source }}</div>
+                    
+                    {{-- Row 10 to 12 --}}
+                    <div class="col-span-3 row-span-3 border border-gray-300 p-2 content-center">{{ $kpi->intended_results }}</div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Collection Frequency</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->collection_frequency }}</div>
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Reporting Frequency</div>
+                    <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->reporting_frequency }}</div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Verified by</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->verified_by }}</div>
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Validated by</div>
+                    <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->validated_by }}</div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Baseline</div>
+                    <div class="col-span-5 border border-gray-300 p-2 text-center">{{ $kpi->baseline }}</div>
+                    
+                    {{-- Row 13 --}}
+                    <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Strategic Initiatives/Action Plans</div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Target</div>
+                    <div class="col-span-5 border border-gray-300 p-2">{{ $kpi->target }}</div>
+                    
+                    {{-- Row 14 to 16 --}}
+                    <div class="col-span-3 row-span-3 border border-gray-300 p-2 content-center">{{ $kpi->initiatives }}</div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Thresholds</div>
+                    <div class="border border-gray-300 bg-red-700 text-white text-center p-2"></div>
+                    <div class="border border-gray-300 text-center p-2">{{ $kpi->threshold_low }}</div>
+                    <div class="border border-gray-300 bg-yellow-400 text-center p-2"></div>
+                    <div class="border border-gray-300 text-center p-2">{{ $kpi->threshold_high }}</div>
+                    <div class="border border-gray-300 bg-green-500 text-center p-2"></div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Target Rationale</div>
+                    <div class="col-span-5 border border-gray-300 p-2 content-center">{{ $kpi->target_rationale }}</div>
+                    <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Comparator</div>
+                    <div class="col-span-5 border border-gray-300 p-2 content-center">{{ $kpi->comparator }}</div>
                 </div>
-                
-                <!-- Row 1 -->
-                <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Perspective</div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Measure Code</div>
-                <div class="border border-gray-300 p-2 content-center">{{ $kpi->measure_code }}</div>
-                <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Measure Owner</div>
-                <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->measure_owner }}</div>
-                
-                <!-- Row 2 -->
-                <div class="col-span-3 border border-gray-300 p-2 content-center">{{ $kpi->perspective }}</div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Measure Name</div>
-                <div class="col-span-5 border border-gray-300 p-2 font-bold content-center">{{ $kpi->measure_name }}</div>
-                
-                <!-- Row 3 and 4 -->
-                <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Strategic Theme</div>
-                <div class="row-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Description</div>
-                <div class="col-span-5 row-span-2 border border-gray-300 p-2 content-center">{{ $kpi->description }}</div>
-                <div class="col-span-3 border border-gray-300 bg-red-900 text-white px-2 py-10 font-semibold content-center">{{ $kpi->strategic_theme }}</div>
-                
-                <!-- Row 5 -->
-                <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Objective</div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Measure Type</div>
-                <div class="border border-gray-300 p-2 content-center">{{ $kpi->measure_type }}</div>
-                <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Lead/Lag</div>
-                <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->lead_lag }}</div>
-
-                <!-- Row 6 and 7 -->
-                <div class="col-span-3 border border-gray-300 p-2">{{ $kpi->objective }}</div>
-                <div class="row-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Formula</div>                
-                <div class="col-span-5 row-span-2 border border-gray-300 p-2 content-center">{{ $kpi->formula }}</div>
-                <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Objective Owner</div>
-                
-                <!-- Row 8-->
-                <div class="col-span-3 border border-gray-300 p-2 content-center">{{ $kpi->objective_owner }}</div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Unit Type</div>
-                <div class="border border-gray-300 p-2 content-center">{{ $kpi->unit_type }}</div>
-                <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Polarity</div>
-                <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->polarity }}</div>
-
-                <!-- Row 9 -->
-                <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Objective Intended Results</div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Data Provider</div>
-                <div class="border border-gray-300 p-2 content-center">{{ $kpi->data_provider }}</div>
-                <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Data Source</div>
-                <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->data_source }}</div>
-                
-                <!-- Row 10 to 12 -->
-                <div class="col-span-3 row-span-3 border border-gray-300 p-2 content-center">{{ $kpi->intended_results }}</div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Collection Frequency</div>
-                <div class="border border-gray-300 p-2 content-center">{{ $kpi->collection_frequency }}</div>
-                <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Reporting Frequency</div>
-                <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->reporting_frequency }}</div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Verified by</div>
-                <div class="border border-gray-300 p-2 content-center">{{ $kpi->verified_by }}</div>
-                <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Validated by</div>
-                <div class="col-span-2 border border-gray-300 p-2 content-center">{{ $kpi->validated_by }}</div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Baseline</div>
-                <div class="col-span-5 border border-gray-300 p-2 text-center">{{ $kpi->baseline }}</div>
-                
-                <!-- Row 13 -->
-                <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Strategic Initiatives/Action Plans</div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Target</div>
-                <div class="col-span-5 border border-gray-300 p-2">{{ $kpi->target }}</div>
-                
-                <!-- Row 14 to 16 -->
-                <div class="col-span-3 row-span-3 border border-gray-300 p-2 content-center">{{ $kpi->initiatives }}</div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Thresholds</div>
-                <div class="border border-gray-300 bg-red-700 text-white text-center p-2"></div>
-                <div class="border border-gray-300 text-center p-2">{{ $kpi->threshold_low }}</div>
-                <div class="border border-gray-300 bg-yellow-400 text-center p-2"></div>
-                <div class="border border-gray-300 text-center p-2">{{ $kpi->threshold_high }}</div>
-                <div class="border border-gray-300 bg-green-500 text-center p-2"></div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Target Rationale</div>
-                <div class="col-span-5 border border-gray-300 p-2 content-center">{{ $kpi->target_rationale }}</div>
-                <div class="border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Comparator</div>
-                <div class="col-span-5 border border-gray-300 p-2 content-center">{{ $kpi->comparator }}</div>
             </div>
         </div>
-        
+
+        {{-- Mobile Layout --}}
+        <div class="block lg:hidden">
+            <div class="mb-4">
+                <div class="grid grid-cols-6 border border-gray-300">
+                    <div class="col-span-6 border border-gray-300 bg-gray-100 text-yellow-600 py-2 text-center font-bold">
+                        HOLY ANGEL UNIVERSITY<br>
+                        BALANCED SCORECARD Performance Measures Information Card
+                    </div>
+                    {{-- Perspective --}}
+                    <div class="col-span-6 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Perspective</div>
+                    <div class="col-span-6 border border-gray-300 p-2 content-center">{{ $kpi->perspective }}</div>
+
+                    {{-- Measure Code and Measure Owner --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Measure Code</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->measure_code }}</div>
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Measure Owner</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->measure_owner }}</div>
+
+                    {{-- Strategic Theme --}}
+                    <div class="col-span-6 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Strategic Theme</div>
+                    <div class="col-span-6 border border-gray-300 bg-red-900 text-white px-2 py-10 font-semibold content-center">{{ $kpi->strategic_theme }}</div>
+
+                    {{-- Description --}}
+                    <div class="col-span-6 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Description</div>
+                    <div class="col-span-6 row-span-2 border border-gray-300 p-2 content-center">{{ $kpi->description }}</div>
+                    
+                    {{-- Objective --}}
+                    <div class="col-span-6 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Objective</div>
+                    <div class="col-span-6 border border-gray-300 p-2">{{ $kpi->objective }}</div>
+
+                    {{-- Measure Type --}}
+                    <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Measure Type</div>
+                    <div class="col-span-3 border border-gray-300 p-2 content-center">{{ $kpi->measure_type }}</div>
+                    
+                    {{-- Lead/Lag --}}
+                    <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Lead/Lag</div>
+                    <div class="col-span-3 border border-gray-300 p-2 content-center">{{ $kpi->lead_lag }}</div>
+
+                    {{-- Formula --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Formula</div>                
+                    <div class="col-span-4 border border-gray-300 p-2 content-center">{{ $kpi->formula }}</div>
+
+                    {{-- Objective Owner --}}
+                    <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Objective Owner</div>
+                    <div class="col-span-3 border border-gray-300 p-2 content-center">{{ $kpi->objective_owner }}</div>
+
+                    {{-- Unit Type and Polarity --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Unit Type</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->unit_type }}</div>
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Polarity</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->polarity }}</div>
+
+                    {{-- Objective Intended Results --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Objective Intended Results</div>
+                    <div class="col-span-4 border border-gray-300 p-2 content-center">{{ $kpi->intended_results }}</div>
+
+                    {{-- Data Provider --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Data Provider</div>
+                    <div class="col-span-4 border border-gray-300 p-2 content-center">{{ $kpi->data_provider }}</div>
+
+                    {{-- Data Source --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Data Source</div>
+                    <div class="col-span-4 border border-gray-300 p-2 content-center">{{ $kpi->data_source }}</div>
+                    
+                    {{-- Collection Frequency --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Collection Frequency</div>
+                    <div class="col-span-4 border border-gray-300 p-2 content-center">{{ $kpi->collection_frequency }}</div>
+
+                    {{-- Reporting Frequency --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Reporting Frequency</div>
+                    <div class="col-span-4 border border-gray-300 p-2 content-center">{{ $kpi->reporting_frequency }}</div>
+
+                    {{-- Verified By and Validated By --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Verified by</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->verified_by }}</div>
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Validated by</div>
+                    <div class="border border-gray-300 p-2 content-center">{{ $kpi->validated_by }}</div>
+
+                    {{-- Baseline --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Baseline</div>
+                    <div class="col-span-4 border border-gray-300 p-2 text-center">{{ $kpi->baseline }}</div>
+                    
+                    {{-- Strategic Initiatives --}}
+                    <div class="col-span-6 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Strategic Initiatives/Action Plans</div>
+                    <div class="col-span-6 row-span-3 border border-gray-300 p-2 content-center">{{ $kpi->strategic_initiatives }}</div>
+                    
+                    {{-- Target --}}
+                    <div class="col-span-3 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Target</div>
+                    <div class="col-span-3 border border-gray-300 p-2">{{ $kpi->target }}</div>
+                    
+                    {{-- Threshold --}}
+                    <div class="col-span-6 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Thresholds</div>
+                    <div class="border border-gray-300 bg-red-700 text-white text-center p-2"></div>
+                    <div class="border border-gray-300 text-center p-2">{{ $kpi->threshold_low }}</div>
+                    <div class="col-span-2 border border-gray-300 bg-yellow-400 text-center p-2"></div>
+                    <div class="border border-gray-300 text-center p-2">{{ $kpi->threshold_high }}</div>
+                    <div class="border border-gray-300 bg-green-500 text-center p-2"></div>
+
+                    {{-- Target Rationale --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Target Rationale</div>
+                    <div class="col-span-4 border border-gray-300 p-2 content-center">{{ $kpi->target_rationale }}</div>
+
+                    {{-- Comparator --}}
+                    <div class="col-span-2 border border-gray-300 bg-gray-100 text-yellow-600 p-2 font-semibold content-center">Comparator</div>
+                    <div class="col-span-4 border border-gray-300 p-2 content-center">{{ $kpi->comparator }}</div>
+                </div>
+            </div>
+        </div>
+
         {{-- SEGMENTATION TABLE --}}
         @if($kpi->segmentations && $kpi->segmentations->count())
             @php
@@ -212,4 +324,7 @@
             </div>
         @endif
     </div>
+
+    <x-back-top-button />
+    
 </x-app-layout>

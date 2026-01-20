@@ -79,7 +79,7 @@ function highlightText($text, $search) {
                     <h1 class="text-3xl font-bold drop-shadow" style="color: #b91c1c;">KPI Library</h1>
                     @if(Auth::user()->role === 'SuperAdmin')
                     <a href="{{ route('kpis.add') }}"
-                    class="inline-block bg-red-700 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg shadow text-sm transition">
+                    class="bg-red-700 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg shadow text-sm transition">
                         + Add KPI
                     </a>
                     @endif
@@ -105,8 +105,7 @@ function highlightText($text, $search) {
 
                         <x-dropdown width="48">
                             <x-slot name="trigger">
-                                <button type="button" class="flex items-center justify-between w-40 h-10 px-4 bg-red-700 text-white rounded-lg cursor-pointer hover:bg-red-800
-                                outline-none focus:outline-none focus:ring-0">
+                                <button type="button" class="flex items-center justify-between w-32 sm:w-40 h-10 px-3 sm:px-4 bg-red-700 hover:bg-red-800 text-white text-sm rounded-lg whitespace-nowrap">
                                     Tools
                                     <svg class="w-4 h-4 ml-2 transition-transform" :class="open ? 'rotate-180' : ''"
                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,7 +117,9 @@ function highlightText($text, $search) {
 
                             <x-slot name="content" class="py-1 bg-white dark:bg-gray-700">
 
-                                <a href="{{ route('kpis.advanced-search') }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">Advanced Search</a>
+                                <a href="{{ route('kpis.advanced-search') }}" class="block px-4 py-2 text-sm sm:text-base hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    Advanced Search
+                                </a>
 
                                 <div class="border-t border-gray-200 my-1 dark:border-gray-600"></div>
                                 
@@ -127,7 +128,7 @@ function highlightText($text, $search) {
                                     @mouseleave="openSort = false">
 
                                     <button 
-                                        class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                        class="flex items-center justify-between w-full px-4 py-2 text-sm sm:text-base hover:bg-gray-100 dark:hover:bg-gray-600">
                                         Sort by
                                         <svg class="w-4 h-4 ml-2 transition-transform"
                                             :class="openSort ? 'rotate-180' : ''"
@@ -146,13 +147,27 @@ function highlightText($text, $search) {
                                         x-transition:leave-start="opacity-100 scale-100"
                                         x-transition:leave-end="opacity-0 scale-95"
                                         class="border-t">
-                                        <a @click.prevent="$dispatch('search-updated', { search: searchTerm, sort: 'id' }); sortBy = 'id'" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">Default</a>
-                                        <a @click.prevent="$dispatch('search-updated', { search: searchTerm, sort: 'name' }); sortBy = 'name'" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">Name (A-Z)</a>
-                                        <a @click.prevent="$dispatch('search-updated', { search: searchTerm, sort: 'objective' }); sortBy = 'objective'" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">Objective (A-Z)</a>
-                                        <a @click.prevent="$dispatch('search-updated', { search: searchTerm, sort: 'theme' }); sortBy = 'theme'" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">Theme (A-Z)</a>
-                                        <a @click.prevent="$dispatch('search-updated', { search: searchTerm, sort: 'perspective' }); sortBy = 'perspective'" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">Perspective (A-Z)</a>
+                                        <a @click.prevent="$dispatch('search-updated', { search: searchTerm, sort: 'id' }); sortBy = 'id'" 
+                                        class="block px-4 py-2 text-sm sm:text-base hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            Default
+                                        </a>
+                                        <a @click.prevent="$dispatch('search-updated', { search: searchTerm, sort: 'name' }); sortBy = 'name'" 
+                                        class="block px-4 py-2 text-sm sm:text-base hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            Name (A-Z)
+                                        </a>
+                                        <a @click.prevent="$dispatch('search-updated', { search: searchTerm, sort: 'objective' }); sortBy = 'objective'" 
+                                        class="block px-4 py-2 text-sm sm:text-base hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            Objective (A-Z)
+                                        </a>
+                                        <a @click.prevent="$dispatch('search-updated', { search: searchTerm, sort: 'theme' }); sortBy = 'theme'" 
+                                        class="block px-4 py-2 text-sm sm:text-base hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            Theme (A-Z)
+                                        </a>
+                                        <a @click.prevent="$dispatch('search-updated', { search: searchTerm, sort: 'perspective' }); sortBy = 'perspective'" 
+                                        class="block px-4 py-2 text-sm sm:text-base hover:bg-gray-100 dark:hover:bg-gray-600">
+                                            Perspective (A-Z)
+                                        </a>
                                     </div>
-
                                 </div>
 
                             </x-slot>
@@ -221,32 +236,32 @@ function highlightText($text, $search) {
                 @search-updated.window="searchTerm = $event.detail.search; sortBy = $event.detail.sort; filterKpis()">
                     <!-- Category Tabs -->
                     <div class="border-b border-gray-200 mb-6">
-                        <nav class="-mb-px flex" style="gap: 32px;">
+                        <nav class="-mb-px flex gap-4 sm:gap-8">
                             <button 
                                 @click="activeTab = 'all'" 
                                 :class="activeTab === 'all' ? 'border-red-500 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors"
+                                class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors flex-shrink-0"
                             >
                                 All KPIs <span x-show="activeTab === 'all'" x-text="`(${filteredKpis.length})`" class="text-xs"></span>
                             </button>
                             <button 
                                 @click="activeTab = 'institutional'" 
                                 :class="activeTab === 'institutional' ? 'border-red-500 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors"
+                                class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors flex-shrink-0"
                             >
                                 Institutional <span x-show="activeTab === 'institutional'" x-text="`(${filteredKpis.length})`" class="text-xs"></span>
                             </button>
                             <button 
                                 @click="activeTab = 'departmental'" 
                                 :class="activeTab === 'departmental' ? 'border-red-500 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors"
+                                class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors flex-shrink-0"
                             >
                                 Departmental <span x-show="activeTab === 'departmental'" x-text="`(${filteredKpis.length})`" class="text-xs"></span>
                             </button>
                             <button 
                                 @click="activeTab = 'personnel'" 
                                 :class="activeTab === 'personnel' ? 'border-red-500 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors"
+                                class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors flex-shrink-0"
                             >
                                 Personnel <span x-show="activeTab === 'personnel'" x-text="`(${filteredKpis.length})`" class="text-xs"></span>
                             </button>
@@ -254,11 +269,13 @@ function highlightText($text, $search) {
                     </div>
 
                     <!-- KPI list when activeTab is 'all' -->
-                    <div x-show="activeTab === 'all'" class="grid grid-cols-3 gap-4 mt-4" style="min-height:60vh;">
+                    <div x-show="activeTab === 'all'" 
+                        class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-4" 
+                        style="min-height:60vh;">
                         <template x-for="category in ['institutional', 'departmental', 'personnel']" :key="category">
                             <div class="bg-white rounded-xl shadow-lg border p-4"
-                                style="border-color: black;">
-                                <h2 class="text-xl font-bold mb-2 text-center"
+                                style="border-color: #800000;">
+                                <h2 class="text-lg md:text-xl font-bold mb-2 text-center"
                                     x-text="category.charAt(0).toUpperCase() + category.slice(1)">
                                 </h2>
                                 <ul class="space-y-2 pr-2">
@@ -269,14 +286,24 @@ function highlightText($text, $search) {
                                         <li class="flex gap-2 items-start rounded-lg transition-colors">
                                             <span class="text-black font-bold mt-0.5">•</span>
                                             <a :href="`/kpis/${kpi.measure_code}`"
-                                               class="font-medium hover:underline text-gray-700 leading-relaxed"
-                                               x-html="highlightText(kpi.measure_name, searchTerm)">
+                                            class="text-sm md:text-base font-medium hover:underline text-gray-700 leading-relaxed"
+                                            x-html="highlightText(kpi.measure_name, searchTerm)">
                                             </a>
                                         </li>
                                     </template>
                                     <li x-show="filteredKpis.filter(k => k.category === category).length === 0"
-                                        class="text-gray-400 text-sm text-center italic py-8">
-                                        No KPIs found
+                                        class="text-gray-400 text-sm text-center py-8">
+                                        <div class="text-6xl mb-4" x-text="category === 'departmental' ? '🏢' : category === 'institutional' ? '🏛️' : '👥'"></div>
+                                        <h3 class="text-lg font-semibold text-gray-600 mb-2">
+                                            <span x-show="searchTerm">No matching KPIs found</span>
+                                            <span x-show="!searchTerm && category === 'departmental'">No Departmental KPIs found</span>
+                                            <span x-show="!searchTerm && category === 'institutional'">No Institutional KPIs found</span>
+                                            <span x-show="!searchTerm && category === 'personnel'">No Personnel KPIs found</span>
+                                        </h3>
+                                        <p class="text-sm">
+                                            <span x-show="searchTerm">Try adjusting your search criteria or browse all KPIs.</span>
+                                            <span x-show="!searchTerm">No KPIs categorized as <span x-text="activeTab"></span> yet.</span>
+                                        </p>
                                     </li>
                                 </ul>
                             </div>
@@ -290,8 +317,7 @@ function highlightText($text, $search) {
                                 style="border-color: #800000; margin-bottom: 16px;"
                                 @click="window.location = `/kpis/${kpi.measure_code}`">
                                 <div class="flex-1 min-w-0">
-                                    <h2 class="text-xl font-bold mb-2 line-clamp-2 overflow-hidden"
-                                        style="color: #b91c1c;">
+                                    <h2 class="text-xl font-bold mb-2 line-clamp-2 overflow-hidden">
                                         <a :href="`/kpis/${kpi.measure_code}`" class="hover:underline" 
                                         x-html="highlightText(kpi.measure_name, searchTerm)"></a>
                                     </h2>
@@ -301,20 +327,20 @@ function highlightText($text, $search) {
                                     <div class="flex flex-wrap gap-2 mb-3">
                                         <span class="px-3 py-1.5 rounded text-xs font-semibold"
                                             style="background-color: #fef2f2; color: #b91c1c;"
-                                            x-html="highlightText(kpi.objective || '', searchTerm)"></span>
+                                            x-html="kpi.objective"></span>
                                         <span class="px-3 py-1.5 rounded text-xs font-semibold"
                                             style="background-color: #ffe066; color: #800000;"
-                                            x-html="highlightText(kpi.strategic_theme || '', searchTerm)"></span>
+                                            x-html="kpi.strategic_theme"></span>
                                         <span class="px-3 py-1.5 rounded text-xs font-semibold"
                                             style="background-color: #f3f4f6; color: #b91c1c;"
-                                            x-html="highlightText(kpi.perspective || '', searchTerm)"></span>
+                                            x-html="kpi.perspective"></span>
                                         <span x-show="kpi.category" class="px-3 py-1.5 rounded text-xs font-semibold"
                                             style="background-color: #ffe066; color: #800000;"
                                             x-text="kpi.category ? kpi.category.charAt(0).toUpperCase() + kpi.category.slice(1) : ''"></span>
                                     </div>
                                     <div class="text-xs"
                                         style="color: #a3a3a3;">
-                                        Code: <span x-html="highlightText(kpi.measure_code, searchTerm)"></span> | Owner: <span x-text="kpi.measure_owner"></span>
+                                        Code: <span x-html="kpi.measure_code"></span> | Owner: <span x-text="kpi.measure_owner"></span>
                                     </div>
                                 </div>
                             </div>
@@ -339,7 +365,6 @@ function highlightText($text, $search) {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
