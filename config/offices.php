@@ -1,6 +1,14 @@
 <?php
 
 return [
+    'source_types' => [
+        'eoms',
+        'procedures',
+        'forms',
+        'records',
+        'policies',
+        'others',
+    ],
     'mappings' => [
         //OOP - Office of the president
         'OOP' => '(OOP) Office of the President',

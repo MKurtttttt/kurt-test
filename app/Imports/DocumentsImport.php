@@ -13,27 +13,35 @@ class DocumentsImport implements ToCollection, WithHeadingRow
 {
     protected $imported = 0;
     protected $errors = [];
+    protected $importedDocumentCodes = []; // Track what's imported in each session.
 
     public function collection(Collection $rows){
-        // Import all originals first
+        // Filter out empty rows
+        $rows = $rows->filter(function($row){
+           return !empty($row['document_code']); 
+        });
+
+        // Import all ACTIVE originals first (even if may deleted counterpart)
         foreach ($rows as $index => $row){
             $rowNumber = $index + 2; //+2 becuase: 0-indexed + header row
 
-            if ((int)$row['current_revision'] === 0){
+            if ((int)$row['current_revision'] === 0 && $row['status'] !== 'Deleted'){
                 try{
                     $this->importRow($row, $rowNumber);
                     $this->imported++;
+                    // Track the imported code
+                    $this->importedDocumentCodes[] = $row['document_code'];
                 } catch (\Exception $e){
                     $this->errors[] = "Row {$rowNumber}: " . $e->getMessage();
                 }
             }
         }
 
-        // Import all revisions
+        // Import all ACTIVE revisions
         foreach ($rows as $index => $row){
             $rowNumber = $index + 2;
 
-            if((int)$row['current_revision'] > 0){
+            if((int)$row['current_revision'] > 0 && $row['status'] !== 'Deleted'){
                 try{
                     $this->importRow($row, $rowNumber);
                     $this->imported++;
@@ -43,7 +51,7 @@ class DocumentsImport implements ToCollection, WithHeadingRow
             }
         }
 
-        // Import all Deletions
+        // Process the deletions for last
         foreach($rows as $index => $row){
             $rowNumber = $index + 2;
             if($row['status'] === 'Deleted'){
@@ -62,6 +70,7 @@ class DocumentsImport implements ToCollection, WithHeadingRow
     }
 
     protected function importRow($row, $rowNumber){
+        \Log::info("Row {$rowNumber} data: ", $row->toArray());
         $isOriginal = (int)$row['current_revision'] === 0;
         $originalDocId = null;
 
@@ -74,7 +83,9 @@ class DocumentsImport implements ToCollection, WithHeadingRow
             }
             $originalDocId = $original->id;
         }
+        // Map Originating section and normalize source type
         $originatingSection = OfficeMapper::map($row['originating_section']);
+        $sourceType = OfficeMapper::normalizeSourceType($row['source_type']);
 
         $registeredAt = !empty($row['registered_at'])
                         ? Carbon::parse($row['registered_at'])
@@ -88,7 +99,7 @@ class DocumentsImport implements ToCollection, WithHeadingRow
         IsoMasterDocument::create([
             'document_code' => $row['document_code'],
             'document_title' => $row['document_title'],
-            'source_type' => $row['source_type'],
+            'source_type' => $sourceType,
             'specific_type' => $row['specific_type'] ?? null,
             'originating_section' => $originatingSection,
             'current_revision' => (int)$row['current_revision'],
@@ -108,18 +119,31 @@ class DocumentsImport implements ToCollection, WithHeadingRow
         // Find the document to delete
         $docToDelete = IsoMasterDocument::where('document_code', $row['document_code'])
                                         ->where('current_revision', (int)$row['current_revision'])
+                                        ->where('status', '!=', 'Deleted')
                                         ->first();
         if(!$docToDelete){
             throw new \Exception("Cannot delete document {$row['document_code']} rev: {$row['current_revision']} - document doesn't exit or is already deleted.");
         }
+        // DEBUG: What's in superseded_at
+        \Log::info("Row {$rowNumber} superseded_at value: ",[
+            'raw_value' => $row['superseded_at'],
+            'is_empty' => empty($row['superseded_at']),
+            'type' => gettype($row['superseded_at']),
+        ]);
+
+        //Check if superseded at column is filled, if not then put now.
+        $supersededAt = !empty($row['superseded_at'])
+                        ? Carbon::parse($row['superseded_at'])
+                        : now();
 
         // Mark original as superseded
         $docToDelete->update([
             'status' => 'Superseded',
-            'superseded_at' => now()
+            'superseded_at' => $supersededAt
         ]);
-        // Map originating section
+        // Map originating section and normalize source type
         $originatingSection = OfficeMapper::map($row['originating_section']);
+        $sourceType = OfficeMapper::normalizeSourceType($row['source_type']);
 
         // Create deletion record audit
         $deletedAt = !empty($row['deleted_at'])
@@ -127,8 +151,8 @@ class DocumentsImport implements ToCollection, WithHeadingRow
                 : now();
         IsoMasterDocument::create([
             'document_code' => $docToDelete->document_code,
-            'document_title' => $docToDelete->document_title . ' (DELETED)',
-            'source_type' => $docToDelete->source_type,
+            'document_title' => $docToDelete->document_title,
+            'source_type' => $sourceType,
             'specific_type' => $docToDelete->specific_type,
             'originating_section' => $originatingSection,
             'current_revision' => $docToDelete->current_revision,

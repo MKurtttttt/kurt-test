@@ -291,7 +291,6 @@ class IsoDocumentController extends Controller
 
         $this->sendTicketStatusNotification($ticket,$oldStatus,$changedBy);
 
-        // TODO: Ask if they want to add save notes to comments
         return redirect()->route('iso.idc.dashboard')
             ->with('msg','Ticket Status updated successfully!');
     }
@@ -487,6 +486,10 @@ class IsoDocumentController extends Controller
                         ]);
                     } elseif ($document->classification === 'revision'){
                         $originalDoc = IsoMasterDocument::find($document->revising_master_document_id);
+                        if(!$originalDoc){
+                            throw new \Exception("Could not find the Original Document to revise (ID: {$document->revising_master_document_id})");
+                        }
+
                         $originalDoc->update([
                             'status' => 'Superseded',
                             'superseded_at'=> now(),
@@ -520,11 +523,10 @@ class IsoDocumentController extends Controller
                             'status' => 'Superseded',
                             'superseded_at' => now()
                         ]);
-                        // Create deletion record for audit trail TODO: Ask them to have a separate record
-                        // when deleting a document or just keep one.
+                        // Create deletion record for audit trail
                         $masterDoc = IsoMasterDocument::create([
                             'document_code' => $docToDelete->document_code,
-                            'document_title' => $docToDelete->document_title . ' (DELETED)',
+                            'document_title' => $docToDelete->document_title,
                             'source_type' => $docToDelete->source_type,
                             'specific_type' => $docToDelete->specific_type,
                             'originating_section' => $ticket->originating_section,

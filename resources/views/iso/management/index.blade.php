@@ -61,7 +61,7 @@
                             <x-stat-card
                                 title="Superseded Documents"
                                 :value="number_format($supersededDocuments)"
-                                color="rose"
+                                color="yellow"
                                 >
                                     <x-slot:icon>
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
@@ -184,6 +184,15 @@
             </div>
             <!-- Breakdown cards -->
             <div class="w[95%] grid grid-cols-2 gap-4 px-4 pb-4">
+                @php
+                    $typeConfig = [
+                        'eoms'          => ['label' => 'EOMS Manual',           'color' => 'purple'],
+                        'procedures'    => ['label' => 'Procedures',            'color' => 'blue'],
+                        'forms'         => ['label' => 'Forms',                 'color' => 'green'],
+                        'records'       => ['label' => 'Records Management',    'color' => 'yellow'],
+                        'others'        => ['label' => 'Others',                'color' => 'gray'],
+                    ]
+                @endphp
                 <!-- By Source Type -->
                 <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                     <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
@@ -191,16 +200,20 @@
                     </div>
                     <div class="p-4">
                         @forelse($byClassification as $item)
+                            @php
+                                // Fallback to 'others' just in case the type isn't on the list.
+                                $config = $typeConfig[$item->source_type] ?? $typeConfig['others'];
+                            @endphp
                             <div class="flex justify-between items-center py-2 px-2 mb-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
                                 <div class="flex items-center">
-                                    <div class="bg-purple-100 text-purple-600 rounded-full p-2 mr-3">
+                                    <div class="bg-{{ $config['color'] }}-100 text-{{ $config['color'] }}-600 rounded-full p-2 mr-3">
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
                                         </svg>
                                     </div>
-                                    <span class="font-medium text-gray-700">{{ $item->source_type }}</span>
+                                    <span class="font-medium text-gray-700">{{ $config['label'] }}</span>
                                 </div>
-                                <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                <span class="bg-{{ $config['color'] }}-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                                     {{ number_format($item->count) }}
                                 </span>
                             </div>
@@ -214,7 +227,8 @@
                     <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
                         <h5 class="font-bold text-gray-700">Top Departments/Offices</h5>
                     </div>
-                    <div class="p-4 flex flex-col gap-2">
+                    <div class="p-4 flex flex-col gap-2 max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-track-transparent">
+                        <ul class="p-4 flex flex-col gap-2">
                         @forelse($byDepartment as $item)
                             <li class="flex justify-between gap-y-4 items-center py-2.5 px-4 bg-gray-50 rounded-xl hover:bg-white hover:shadow-md hover:ring-1 hover:ring-gray-200 transition-all duration-200 group">
                                 <div class="flex items-center min-w-0">
@@ -241,6 +255,7 @@
                                 <p class="text-gray-400 text-xs">New entries will appear here automatically.</p>
                             </li>
                         @endforelse
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -574,18 +589,40 @@ function createDocumentRow(doc){
     const hasRevisions = doc.current_revision > 0;
 
     const registeredDate = new Date(doc.registered_at).toLocaleDateString();
+    // Label Mapping
+    const typeLabels = {
+        'eoms' : 'EOMS Manual',
+        'procedures' : 'Procedures',
+        'forms' : 'Forms',
+        'records' : 'Records',
+        'others' : 'Others'
+    }
+    // Specific Type Mapping
+    const specificTypeMapping = {
+        '3.0' : '3.0 Records Rentention Schedule',
+        '3'   : '3.0 Records Rentention Schedule',
+        '4.0' : '4.0 Definition and Records Series Title',
+        '4'   : '4.0 Definition and Records Series Title',
+        '4.1' : '4.1 Interested Parties',
+        '4.2' : '4.2 Risk Assessment',
+        '7.4' : '7.4 Communication',
+        '8.1' : '8.1 EOMS Plan'
+    }
     // Status badge colors
     const statusColors = {
         'Active': 'bg-green-100 text-green-800',
         'Superseded': 'bg-yellow-100 text-yellow-800',
         'Deleted' : 'bg-red-100 text-red-800'
     };
-
+    const formatLabel = typeLabels[doc.source_type] || doc.source_type;
+    const formatSpecificType = doc.specific_type
+                    ? (specificTypeMapping[doc.specific_type] || doc.specific_type)
+                    : 'N/A';
     tr.innerHTML = `
         <td class="px-4 py-3 text-sm font-mono text-blue-600">${doc.document_code}</td>
         <td class="px-4 py-3 text-sm">${doc.document_title}</td>
-        <td class="px-4 py-3 text-sm">${doc.source_type}</td>
-        <td class="px-4 py-3 text-sm">${doc.specific_type}</td>
+        <td class="px-4 py-3 text-sm">${formatLabel}</td>
+        <td class="px-4 py-3 text-sm">${formatSpecificType}</td>
         <td class="px-4 py-3 text-sm">${doc.originating_section}</td>
         <td class="px-4 py-3 text-sm">
             ${hasRevisions
@@ -682,11 +719,18 @@ document.getElementById('import_form').addEventListener('submit', async function
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
             }
         });
+        const contentType = response.headers.get("content-type");
+        let data;
+        if(contentType && contentType.indexOf("application/json") !== -1){
+            data = await response.json();
+        } else {
+            throw new Error("Server returned a non-JSON response (likely a 500 error).")
+        }
 
-        const data = await response.json();
         if(response.ok){
             document.getElementById('success-message').textContent = data.message;
             document.getElementById('import-success').classList.remove('hidden');

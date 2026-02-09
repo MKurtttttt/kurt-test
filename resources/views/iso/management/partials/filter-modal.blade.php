@@ -17,9 +17,12 @@
                                 ->sort();
                         @endphp
                         @foreach ($sourceTypes as $type)
+                            @php
+                                $label = $typeConfig[$type]['label'] ?? ucfirst($type);
+                            @endphp
                             <label class="flex items-center bg-gray-50 p-2 rounded hover:bg-gray-100 cursor-pointer">
                                 <input type="checkbox" name="source_type[]" value="{{ $type }}" class="mr-2 text-purple-500 focus:ring-purple-500">
-                                <span class="text-sm">{{ $type }}</span>
+                                <span class="text-sm">{{ $label }}</span>
                             </label>
                         @endforeach
                     </div>
@@ -78,18 +81,21 @@
                 
                 <!-- Document Status Filter -->
                 <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Document Status</label>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Document Status</label>
+                        <span class="text-xs text-gray-400 italic">Uncheck to exclude from filter</span>
+                    </div>
                     <div class="grid grid-cols-3 gap-2">
                         <label class="flex items-center bg-green-50 p-2 rounded hover:bg-green-100 cursor-pointer">
-                            <input type="radio" name="status[]" value="Active" class="mr-2 text-green-500 focus:ring-green-500" checked>
+                            <input type="checkbox" name="status[]" value="Active" class="mr-2 text-green-500 focus:ring-green-500" checked>
                             <span class="text-sm">Active</span>
                         </label>
                         <label class="flex items-center bg-yellow-50 p-2 rounded hover:bg-yellow-100 cursor-pointer">
-                            <input type="radio" name="status[]" value="Superseded" class="mr-2 text-yellow-500 focus:ring-yellow-500" checked>
+                            <input type="checkbox" name="status[]" value="Superseded" class="mr-2 text-yellow-500 focus:ring-yellow-500" checked>
                             <span class="text-sm">Superseded</span>
                         </label>
                         <label class="flex items-center bg-red-50 p-2 rounded hover:bg-red-100 cursor-pointer">
-                            <input type="radio" name="status[]" value="Deleted" class="mr-2 text-red-500 focus:ring-red-500" checked>
+                            <input type="checkbox" name="status[]" value="Deleted" class="mr-2 text-red-500 focus:ring-red-500" checked>
                             <span class="text-sm">Deleted</span>
                         </label>
                     </div>
