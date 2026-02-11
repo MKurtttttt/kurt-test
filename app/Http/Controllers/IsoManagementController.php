@@ -108,6 +108,15 @@ class IsoManagementController extends Controller
                 'errors' => ['file' => $errors]
             ], 422);
         } catch (\Exception $e){
+            $decoded = json_decode($e->getMessage(), true);
+
+            if(json_last_error() === JSON_ERROR_NONE && is_array($decoded)){
+                return response()->json([
+                    'message' => 'Import completed with errors',
+                    'errors' => ['file' => $decoded]
+                ], 422);
+            }
+
             return response()->json([
                 'message' => 'Import failed: ' . $e->getMessage(),
                 'errors' => ['file' => [$e->getMessage()]]

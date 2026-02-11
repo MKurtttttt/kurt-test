@@ -22,6 +22,7 @@
                             <option value="eac">External Affairs Cluster (EAC)</option>
                             <option value="frm">Finance & Resources Management Services (FRM)</option>
                             <option value="hro">Human Resource Management Office (HRO)</option>
+                            <option value="iat">Internal Audit Team (IAT)</option>
                             <option value="oie">Office of Institutional Effectiveness (OIE)</option>
                             <option value="oop">Office of the President (OOP)</option>
                             <option value="rss">Records Services & Affairs (RSS)</option>

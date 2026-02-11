@@ -14,7 +14,7 @@ return [
         'OOP' => '(OOP) Office of the President',
         'OOP-AVI' => '(OOP-AVI) Aviation Institute',
         'OOP-CKS' => '(OOP-CKS) Center for Kapampangan Studies',
-        'OOP-DOP' => '(OOP-DPO) Data Privacy Office',
+        'OOP-DPO' => '(OOP-DPO) Data Privacy Office',
         'OOP-ITC' => '(OOP-ITC) Institutional Testing and Evaluation Center',
         'OOP-ITS' => '(OOP-ITS) Information Technology Systems & Services',
         'OOP-OIA' => '(OOP-OIA) Office of International Affairs',
@@ -27,6 +27,7 @@ return [
         'AAC-CJE' => '(AAC-CJE) College of Criminal Justice Education & Forensics',
         'AAC-CTL' => '(AAC-CTL) Center for Teaching & Learning',
         'AAC-GSR' => '(AAC-GSR) Graduate Studies & Research',
+        'AAC-HAT' => '(AAC-HAT) Holy Angel Travel Services',
         'AAC-IRB' => '(AAC-IRB) Institutional Review Board',
         'AAC-LIB' => '(AAC-LIB) Library Department',
         'AAC-LMS' => '(AAC-LMS) Learning Management System',
@@ -47,6 +48,8 @@ return [
         'OIE-QAO' => '(OIE-QAO) Quality Assurance Office',
 
         // CFS
+        'CFS' => '(CFS) Institute for Catholic Formation & Social Integration',
+        'CFS-CEP' => '(CFS-CEP) Character Education Program Desk',
         'CFS-CES' => '(CFS-CES) Office of the Community Extension Services',
         'CFS-CLE' => '(CFS-CLE) Christian Living Education',
         'CFS-CMO' => '(CFS-CMO) Campus Ministry Office',
@@ -58,12 +61,14 @@ return [
         // FRM
         'FRM' => '(FRM) Finance and Resource Management Office',
         'FRM-ACC' => '(FRM-ACC) Accounts & Collection',
+        'FRM-ASA' => '(FRM-ASA) Ancillary Services Accounting',
         'FRM-ASE' => '(FRM-ASE) Ancillary Services',
         'FRM-ATO' => '(FRM-ATO) Accounting',
         'FRM-GRT' => '(FRM-GRT) Grants Accounttant',
         'FRM-PAO' => '(FRM-PAO) Payroll',
 
         // RSS
+        'RSS' => '(RSS) Records Systems & Services',
         'RSS-ADO' => '(RSS-ADO) Admissions Office',
 
         // SSA
@@ -82,6 +87,8 @@ return [
         'EAC-PRO' => '(EAC-PRO) Public Relations Office',
 
         // CSD
+        'CSD' => '(CSD) Campus Services & Development Office',
+        'CSD-CPO' => '(CSD-CPO) Central Purchasing Office',
         'CSD-CSO' => '(CSD-CSO) Campus Services Office',
         'CSD-ECM' => '(CSD-ECM) Engineering Construction and Maintenance',
         'CSD-MCM' => '(CSD-MCM) Motorpool/Campus Maintenance',
@@ -91,8 +98,12 @@ return [
         'CSD-VLO' => '(CSD-VLO) Venues and Logistics Office',
 
         // AIE
+        'AIE' => '(AIE) Institute for academic Innovation & Entrepreneurship',
         'AIE-ETA' => '(AIE-ETA) Expanded Tertiary Education, Equivalency & Accreditation',
         'AIE-SPL' => '(AIE-SPL) School of Professional Education and Lifelong Learning',
         'AIE-TBI' => '(AIE-TBI) Technology Business Incubator - KITTO',
+
+        // IAT
+        'IAT' => '(IAT) Internal Audit Team',
     ]
 ];

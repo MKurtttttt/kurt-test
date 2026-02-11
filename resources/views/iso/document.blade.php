@@ -409,6 +409,7 @@ function getStatusColor($status){
             '(AAC-CJE) College of Criminal Justice Education & Forensics',
             '(AAC-CTL) Center for Teaching & Learning',
             '(AAC-GSR) Graduate Studies & Research',
+            '(AAC-HAT) Holy Angel Travel Services',
             '(AAC-IRB) Institutional Review Board',
             '(AAC-LIB) Library Department',
             '(AAC-LMS) Learning Management System',
@@ -429,7 +430,9 @@ function getStatusColor($status){
             '(OIE-QAO) Quality Assurance Office'
         ],
         cfs: [
+            '(CFS) Institute for Catholic Formation & Social Integration',
             '(CFS-CES) Office of the Community Extension Services',
+            '(CFS-CEP) Character Education Program Desk',
             '(CFS-CLE) Christian Living Education',
             '(CFS-CMO) Campus Ministry Office'
         ],
@@ -440,12 +443,14 @@ function getStatusColor($status){
         frm: [
             '(FRM) Finance and Resource Management Office',
             '(FRM-ACC) Accounts & Collection',
+            '(FRM-ASA) Ancillary Services Accounting',
             '(FRM-ASE) Ancillary Services',
             '(FRM-ATO) Accounting',
             '(FRM-GRT) Grants Accounttant',
             '(FRM-PAO) Payroll'
         ],
         rss: [
+            '(RSS) Records Systems & Services',
             '(RSS-ADO) Admissions Office'
         ],
         ssa: [
@@ -464,6 +469,8 @@ function getStatusColor($status){
             '(EAC-PRO) Public Relations Office'
         ],
         csd: [
+            '(CSD) Campus Services & Development Office',
+            '(CSD-CPO) Central Purchasing Office',
             '(CSD-CSO) Campus Services Office',
             '(CSD-ECM) Engineering Construction and Maintenance',
             '(CSD-MCM) Motorpool/Campus Maintenance',
@@ -473,9 +480,13 @@ function getStatusColor($status){
             '(CSD-VLO) Venues and Logistics Office'
         ],
         aie: [
+            '(AIE) Institute for academic Innovation & Entrepreneurship',
             '(AIE-ETA) Expanded Tertiary Education, Equivalency & Accreditation',
             '(AIE-SPL) School of Professional Education and Lifelong Learning',
             '(AIE-TBI) Technology Business Incubator - KITTO'
+        ],
+        iat: [
+            '(IAT) Internal Audit Team'
         ]
     }
     // Cluster and Office Logic
@@ -616,7 +627,7 @@ function getStatusColor($status){
                 documents.forEach(doc => {
                     const option = document.createElement('option');
                     option.value = doc.id;
-                    option.textContent = `${doc.document_code} - ${doc.document_title}`;
+                    option.textContent = `${doc.document_code} | ${doc.document_title}`;
 
                     // Store document data in data attributes
                     option.dataset.code = doc.document_code;

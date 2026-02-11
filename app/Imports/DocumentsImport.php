@@ -65,7 +65,7 @@ class DocumentsImport implements ToCollection, WithHeadingRow
         }
 
         if(!empty($this->errors)) {
-            throw new \Exception(implode("\n", $this->errors));
+            throw new \Exception(json_encode($this->errors));
         }
     }
 
@@ -74,15 +74,6 @@ class DocumentsImport implements ToCollection, WithHeadingRow
         $isOriginal = (int)$row['current_revision'] === 0;
         $originalDocId = null;
 
-        if(!$isOriginal){
-            $original = IsoMasterDocument::where('document_code', $row['document_code'])
-                                        ->where('current_revision', 0)
-                                        ->first();
-            if (!$original){
-                throw new \Exception("Revision requires original document with code {$row['document_code']} to exist first.");
-            }
-            $originalDocId = $original->id;
-        }
         // Map Originating section and normalize source type
         $originatingSection = OfficeMapper::map($row['originating_section']);
         $sourceType = OfficeMapper::normalizeSourceType($row['source_type']);
@@ -96,6 +87,24 @@ class DocumentsImport implements ToCollection, WithHeadingRow
         $deletedAt = !empty($row['deleted_at'])
                     ?Carbon::parse($row['deleted_at'])
                     : null;
+        // Revision Logic
+        if(!$isOriginal){
+            $original = IsoMasterDocument::where('document_code', $row['document_code'])
+                                        ->where('current_revision', 0)
+                                        ->first();
+            if (!$original){
+                throw new \Exception("Revision requires original document with code {$row['document_code']} to exist first.");
+            }
+            $originalDocId = $original->id;
+            
+            // Make the original document superseded
+            $original->update([
+                    'status' => 'Superseded',
+                    'superseded_at' => $registeredAt, //The registered At date of the Current row
+                ]
+            );
+        }
+        
         IsoMasterDocument::create([
             'document_code' => $row['document_code'],
             'document_title' => $row['document_title'],
@@ -125,14 +134,17 @@ class DocumentsImport implements ToCollection, WithHeadingRow
             throw new \Exception("Cannot delete document {$row['document_code']} rev: {$row['current_revision']} - document doesn't exit or is already deleted.");
         }
 
-        //Check if superseded at column is filled, if not then put now.
-        $supersededAt = $docToDelete->superseded_at ?? now();
+        //Get the value of the deleted date
+        $deletedDate = $row['deleted_at'];
+        \Log::info("BEFORE Update - registered at: " . $docToDelete->registered_at);
 
         // Mark original as superseded
         $docToDelete->update([
             'status' => 'Superseded',
-            'superseded_at' => $supersededAt
+            'superseded_at' => $deletedDate
         ]);
+
+        \Log::info("AFTER Update - registered at: " . $docToDelete->registered_at);
         // Map originating section and normalize source type
         $originatingSection = OfficeMapper::map($row['originating_section']);
         $sourceType = OfficeMapper::normalizeSourceType($row['source_type']);
@@ -141,6 +153,7 @@ class DocumentsImport implements ToCollection, WithHeadingRow
         $deletedAt = !empty($row['deleted_at'])
                 ? Carbon:: parse($row['deleted_at'])
                 : now();
+        \Log::info("Creating Deletion record with registered_at: " . $docToDelete->registered_at);
         IsoMasterDocument::create([
             'document_code' => $docToDelete->document_code,
             'document_title' => $docToDelete->document_title,
@@ -151,7 +164,7 @@ class DocumentsImport implements ToCollection, WithHeadingRow
             'is_original' => false,
             'original_document_id' => $docToDelete->original_document_id ?? $docToDelete->id,
             'status' => 'Deleted',
-            'registered_at' => $docToDelete->registered_at,
+            'registered_at' => $row['registered_at'],
             'deleted_at' => $deletedAt,
             'source' => 'excel',
             'ticket_id' => null,

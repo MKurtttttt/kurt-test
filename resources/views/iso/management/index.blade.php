@@ -399,13 +399,14 @@ const specificOfficeOptions = {
         "(OOP-OIA) Office of International Affairs",
         "(OOP-TRO) Treasury Office",
         "(OOP-UCO) University Chaplain Office"
-    ],
+        ],
     aac: [
         '(AAC) Academic Affairs Office',
         '(AAC-BED) School of Basic Education',
         '(AAC-CJE) College of Criminal Justice Education & Forensics',
         '(AAC-CTL) Center for Teaching & Learning',
         '(AAC-GSR) Graduate Studies & Research',
+        '(AAC-HAT) Holy Angel Travel Services',
         '(AAC-IRB) Institutional Review Board',
         '(AAC-LIB) Library Department',
         '(AAC-LMS) Learning Management System',
@@ -417,7 +418,7 @@ const specificOfficeOptions = {
         '(AAC-SOC) School of Computing',
         '(AAC-STM) School of Hospitality & Tourism Management',
         '(AAC-URO) University Research Office'
-    ],
+        ],
     oie: [
         '(OIE) Office of the Institutional Effectiveness',
         '(OIE-DMO) Institutional Database Management Office',
@@ -426,7 +427,9 @@ const specificOfficeOptions = {
         '(OIE-QAO) Quality Assurance Office'
     ],
     cfs: [
+        '(CFS) Institute for Catholic Formation & Social Integration',
         '(CFS-CES) Office of the Community Extension Services',
+        '(CFS-CEP) Character Education Program Desk',
         '(CFS-CLE) Christian Living Education',
         '(CFS-CMO) Campus Ministry Office'
     ],
@@ -437,12 +440,14 @@ const specificOfficeOptions = {
     frm: [
         '(FRM) Finance and Resource Management Office',
         '(FRM-ACC) Accounts & Collection',
+        '(FRM-ASA) Ancillary Services Accounting',
         '(FRM-ASE) Ancillary Services',
         '(FRM-ATO) Accounting',
         '(FRM-GRT) Grants Accounttant',
         '(FRM-PAO) Payroll'
     ],
     rss: [
+        '(RSS) Records Systems & Services',
         '(RSS-ADO) Admissions Office'
     ],
     ssa: [
@@ -461,6 +466,8 @@ const specificOfficeOptions = {
         '(EAC-PRO) Public Relations Office'
     ],
     csd: [
+        '(CSD) Campus Services & Development Office',
+        '(CSD-CPO) Central Purchasing Office',
         '(CSD-CSO) Campus Services Office',
         '(CSD-ECM) Engineering Construction and Maintenance',
         '(CSD-MCM) Motorpool/Campus Maintenance',
@@ -470,9 +477,13 @@ const specificOfficeOptions = {
         '(CSD-VLO) Venues and Logistics Office'
     ],
     aie: [
+        '(AIE) Institute for academic Innovation & Entrepreneurship',
         '(AIE-ETA) Expanded Tertiary Education, Equivalency & Accreditation',
         '(AIE-SPL) School of Professional Education and Lifelong Learning',
         '(AIE-TBI) Technology Business Incubator - KITTO'
+    ],
+    iat: [
+        '(IAT) Internal Audit Team'
     ]
 };
 const filterModal = document.getElementById('filter_modal');
@@ -666,7 +677,7 @@ function createDocumentRow(doc){
     const hasRevisions = doc.current_revision > 0;
 
     const registeredDate = new Date(doc.registered_at).toLocaleDateString();
-    const supersededDate = doc.superseded_at ? new Date(doc.registered_at).toLocaleDateString() : 'N/A';
+    const supersededDate = doc.superseded_at ? new Date(doc.superseded_at).toLocaleDateString() : 'N/A';
     // Label Mapping
     const typeLabels = {
         'eoms' : 'EOMS Manual',
@@ -818,6 +829,7 @@ document.getElementById('import_form').addEventListener('submit', async function
             throw new Error("Server returned a non-JSON response (likely a 500 error).")
         }
 
+        // Success Message
         if(response.ok){
             document.getElementById('success-message').textContent = data.message;
             document.getElementById('import-success').classList.remove('hidden');
@@ -827,16 +839,20 @@ document.getElementById('import_form').addEventListener('submit', async function
                 window.location.reload();
             }, 2000);
         } else {
+            // Hide success message if it was previously visible
+            document.getElementById('import-success').classList.add('hidden');
+            
             const errorList = document.getElementById('error-list');
             errorList.innerHTML = '';
 
             if(data.errors) {
-                Object.values(data.errors).forEach(errorArray => {
-                    errorArray.forEach(error => {
-                        const li = document.createElement('li');
-                        li.textContent = error;
-                        errorList.appendChild(li);
-                    });
+                // Flatten the errors into one single array regardless of structure
+                const allErrors = Object.values(data.errors).flat();
+                allErrors.forEach(error => {
+                    const li = document.createElement('li');
+                    li.className = 'py-0.5' // add a little spacing
+                    li.textContent = error;
+                    errorList.appendChild(li);
                 });
             } else {
                 const li = document.createElement('li');
