@@ -490,10 +490,13 @@ class IsoDocumentController extends Controller
                             throw new \Exception("Could not find the Original Document to revise (ID: {$document->revising_master_document_id})");
                         }
 
+                        $originalDoc->timestamps = false; // Debug: Remove this if ever
                         $originalDoc->update([
                             'status' => 'Superseded',
                             'superseded_at'=> now(),
                         ]);
+                        $originalDoc->timestamps = true; //This too
+
                         $masterDoc = IsoMasterDocument::create([
                             'document_code' => $originalDoc->document_code,
                             'document_title' => $document->document_title,
@@ -519,10 +522,13 @@ class IsoDocumentController extends Controller
                             throw new \Exception("Document to delete not found (ID: {$document->revising_master_document_id})");
                         }
 
+                        $docToDelete->timestamps = false;
                         $docToDelete->update([
                             'status' => 'Superseded',
                             'superseded_at' => now()
                         ]);
+                        $docToDelete->timestamps = true;
+
                         // Create deletion record for audit trail
                         $masterDoc = IsoMasterDocument::create([
                             'document_code' => $docToDelete->document_code,

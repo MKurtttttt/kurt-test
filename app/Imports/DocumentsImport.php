@@ -4,10 +4,10 @@ namespace App\Imports;
 
 use App\Models\IsoMasterDocument;
 use App\Helpers\IsoManagement\OfficeMapper;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Collection;
-use Carbon\Carbon;
 
 class DocumentsImport implements ToCollection, WithHeadingRow
 {
@@ -70,7 +70,7 @@ class DocumentsImport implements ToCollection, WithHeadingRow
     }
 
     protected function importRow($row, $rowNumber){
-        \Log::info("Row {$rowNumber} data: ", $row->toArray());
+        // \Log::info("Row {$rowNumber} data: ", $row->toArray());
         $isOriginal = (int)$row['current_revision'] === 0;
         $originalDocId = null;
 
@@ -97,12 +97,11 @@ class DocumentsImport implements ToCollection, WithHeadingRow
             }
             $originalDocId = $original->id;
             
-            // Make the original document superseded
             $original->update([
-                    'status' => 'Superseded',
-                    'superseded_at' => $registeredAt, //The registered At date of the Current row
-                ]
-            );
+                'status' => 'Superseded',
+                'superseded_at' => $registeredAt // use the date of the registered document to mark
+                // The date where the original document is superseded at
+            ]);
         }
         
         IsoMasterDocument::create([
@@ -136,15 +135,12 @@ class DocumentsImport implements ToCollection, WithHeadingRow
 
         //Get the value of the deleted date
         $deletedDate = $row['deleted_at'];
-        \Log::info("BEFORE Update - registered at: " . $docToDelete->registered_at);
-
         // Mark original as superseded
         $docToDelete->update([
             'status' => 'Superseded',
             'superseded_at' => $deletedDate
         ]);
-
-        \Log::info("AFTER Update - registered at: " . $docToDelete->registered_at);
+        
         // Map originating section and normalize source type
         $originatingSection = OfficeMapper::map($row['originating_section']);
         $sourceType = OfficeMapper::normalizeSourceType($row['source_type']);
@@ -153,7 +149,7 @@ class DocumentsImport implements ToCollection, WithHeadingRow
         $deletedAt = !empty($row['deleted_at'])
                 ? Carbon:: parse($row['deleted_at'])
                 : now();
-        \Log::info("Creating Deletion record with registered_at: " . $docToDelete->registered_at);
+        // \Log::info("Creating Deletion record with registered_at: " . $docToDelete->registered_at);
         IsoMasterDocument::create([
             'document_code' => $docToDelete->document_code,
             'document_title' => $docToDelete->document_title,
