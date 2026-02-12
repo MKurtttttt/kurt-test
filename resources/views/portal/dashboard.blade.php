@@ -74,189 +74,199 @@ $mname = '';
 
             <!-- end of card slot  -->
 
-
-              <!-- a card slot  -->
-              <a href = "{{route('portal.loads')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/loads.svg')}}"/> </div>
-                    <div class  = "nav-card-title"> <h3> Teaching Loads</h3> </div> 
-                </div> 
-            </a> 
-
-            <!-- end of card slot  -->
-
-            <!-- a card slot  -->
-            <a href = "{{route('portal.hiring')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/hiring.png')}}"/> </div>
-                    <div class  = "nav-card-title"> <h3> Hiring History</h3> </div> 
-                </div> 
-            </a> 
-
-            <!-- end of card slot  -->
-
-
-            <!-- a card slot  -->
-            <a href = "{{route('portal.org')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/organization.svg')}}"/> </div>
-                    <div class  = "nav-card-title"> <h3> Organizations</h3> </div> 
-                </div> 
-            </a> 
-
-             <!-- a card slot  -->
-             <a href = "{{route('portal.respub')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/research.svg')}}"/> </div>
-                    <div class  = "nav-card-title"> <h3> Research & Publication</h3> </div> 
-                </div> 
-            </a> 
-
-            <!-- end of card slot  -->
-
-
-            <!-- end of card slot  -->
-
-        </div> 
-    </div> 
-    <div class = "navigation-cards">
-        <div class = "navigation-cards-box-5">
-            <!-- a card slot  -->
-            <a href = "{{route('portal.certifications')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/cert.svg')}}"> </div>
-                    <div class  = "nav-card-title"> <h3> Certifications</h3> </div> 
-                </div> 
-            </a> 
-
-            <!-- end of card slot  -->
-            <a href = "{{route('portal.training')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/training.svg')}}"/> </div>
-                    <div class  = "nav-card-title"> <h3>Trainings</h3> </div> 
-                </div> 
-            </a> 
-
-            <!-- end of card slot  -->
-
-
-              <!-- a card slot  -->
-              <a href = "{{route('portal.license')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/license.png')}}"/> </div>
-                    <div class  = "nav-card-title"> <h3> Licenses</h3> </div> 
-                </div> 
-            </a> 
-
-            <!-- end of card slot  -->
+            @if (Auth::user()->role !== 'ISO Document Handler')
             
-            <!-- a card slot  -->
-            <a href = "{{route('portal.edu-bg')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon w-24 h-24"> <img src = "{{asset('images/icons/portal_nav/education.png')}}"/> </div>
-                    <div class  = "nav-card-title"> <h3> Educational Background</h3> </div> 
-                </div> 
-            </a> 
+                <!-- a card slot  -->
+                <a href = "{{route('portal.loads')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/loads.svg')}}"/> </div>
+                        <div class  = "nav-card-title"> <h3> Teaching Loads</h3> </div> 
+                    </div> 
+                </a> 
 
-            <!-- end of card slot  -->
+                <!-- end of card slot  -->
 
-            <!-- a card slot  -->
-            <a href = "{{route('portal.employment')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/employment.png')}}"/> </div>
-                    <div class  = "nav-card-title"> <h3> Employment</h3> </div> 
-                </div> 
-            </a> 
+                <!-- a card slot  -->
+                <a href = "{{route('portal.hiring')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/hiring.png')}}"/> </div>
+                        <div class  = "nav-card-title"> <h3> Hiring History</h3> </div> 
+                    </div> 
+                </a> 
 
-            <!-- end of card slot  -->
+                <!-- end of card slot  -->
 
+
+                <!-- a card slot  -->
+                <a href = "{{route('portal.org')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/organization.svg')}}"/> </div>
+                        <div class  = "nav-card-title"> <h3> Organizations</h3> </div> 
+                    </div> 
+                </a> 
+
+                <!-- a card slot  -->
+                <a href = "{{route('portal.respub')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/research.svg')}}"/> </div>
+                        <div class  = "nav-card-title"> <h3> Research & Publication</h3> </div> 
+                    </div> 
+                </a> 
+
+                <!-- end of card slot  -->
+
+
+                <!-- end of card slot  -->
+
+            </div> 
         </div> 
-    </div> 
-
-    <div class = "navigation-cards">
-        <div class = "navigation-cards-box-5">
-
-            <!-- a card slot  -->
-            <a href = "{{route('portal.dependencies')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/dep.svg')}}" class = "w-24 h-24"/> </div>
-                    <div class  = "nav-card-title"> <h3> Dependents</h3> </div> 
-                </div> 
-            </a> 
-
-            <!-- end of card slot  -->
-
-
-            <!-- a card slot  -->
-            <a href = "{{route('portal.pending')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/pending.svg')}}"/> </div>
-                    <div class  = "nav-card-title"> <h3> Pending Requests</h3> </div> 
-                </div> 
-            </a> 
-
-            <!-- end of card slot  -->
-
-            <!-- a card slot  -->
-            <a href = "{{route('portal.filing.type')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/send.svg')}}" class = "w-24 h-24"/> </div>
-                    <div class  = "nav-card-title"> <h3> Filing Application</h3> </div> 
-                </div> 
-            </a> 
-
-            <!-- end of card slot  -->
-
-            <!-- a card slot  -->
-                <a href = "{{route('sharepoint-sites.dashboard')}}">
+        <div class = "navigation-cards">
+            <div class = "navigation-cards-box-5">
+                <!-- a card slot  -->
+                <a href = "{{route('portal.certifications')}}">
                     <div class = "nav-card"> 
-                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/sharepoint.png')}}" class = "w-24 h-24"/> </div>
-                        <div class  = "nav-card-title"> <h3>SharePoint Sites</h3> </div> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/cert.svg')}}"> </div>
+                        <div class  = "nav-card-title"> <h3> Certifications</h3> </div> 
                     </div> 
                 </a> 
 
-            <!-- end of card slot  -->
-
-            <!-- a card slot  -->
-                <a href = "{{route('knowledge-hub.dashboard')}}">
+                <!-- end of card slot  -->
+                <a href = "{{route('portal.training')}}">
                     <div class = "nav-card"> 
-                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/knowledge.png')}}" class = "w-24 h-24"/> </div>
-                        <div class  = "nav-card-title"> <h3>Knowledge Hub</h3> </div> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/training.svg')}}"/> </div>
+                        <div class  = "nav-card-title"> <h3>Trainings</h3> </div> 
                     </div> 
                 </a> 
 
-            <!-- end of card slot  -->
+                <!-- end of card slot  -->
 
+
+                <!-- a card slot  -->
+                <a href = "{{route('portal.license')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/license.png')}}"/> </div>
+                        <div class  = "nav-card-title"> <h3> Licenses</h3> </div> 
+                    </div> 
+                </a> 
+
+                <!-- end of card slot  -->
+                
+                <!-- a card slot  -->
+                <a href = "{{route('portal.edu-bg')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon w-24 h-24"> <img src = "{{asset('images/icons/portal_nav/education.png')}}"/> </div>
+                        <div class  = "nav-card-title"> <h3> Educational Background</h3> </div> 
+                    </div> 
+                </a> 
+
+                <!-- end of card slot  -->
+
+                <!-- a card slot  -->
+                <a href = "{{route('portal.employment')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/employment.png')}}"/> </div>
+                        <div class  = "nav-card-title"> <h3> Employment</h3> </div> 
+                    </div> 
+                </a> 
+
+                <!-- end of card slot  -->
+
+            </div> 
         </div> 
-    </div>
-    
-    
-    <div class = "navigation-cards">
-        <div class = "navigation-cards-box-5">
 
-            <!-- a card slot  -->
-                <a href = "{{route('kpis.dashboard')}}">
+        <div class = "navigation-cards">
+            <div class = "navigation-cards-box-5">
+
+                <!-- a card slot  -->
+                <a href = "{{route('portal.dependencies')}}">
                     <div class = "nav-card"> 
-                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/kpi.png')}}" class = "w-24 h-24"/> </div>
-                        <div class  = "nav-card-title"> <h3>KPIs</h3> </div> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/dep.svg')}}" class = "w-24 h-24"/> </div>
+                        <div class  = "nav-card-title"> <h3> Dependents</h3> </div> 
                     </div> 
                 </a> 
 
-            <!-- end of card slot  -->
+                <!-- end of card slot  -->
 
-            @if(Auth::user()->role === 'IDC Admin' || Auth::user()->role === 'SuperAdmin')
-            <!-- a card slot  -->
-            <a href = "{{route('iso.document')}}">
-                <div class = "nav-card"> 
-                    <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/iso.png')}}" class = "w-24 h-24"/> </div>
-                    <div class  = "nav-card-title"> <h3> ISO Document Handling</h3> </div> 
+
+                <!-- a card slot  -->
+                <a href = "{{route('portal.pending')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/pending.svg')}}"/> </div>
+                        <div class  = "nav-card-title"> <h3> Pending Requests</h3> </div> 
+                    </div> 
+                </a> 
+
+                <!-- end of card slot  -->
+
+                <!-- a card slot  -->
+                <a href = "{{route('portal.filing.type')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/send.svg')}}" class = "w-24 h-24"/> </div>
+                        <div class  = "nav-card-title"> <h3> Filing Application</h3> </div> 
+                    </div> 
+                </a> 
+
+                <!-- end of card slot  -->
+
+                <!-- a card slot  -->
+                    <a href = "{{route('sharepoint-sites.dashboard')}}">
+                        <div class = "nav-card"> 
+                            <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/sharepoint.png')}}" class = "w-24 h-24"/> </div>
+                            <div class  = "nav-card-title"> <h3>SharePoint Sites</h3> </div> 
+                        </div> 
+                    </a> 
+
+                <!-- end of card slot  -->
+
+                <!-- a card slot  -->
+                    <a href = "{{route('knowledge-hub.dashboard')}}">
+                        <div class = "nav-card"> 
+                            <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/knowledge.png')}}" class = "w-24 h-24"/> </div>
+                            <div class  = "nav-card-title"> <h3>Knowledge Hub</h3> </div> 
+                        </div> 
+                    </a> 
+
+                <!-- end of card slot  -->
+                 <div class = "navigation-cards">
+                <div class = "navigation-cards-box-5">
+
+                    <!-- a card slot  -->
+                        <a href = "{{route('kpis.dashboard')}}">
+                            <div class = "nav-card"> 
+                                <div class = "nav-card-icon"> <img src = "{{asset('images/icons/nav/kpi.png')}}" class = "w-24 h-24"/> </div>
+                                <div class  = "nav-card-title"> <h3>KPIs</h3> </div> 
+                            </div> 
+                        </a> 
+
+                    <!-- end of card slot  -->
+
+                    @if(Auth::user()->role === 'IDC Admin' || Auth::user()->role === 'SuperAdmin')
+                    <!-- a card slot  -->
+                    <a href = "{{route('iso.document')}}">
+                        <div class = "nav-card"> 
+                            <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/iso.png')}}" class = "w-24 h-24"/> </div>
+                            <div class  = "nav-card-title"> <h3> ISO Document Handling</h3> </div> 
+                        </div> 
+                    </a> 
+                    <!-- end of card slot  -->
+                    @endif
                 </div> 
-            </a> 
-
-            <!-- end of card slot  -->
+            </div>
+            @elseif(Auth::user()->role === 'ISO Document Handler')
+                <!-- a card slot  -->
+                <a href = "{{route('iso.document')}}">
+                    <div class = "nav-card"> 
+                        <div class = "nav-card-icon"> <img src = "{{asset('images/icons/portal_nav/iso.png')}}" class = "w-24 h-24"/> </div>
+                        <div class  = "nav-card-title"> <h3> ISO Document Handling</h3> </div> 
+                    </div> 
+                </a> 
+                <!-- end of card slot  -->
             @endif
-        </div> 
+        </div>
     </div>
+    
+    
+    
     
 </x-app-layout>
 

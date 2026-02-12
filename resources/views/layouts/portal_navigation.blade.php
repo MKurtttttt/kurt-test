@@ -53,212 +53,213 @@
                             <h3>Profile</h3>
             
                     </div>
-                </a> 
+                </a>
+                @if(Auth::user()->role === 'IDC Admin' || Auth::user()->role === 'SuperAdmin' || Auth::user()->role === 'ISO Document Handler')
+                    <!-- A LINK NAVIGATION Can only be seen by IDC Admin and SuperAdmin-->
+                    <a href="{{ route('iso.document') }}" class="{{ request()->routeIs('iso*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                                <img src="{{ asset('images/icons/portal_nav/iso.png') }}" />
+                                <h3>ISO Document Handling</h3>
+                        </div>
+                    </a> 
+                @endif
 
-                   <!-- A LINK NAVIGATION  -->
-                   <a href="{{ route('portal.loads') }}" class="{{ request()->routeIs('portal.loads*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
-                       
-                            <img src="{{ asset('images/icons/portal_nav/loads.svg') }}" />
-                     
-                     
-                            <h3>Teaching Loads</h3>
-            
-                    </div>
-                </a> 
+                @if (Auth::user()->role !== 'ISO Document Handler')
+                        <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('portal.loads') }}" class="{{ request()->routeIs('portal.loads*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                        
+                                <img src="{{ asset('images/icons/portal_nav/loads.svg') }}" />
+                        
+                        
+                                <h3>Teaching Loads</h3>
+                
+                        </div>
+                    </a> 
+
+                        <!-- A LINK NAVIGATION  -->
+                        <a href="{{ route('portal.hiring') }}" class="{{ request()->routeIs('portal.hiring*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                        
+                                <img src="{{ asset('images/icons/portal_nav/hiring.png') }}" />
+                        
+                        
+                                <h3>Hiring History</h3>
+                
+                        </div>
+                    </a> 
+
+
+
 
                     <!-- A LINK NAVIGATION  -->
-                    <a href="{{ route('portal.hiring') }}" class="{{ request()->routeIs('portal.hiring*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
-                       
-                            <img src="{{ asset('images/icons/portal_nav/hiring.png') }}" />
-                     
-                     
-                            <h3>Hiring History</h3>
+                    <a href="{{ route('portal.org') }}" class="{{ request()->routeIs('portal.org*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/portal_nav/organization.svg') }}" />
+                        
+                        
+                                <h3>Organizations</h3>
+                        
+                        </div>
+                    </a> 
+
+
+
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('portal.respub') }}" class="{{ request()->routeIs('portal.respub*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/portal_nav/research.svg') }}" />
+                        
+                        
+                                <h3>Research & Publication</h3>
+                            
+                        </div>
+                    </a> 
+
+                    <a href="{{ route('portal.certifications') }}" class="{{ request()->routeIs('portal.certifications*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/portal_nav/cert.svg') }}" />
+                        
+                                <h3> Certifications </h3>
+                        
+                        </div>
+                    </a> 
+
             
-                    </div>
-                </a> 
-
-
-
-
-                <!-- A LINK NAVIGATION  -->
-                <a href="{{ route('portal.org') }}" class="{{ request()->routeIs('portal.org*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/portal_nav/organization.svg') }}" />
+                    <a href="{{ route('portal.training') }}" class="{{ request()->routeIs('portal.training*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/portal_nav/training.svg') }}" />
                     
-                     
-                            <h3>Organizations</h3>
+                        
+                                <h3> Trainings </h3>
                     
-                    </div>
-                </a> 
+                        </div>
+                    </a> 
 
 
-
-                 <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('portal.respub') }}" class="{{ request()->routeIs('portal.respub*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
+                    <a href="{{ route('portal.license') }}" class="{{ request()->routeIs('portal.license*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/portal_nav/license.png') }}" />
                         
-                            <img src="{{ asset('images/icons/portal_nav/research.svg') }}" />
-                       
-                     
-                            <h3>Research & Publication</h3>
+                                <h3>Licenses</h3>
                         
-                    </div>
-                </a> 
+                        </div>
+                    </a> 
 
-                <a href="{{ route('portal.certifications') }}" class="{{ request()->routeIs('portal.certifications*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/portal_nav/cert.svg') }}" />
                     
-                            <h3> Certifications </h3>
-                      
-                    </div>
-                </a> 
-
-        
-                <a href="{{ route('portal.training') }}" class="{{ request()->routeIs('portal.training*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
+                    <a href="{{ route('portal.edu-bg') }}" class="{{ request()->routeIs('portal.edu-bg') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/portal_nav/education.png') }}" />
                         
-                            <img src="{{ asset('images/icons/portal_nav/training.svg') }}" />
-                
-                     
-                            <h3> Trainings </h3>
-                  
-                    </div>
-                </a> 
-
-
-                <a href="{{ route('portal.license') }}" class="{{ request()->routeIs('portal.license*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
+                                <h3> Educational Background</h3>
                         
-                            <img src="{{ asset('images/icons/portal_nav/license.png') }}" />
+                        </div>
+                    </a> 
+
+
+
+                    <a href="{{ route('portal.employment') }}" class="{{ request()->routeIs('portal.employment*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/portal_nav/employment.png') }}" />
+                        
+                                <h3> Employment</h3>
+                        
+                        </div>
+                    </a> 
+
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('portal.dependencies') }}" class="{{ request()->routeIs('portal.dependencies*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/portal_nav/dep.svg') }}" />
                     
-                            <h3>Licenses</h3>
-                      
-                    </div>
-                </a> 
+                                <h3>Dependents </h3>
+                            
+                        </div>
+                    </a> 
 
-                
-                <a href="{{ route('portal.edu-bg') }}" class="{{ request()->routeIs('portal.edu-bg') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/portal_nav/education.png') }}" />
                     
-                            <h3> Educational Background</h3>
-                      
-                    </div>
-                </a> 
-
-
-
-                <a href="{{ route('portal.employment') }}" class="{{ request()->routeIs('portal.employment*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/portal_nav/employment.png') }}" />
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('portal.pending') }}" class="{{ request()->routeIs('portal.pending*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/portal_nav/pending.svg') }}" />
                     
-                            <h3> Employment</h3>
-                      
-                    </div>
-                </a> 
-
-                   <!-- A LINK NAVIGATION  -->
-                   <a href="{{ route('portal.dependencies') }}" class="{{ request()->routeIs('portal.dependencies*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/portal_nav/dep.svg') }}" />
-                   
-                            <h3>Dependents </h3>
-                        
-                    </div>
-                </a> 
-
-                
-                 <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('portal.pending') }}" class="{{ request()->routeIs('portal.pending*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/portal_nav/pending.svg') }}" />
-                 
-                            <h3>Pending Requests</h3>
+                                <h3>Pending Requests</h3>
 
 
-                        
-                  
-                    </div>
-                </a> 
-
-
-                 <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('portal.filing.type') }}" class="{{ request()->routeIs('portal.filing*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/portal_nav/send.svg') }}" />
+                            
                     
-                     
-                            <h3>Filing Application</h3>
-                     
-                    </div>
-                </a>
+                        </div>
+                    </a> 
 
-                <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('sharepoint-sites.dashboard') }}" class="{{ request()->routeIs('sharepoint-sites*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
+
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('portal.filing.type') }}" class="{{ request()->routeIs('portal.filing*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/portal_nav/send.svg') }}" />
                         
-                            <img src="{{ asset('images/icons/nav/sharepoint.svg') }}" />
-                    
-                     
-                            <h3>SharePoint Sites</h3>
-                     
-                    </div>
-                </a> 
-
-                <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('knowledge-hub.dashboard') }}" class="{{ request()->routeIs('knowledge-hub*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
                         
-                            <img src="{{ asset('images/icons/nav/knowledge.svg') }}" />
-                    
-                     
-                            <h3>Knowledge Hub</h3>
-                     
-                    </div>
-                </a>
-
-                <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('kpis.dashboard') }}" class="{{ request()->routeIs('kpis*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
+                                <h3>Filing Application</h3>
                         
-                            <img src="{{ asset('images/icons/nav/kpi.png') }}" />
-                    
-                     
-                            <h3>KPIs</h3>
-                     
-                    </div>
-                </a> 
+                        </div>
+                    </a>
 
-                
-                @if(Auth::user()->role === 'IDC Admin' || Auth::user()->role === 'SuperAdmin')
-                <!-- A LINK NAVIGATION Can only be seen by IDC Admin and SuperAdmin-->
-                <a href="{{ route('iso.document') }}" class="{{ request()->routeIs('iso*') ? 'font-semibold' : '' }}">
-                    <div class="nav-link">
-                            <img src="{{ asset('images/icons/portal_nav/iso.png') }}" />
-                            <h3>ISO Document Handling</h3>
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('sharepoint-sites.dashboard') }}" class="{{ request()->routeIs('sharepoint-sites*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/sharepoint.svg') }}" />
+                        
+                        
+                                <h3>SharePoint Sites</h3>
+                        
+                        </div>
+                    </a> 
+
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('knowledge-hub.dashboard') }}" class="{{ request()->routeIs('knowledge-hub*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/knowledge.svg') }}" />
+                        
+                        
+                                <h3>Knowledge Hub</h3>
+                        
+                        </div>
+                    </a>
+
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('kpis.dashboard') }}" class="{{ request()->routeIs('kpis*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/kpi.png') }}" />
+                        
+                        
+                                <h3>KPIs</h3>
+                        
+                        </div>
+                    </a> 
+                    
+                    @if(Auth::user()->role !== 'Employee')
+                    <!-- A LINK NAVIGATION  -->
+                    <div class="w-full flex justify-center my-4">
+                        <a href="{{route('dashboard')}}" class="w-[90%] flex items-center justify-center px-4 py-1 gap-2 bg-white hover:bg-gray-200 rounded-xl">
+                        <img src="{{asset('images/icons/back_maroon.png')}}" alt="" class="w-[20px] h-[20px">
+                            <span class="text-red-900 font-semibold">Back to Main Dashboard</span>
+                        </a>
                     </div>
-                </a> 
+                    @endif
                 @endif
-                
-         @if(Auth::user()->role !== 'Employee')
-        <!-- A LINK NAVIGATION  -->
-        <div class="w-full flex justify-center my-4">
-            <a href="{{route('dashboard')}}" class="w-[90%] flex items-center justify-center px-4 py-1 gap-2 bg-white hover:bg-gray-200 rounded-xl">
-            <img src="{{asset('images/icons/back_maroon.png')}}" alt="" class="w-[20px] h-[20px">
-                <span class="text-red-900 font-semibold">Back to Main Dashboard</span>
-            </a>
-        </div>
-        @endif
+                   
 
 
 

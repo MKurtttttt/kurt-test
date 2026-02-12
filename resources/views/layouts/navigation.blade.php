@@ -10,153 +10,157 @@
     </div>
 
     <div class = "navigation_links"> 
-
-                     <!-- A LINK NAVIGATION  -->
-                     <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard*') ? 'active' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/nav/dashboard.svg') }}" />
-                        
-                            <h3>Dashboard</h3>
-                        
-                    </div>
-                </a> 
-
-                 <!-- A LINK NAVIGATION  -->
-                <a href="{{ route('manage-emps.dashboard') }}" class="{{ request()->routeIs('manage-emps*') ? 'active' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/nav/employees.svg') }}" />
-                        
-                            <h3>Manage Employees</h3>
-                 
-                    </div>
-                </a> 
-
-
-                 <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('construction') }}" class="{{ request()->routeIs('scholarships-grants*') ? 'active' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/nav/scholarships.svg') }}" />
-                        
-                            <h3>Scholarships and Grants</h3>
-                     
-                    </div>
-                </a> 
-
-
-                 <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('construction')  }}" class="{{ request()->routeIs('outreach_programs*') ? 'active' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/nav/outreach.svg') }}" />
-                        
-                            <h3>Outreach Programs</h3>
-                   
-                    </div>
-                </a> 
-
-
-                 <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('construction')  }}" class="{{ request()->routeIs('accreditations*') ? 'active' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/nav/accreditation.svg') }}" />
-                        
-                            <h3>Accreditations</h3>
-                    
-                    </div>
-                </a> 
-
-
-                 <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('construction') }}" class="{{ request()->routeIs('research*') ? 'active' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/nav/research.svg') }}" />
-                        
-                            <h3>Research</h3>
-                      
-                    </div>
-                </a> 
-                
-                @if(Auth::user()->role !== 'Employee' && Auth::user()->role !== 'Dean' && Auth::user()->role !== 'HR Admin' )
-                <a href="{{route('admin.prc')}}" class="{{ request()->routeIs('admin.prc*')? 'active' : ''}}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/portal_nav/prc.png') }}" />
-                 
-                            <h3>PRC Results</h3>
-                  
-                    </div>
-                </a>
-                @endif
-
-                @if(Auth::user()->role !== 'Employee')
-                <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('sharepoint-sites.dashboard') }}" class="{{ request()->routeIs('sharepoint-sites*') ? 'active' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/nav/sharepoint.svg') }}" class = "w-24 h-24"/>
-                        
-                            <h3>SharePoint Sites</h3>
-                      
-                    </div>
-                </a>
-
-                <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('knowledge-hub.dashboard') }}" class="{{ request()->routeIs('knowledge-hub*') ? 'active' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/nav/knowledge.svg') }}" class = "w-24 h-24"/>
-                        
-                            <h3>Knowledge Hub</h3>
-                      
-                    </div>
-                </a>
-
-                <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('kpis.dashboard') }}" class="{{ request()->routeIs('kpis*') ? 'active' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/nav/kpi.png') }}" class = "w-24 h-24"/>
-                        
-                            <h3>KPIs</h3>
-                      
-                    </div>
-                </a> 
-                @endif
-
                 <!-- TODO: fix the if statements here to fit on the role available for the ISO Document Handlers and Admin -->
-                @if(Auth::user()->role === 'IDC Admin' || Auth::user()->role === 'SuperAdmin')
+                @if(Auth::user()->role === 'IDC Admin' || Auth::user()->role === 'SuperAdmin' || Auth::user()->role === 'ISO Document Handler')
                 <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('iso.document') }}" class="{{ request()->routeIs('iso*') ? 'active' : '' }}">
+                <a href="{{ route('iso.document') }}" class="{{ request()->routeIs('iso*') ? 'active' : '' }}">
                     <div class="nav-link">
                             <img src="{{ asset('images/icons/portal_nav/iso.png') }}" />
                             <h3>ISO Document Handling</h3>
                     </div>
                 </a> 
+                @endif 
+                @if (Auth::user()->role !== 'ISO Document Handler')
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard*') ? 'active' : '' }}">
+                        <div class="nav-link">
+                            <img src="{{ asset('images/icons/nav/dashboard.svg') }}" />
+                            <h3>Dashboard</h3>
+                        </div>
+                    </a>
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('manage-emps.dashboard') }}" class="{{ request()->routeIs('manage-emps*') ? 'active' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/employees.svg') }}" />
+                            
+                                <h3>Manage Employees</h3>
+                    
+                        </div>
+                    </a> 
+
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('construction') }}" class="{{ request()->routeIs('scholarships-grants*') ? 'active' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/scholarships.svg') }}" />
+                            
+                                <h3>Scholarships and Grants</h3>
+                        
+                        </div>
+                    </a> 
+
+
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('construction')  }}" class="{{ request()->routeIs('outreach_programs*') ? 'active' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/outreach.svg') }}" />
+                            
+                                <h3>Outreach Programs</h3>
+                    
+                        </div>
+                    </a> 
+
+
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('construction')  }}" class="{{ request()->routeIs('accreditations*') ? 'active' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/accreditation.svg') }}" />
+                            
+                                <h3>Accreditations</h3>
+                        
+                        </div>
+                    </a> 
+
+
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('construction') }}" class="{{ request()->routeIs('research*') ? 'active' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/research.svg') }}" />
+                            
+                                <h3>Research</h3>
+                        
+                        </div>
+                    </a> 
+                    
+                    @if(Auth::user()->role !== 'Employee' && Auth::user()->role !== 'Dean' && Auth::user()->role !== 'HR Admin' )
+                    <a href="{{route('admin.prc')}}" class="{{ request()->routeIs('admin.prc*')? 'active' : ''}}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/portal_nav/prc.png') }}" />
+                    
+                                <h3>PRC Results</h3>
+                    
+                        </div>
+                    </a>
+                    @endif
+
+                    @if(Auth::user()->role !== 'Employee')
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('sharepoint-sites.dashboard') }}" class="{{ request()->routeIs('sharepoint-sites*') ? 'active' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/sharepoint.svg') }}" class = "w-24 h-24"/>
+                            
+                                <h3>SharePoint Sites</h3>
+                        
+                        </div>
+                    </a>
+
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('knowledge-hub.dashboard') }}" class="{{ request()->routeIs('knowledge-hub*') ? 'active' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/knowledge.svg') }}" class = "w-24 h-24"/>
+                            
+                                <h3>Knowledge Hub</h3>
+                        
+                        </div>
+                    </a>
+
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('kpis.dashboard') }}" class="{{ request()->routeIs('kpis*') ? 'active' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/kpi.png') }}" class = "w-24 h-24"/>
+                            
+                                <h3>KPIs</h3>
+                        
+                        </div>
+                    </a> 
+                    @endif
+                    
+                    @if(Auth::user()->role !== 'Employee')
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('visitor-count.dashboard') }}" class="{{ request()->routeIs('visitor-count*') ? 'active' : '' }}">
+                        <div class="nav-link">
+                            
+                                <img src="{{ asset('images/icons/nav/visitor_count.svg') }}" class = "w-24 h-24"/>
+                            
+                                <h3>Visitor Counter</h3>
+                        
+                        </div>
+                    </a>
+                    @endif
+                    @elseif(Auth::user()->role === 'ISO Document Handler')
+                    <!-- A LINK NAVIGATION  -->
+                    <a href="{{ route('portal.dashboard') }}" class="{{ request()->routeIs('portal.dashboard*') ? 'font-semibold' : '' }}">
+                        <div class="nav-link">        
+                            <img src="{{ asset('images/icons/nav/dashboard.svg') }}" />
+                            <h3>Dashboard</h3>
+                        </div>            
+                    </a> 
                 @endif
                 
-                @if(Auth::user()->role !== 'Employee')
-                <!-- A LINK NAVIGATION  -->
-                 <a href="{{ route('visitor-count.dashboard') }}" class="{{ request()->routeIs('visitor-count*') ? 'active' : '' }}">
-                    <div class="nav-link">
-                        
-                            <img src="{{ asset('images/icons/nav/visitor_count.svg') }}" class = "w-24 h-24"/>
-                        
-                            <h3>Visitor Counter</h3>
-                      
-                    </div>
-                </a>
-                @endif
     </div> 
 
     <div class="navigation-links">
 
-    <!-- Employee Dashboard (shown to everyone EXCEPT Employee role) -->
-    @if(Auth::user()->role !== 'Employee')
+    <!-- Employee Dashboard (shown to everyone EXCEPT for Employee role and ISO Document Handler) -->
+    @if(Auth::user()->role !== 'Employee' && Auth::user()->role !== 'ISO Document Handler')
         <hr>
        <a href="{{ route('portal.dashboard') }}" class="{{ request()->routeIs('portal.dashboard*') ? 'font-semibold' : '' }}">
             <div class="nav-link">        
