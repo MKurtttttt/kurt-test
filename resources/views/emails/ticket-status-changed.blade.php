@@ -86,8 +86,6 @@
             <h1> ISO Ticket Status Update</h1>
         </div>
         <div class="email-body">
-            <p>Hello <strong>{{ $recipientName ?? 'User' }}</strong></p>
-
             <p>A ticket status has been updated in the ISO Document Management System.</p>
         </div>
         <!-- Status Change display -->
@@ -105,35 +103,24 @@
         <div class="info-box">
             <div class="info-row">
                 <span class="info-label">Ticket ID:</span>
-                <span>#{{ $ticket->id }}</span>
+                <span>{{ $ticket->ticket_number }}</span>
             </div>
             <div class="info-row">
-                <span class="info-label">Document Title:</span>
-                <span>#{{ $ticket->documents->first()->document_title ?? 'N/A' }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Document Code:</span>
-                <span>#{{ $ticket->documents->first()->document_code?? 'N/A' }}</span>
+                <span class="info-label">Department/Office:</span>
+                <span>{{ $ticket->originating_section }}</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Submitted by:</span>
-                <span>#{{ $ticket->creator->name ?? 'N/A' }}</span>
+                <span>{{ $ticket->creator->name ?? 'N/A' }}</span>
             </div>
             <div class="info-row">
-                <span class="info-label">Changed By:</span>
-                <span>#{{ $changedBy}}</span>
+                <span class="info-label">Status changed by:</span>
+                <span>{{ $changedBy}}</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Date & Time:</span>
-                <span>#{{ now()->format('F j, Y - g:i A') }}</span>
+                <span>{{ now()->format('F j, Y - g:i A') }}</span>
             </div>
-        </div>
-
-        <!-- Call to Action -->
-        <div style="text-align: center;">
-            <a href="{{ url('/tickets/' . $ticket->id) }}" class="button">
-                View Ticket Details
-            </a>
         </div>
 
         <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
@@ -146,7 +133,7 @@
         <p><strong>Holy Angel University</strong><br>
         Office of Institutional Effectiveness - IDMO</p>
         <p style="margin-top: 10px;">
-            © {{ date('Y') }} HAU-OIE-IDMO. All rights reserved.
+            © {{ date('Y') }} HAU-OIE. All rights reserved.
         </p>
     </div>
 </body>

@@ -883,11 +883,6 @@ function getStatusColor($status){
             const documentsJson = e.target.dataset.ticketDocuments;
             const documentsList = document.getElementById('detail_documents_list');
 
-            // TODO: Remove this Debug in the future
-            console.log('Raw JSON string:', documentsJson);
-            console.log('Type:', typeof documentsJson);
-            console.log('length', documentsJson.length);
-
             // Debug: Try to parse with error Handling
             let ticketDocuments = [];
             try{

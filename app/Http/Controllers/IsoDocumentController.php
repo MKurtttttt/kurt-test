@@ -57,7 +57,7 @@ class IsoDocumentController extends Controller
         if ($search) {
             $query->where(function($q) use ($search) {
             // Search in ticket fields
-            $q->where('id', '=',  $search)
+            $q->where('ticket_number', 'like',  "%$search%")
                 ->orWhere('originating_section', 'like', "%{$search}%")
             //Search in related documents
                 ->orWhereHas('documents', function($docQuery) use ($search) {
@@ -372,7 +372,7 @@ class IsoDocumentController extends Controller
         // Email the Document Handler (Ticket owner)
         Mail::to($ticket->creator->email)
             ->queue(new TicketStatusChanged($ticket, $oldStatus, $changedBy));
-        
+        \Log::info("Email of: " .$ticket->creator . ". Is: " . $ticket->creator->email);
         // Delay for the free trial of Mailtrap
         usleep(500000);
 

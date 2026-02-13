@@ -157,7 +157,7 @@ function getStatusColor($status){
                             @foreach ($tickets as $ticket)
                                 <tr class="border-b hover:bg-gray-50 cursor-pointer">
                                     <td class="px-4 py-3 text-sm font-mono text-blue-600">
-                                        #{{ $ticket->ticket_number }}
+                                        {{ $ticket->ticket_number }}
                                     </td>
                                     <td class="px-4 py-3 text-sm">
                                         {{ $ticket->originating_section }}
