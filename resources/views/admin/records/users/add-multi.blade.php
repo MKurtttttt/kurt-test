@@ -3,7 +3,7 @@
         <div class="w-full flex justify-center py-8">
             <div class="w-[95%] flex flex-col px-6 py-6 p-8 bg-white rounded-lg">
 
-                <!-- Header Section -->
+                {{-- Header Section --}}  
                 <div class="w-full flex flex-col gap-4">
                     <a href="{{ $origin === 'all' ? route('admin.users') : route('admin.records') }}" 
                     class="w-[25%] rounded-lg flex items-center justify-center py-2 bg-red-900 text-white font-bold gap-1 hover:bg-red-700">
@@ -14,25 +14,62 @@
                     <h1 class="text-[1.7rem] font-bold text-gray-700">Add Multiple Users</h1>
                 </div>
             
-                <!-- Upload Section -->
+                {{-- Upload Section --}} 
                 <span class="text-xl text-gray-500 mt-4">Upload Users File</span>
                 <span class="text-[0.8rem] text-gray-400">Ensure the uploaded file follows the official template for CSV updates. This is crucial for accurate data processing.</span>
+
+                {{-- Error Messages --}}
+                @if($errors->any())
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 my-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Validation Errors - Please fix these issues:</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <ul class="list-disc list-inside space-y-1">
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 my-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
                 @if(!isset($excel_data))
                     <div class="w-full flex flex-col items-start gap-4 my-4">
                         <form action="{{ route('admin.users.addMultiple.load') }}" method="POST" class="flex flex-col items-start gap-4" enctype="multipart/form-data"> 
                             @csrf
-                            @method('POST')
 
-                            <!-- Hidden Origin Input -->
-                            <input type="hidden" name="origin" value="{{ $origin }}">
+                            {{-- Hidden Origin Input --}} 
+                            <input type="hidden" name="origin" value="{{ $origin ?? 'all' }}">
 
-                            <!-- File Input -->
+                            {{-- File Input --}} 
                             <div class="flex items-center gap-2">
                                 <input class="my-2" type="file" name="file" accept=".xlsx" required/>
                             </div>
 
-                            <!-- Action Buttons -->
+                            {{-- Action Buttons --}} 
                             <div class="flex gap-4">
                                 <div class="flex bg-red-900 hover:bg-red-700 text-white px-8 py-2 rounded-lg">
                                     <img src="{{ asset('images/icons/upload.png') }}" class="w-[20px] h-[20px] mr-2" alt="">
@@ -46,256 +83,295 @@
                             </div>
                         </form>
                     </div>
-                @endif
-
-                <!-- Display Import Errors -->
-                @if(isset($import_errors) && count($import_errors) > 0)
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <strong class="font-bold">Error(s) in uploaded file:</strong>
-                        <ul class="mt-2 list-disc list-inside text-sm">
-                            @foreach($import_errors as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <hr class="opacity-100 my-4">
-
-                @if(isset($excel_data)) 
-                    <!-- Total Users Count -->
-                    <span class="text-gray-500 text-lg mb-2">
-                        Total Users: <strong>{{ $excel_data->count() }}</strong>
-                    </span>
-
-                    <!-- Users Table -->
-                    <div class="w-full flex flex-col border border-gray-200 gap-0 overflow-y-auto relative pb-16">
-                        <!-- Table Header -->
-                        <div class="w-full bg-gray-500 text-white grid grid-cols-[16%_16%_16%_20%_16%_16%] p-2">
-                            <h1>Emp ID</h1>
-                            <h1>First Name</h1>
-                            <h1>Last Name</h1>
-                            <h1>Email</h1>
-                            <h1>Department</h1>
-                            <h1>Gender</h1>
+                @else
+                    {{-- Preview Section --}}
+                    <div class="w-full mt-6">
+                        <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
+                            <p class="text-green-700 font-semibold">✓ File validated successfully!</p>
+                            <p class="text-green-600 text-sm">Review the data below and click "Save to Database" to proceed.</p>
                         </div>
 
-                        <!-- Display First 6 Users -->
-                        @foreach($excel_data->take(6) as $index => $item) 
-                            <div class="w-full bg-gray text-gray-500 grid grid-cols-[16%_16%_16%_20%_16%_16%] p-2 border bt-gray-100">
-                                <div class="flex items-center">
-                                    <h1>{{ $item->emp_id }}</h1>
-                                </div>
-                                <div class="flex items-center">
-                                    <h1>{{ $item->emp_fname }}</h1>
-                                </div>
-                                <div class="flex items-center">
-                                    <h1>{{ $item->emp_lname }}</h1>
-                                </div>
-                                <div class="flex items-center">
-                                    <h1>{{ $item->email }}</h1>
-                                </div>
-                                <div class="flex items-center">
-                                    <h1>{{ $item->emp_dept }}</h1>
-                                </div>
-                                <div class="flex items-center">
-                                    <h1>{{ $item->emp_gender }}</h1>
-                                </div>
-                            </div>
-                        @endforeach
-
-                        <!-- Extra Items (Initially Hidden) -->
-                        @if($excel_data->count() > 6)
-                            <div id="extra-items" class="hidden">
-                                @foreach($excel_data->slice(6) as $item)
-                                    <div class="w-full bg-gray text-gray-500 grid grid-cols-[16%_16%_16%_20%_16%_16%] p-2 border bt-gray-100">
-                                        <div class="flex items-center">
-                                            <h1>{{ $item->emp_id }}</h1>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <h1>{{ $item->emp_fname }}</h1>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <h1>{{ $item->emp_lname }}</h1>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <h1>{{ $item->email }}</h1>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <h1>{{ $item->emp_dept }}</h1>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <h1>{{ $item->emp_gender }}</h1>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-
-                            <!-- Show All / Hide Buttons -->
-                            <div id="toggleButtonsContainer" class="absolute bottom-2 right-2">
-                                <button id="showAllButton" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded mr-2">
-                                    Show All
-                                </button>
-                                <button id="hideButton" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded hidden">
-                                    Hide
-                                </button>
-                            </div>
+                        {{-- Personal Info Preview --}}
+                        @if(isset($excel_data['personal']) && count($excel_data['personal']) > 0)
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Personal Information ({{ count($excel_data['personal']) }} records)</h3>
+                        <div class="overflow-x-auto mb-6">
+                            <table class="min-w-full bg-white border">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-2 border text-left text-sm font-semibold">Row #</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Employee ID</th>
+                                        <th class="px-4 py-2 border text-left text-sm">First Name</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Last Name</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Department</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Gender</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Maiden Name</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Date of Birth</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Place of Birth</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Civil Status</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Religion</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Blood Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($excel_data['personal'] as $row)
+                                    <tr>
+                                        <td class="px-4 py-2 border text-sm font-semibold bg-gray-50">{{ $row['__row_number__'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Employee ID'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['First Name'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Last Name'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Department'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Gender'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Maiden Name'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Date of Birth'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Place of Birth'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Civil Status'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Religion'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Blood Type'] ?? '' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                         @endif
+
+                        {{-- Login Info Preview --}}
+                        @if(isset($excel_data['login']) && count($excel_data['login']) > 0)
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Login Information ({{ count($excel_data['login']) }} records)</h3>
+                        <div class="overflow-x-auto mb-6">
+                            <table class="min-w-full bg-white border">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-2 border text-left text-sm font-semibold">Row #</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Email</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Role</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Password</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($excel_data['login'] as $row)
+                                    <tr>
+                                        <td class="px-4 py-2 border text-sm font-semibold bg-gray-50">{{ $row['__row_number__'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Email'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Role'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ str_repeat('*', min(strlen($row['Password'] ?? ''), 10)) }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        @endif
+
+                        {{-- Contact Info Preview --}}
+                        @if(isset($excel_data['contact']) && count($excel_data['contact']) > 0)
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Contact Information ({{ count($excel_data['contact']) }} records)</h3>
+                        <div class="overflow-x-auto mb-6">
+                            <table class="min-w-full bg-white border">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-2 border text-left text-sm font-semibold">Row #</th>
+                                        <th class="px-4 py-2 border text-left text-sm">House Number</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Street</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Barangay</th>
+                                        <th class="px-4 py-2 border text-left text-sm">City</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Province</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Postal Code</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Home Phone</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Mobile Phone</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Email Address 1</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Email Address 2</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($excel_data['contact'] as $row)
+                                    <tr>
+                                        <td class="px-4 py-2 border text-sm font-semibold bg-gray-50">{{ $row['__row_number__'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['House Number'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Street'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Barangay'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['City'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Province'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Postal Code'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Home Phone'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Mobile Phone'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Email Address 1'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Email Address 2'] ?? '' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        @endif
+
+                        {{-- Provincial Contact Info Preview --}}
+                        @if(isset($excel_data['provincial']) && count($excel_data['provincial']) > 0)
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Provincial Contact Information ({{ count($excel_data['provincial']) }} records)</h3>
+                        <div class="overflow-x-auto mb-6">
+                            <table class="min-w-full bg-white border">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-2 border text-left text-sm font-semibold">Row #</th>
+                                        <th class="px-4 py-2 border text-left text-sm">House Number</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Street</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Barangay</th>
+                                        <th class="px-4 py-2 border text-left text-sm">City</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Province</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Postal Code</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Phone</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($excel_data['provincial'] as $row)
+                                    <tr>
+                                        <td class="px-4 py-2 border text-sm font-semibold bg-gray-50">{{ $row['__row_number__'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['House Number'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Street'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Barangay'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['City'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Province'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Postal Code'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Phone'] ?? '' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        @endif
+
+                        {{-- Emergency Contact Info Preview --}}
+                        @if(isset($excel_data['emergency']) && count($excel_data['emergency']) > 0)
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Emergency Contact Information ({{ count($excel_data['emergency']) }} records)</h3>
+                        <div class="overflow-x-auto mb-6">
+                            <table class="min-w-full bg-white border">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-2 border text-left text-sm font-semibold">Row #</th>
+                                        <th class="px-4 py-2 border text-left text-sm">First Name</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Middle Name</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Last Name</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Relationship</th>
+                                        <th class="px-4 py-2 border text-left text-sm">House Number</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Street</th>
+                                        <th class="px-4 py-2 border text-left text-sm">City</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Province</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Postal Code</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Home Phone</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Mobile Phone</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($excel_data['emergency'] as $row)
+                                    <tr>
+                                        <td class="px-4 py-2 border text-sm font-semibold bg-gray-50">{{ $row['__row_number__'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['First Name'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Middle Name'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Last Name'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Relationship'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['House Number'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Street'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['City'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Province'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Postal Code'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Home Phone'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Mobile Phone'] ?? '' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        @endif
+
+                        {{-- Accounting Details Preview --}}
+                        @if(isset($excel_data['accounting']) && count($excel_data['accounting']) > 0)
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Accounting Details ({{ count($excel_data['accounting']) }} records)</h3>
+                        <div class="overflow-x-auto mb-6">
+                            <table class="min-w-full bg-white border">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-2 border text-left text-sm font-semibold">Row #</th>
+                                        <th class="px-4 py-2 border text-left text-sm">SSS Number</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Tax Identification Number</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Pag IBIG Number</th>
+                                        <th class="px-4 py-2 border text-left text-sm">PhilHealth Number</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($excel_data['accounting'] as $row)
+                                    <tr>
+                                        <td class="px-4 py-2 border text-sm font-semibold bg-gray-50">{{ $row['__row_number__'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['SSS Number'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Tax Identification Number'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Pag IBIG Number'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['PhilHealth Number'] ?? '' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        @endif
+
+                        {{-- Hiring Info Preview --}}
+                        @if(isset($excel_data['hiring']) && count($excel_data['hiring']) > 0)
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Hiring Information ({{ count($excel_data['hiring']) }} records)</h3>
+                        <div class="overflow-x-auto mb-6">
+                            <table class="min-w-full bg-white border">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-2 border text-left text-sm font-semibold">Row #</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Date Hired</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Position</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Nature</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Tenure</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Non Tenure</th>
+                                        <th class="px-4 py-2 border text-left text-sm">Required License</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($excel_data['hiring'] as $row)
+                                    <tr>
+                                        <td class="px-4 py-2 border text-sm font-semibold bg-gray-50">{{ $row['__row_number__'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Date Hired'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Position'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Nature'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Tenure'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Non Tenure'] ?? '' }}</td>
+                                        <td class="px-4 py-2 border text-sm">{{ $row['Required License'] ?? '' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        @endif
+
+                        {{-- Action Buttons --}}
+                        <div class="flex gap-4 mt-6">
+                            <form action="{{ route('admin.users.addMultiple.save') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="origin" value="{{ $origin }}">
+                                <input type="hidden" name="file_path" value="{{ $file_path }}">
+                                <button type="submit" class="flex items-center bg-green-700 hover:bg-green-600 text-white px-8 py-2 rounded-lg">
+                                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                                    </svg>
+                                    Save to Database
+                                </button>
+                            </form>
+                            <a href="{{ route('admin.users.addMultiple', ['origin' => $origin]) }}" 
+                               class="flex items-center bg-gray-600 hover:bg-gray-500 text-white px-8 py-2 rounded-lg">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                </svg>
+                                Cancel
+                            </a>
+                        </div>
                     </div>
-
-                    <!-- Confirmation and Submission Form -->
-                    <div class="w-full grid grid-cols-[75%_25%] leading-tight mt-4">
-                        <span class="text-[0.8rem] text-gray-400 text-justify">
-                            Before confirming and adding the data to the system, please ensure that the uploaded Excel file is correct. 
-                            Double-check the loaded data on the page to verify accuracy and completeness. Any errors in the data might 
-                            affect the system's functionality or integrity. Make sure all information is correct before proceeding.
-                        </span>
-
-                        <!-- 
-                            The key changes begin below: We add IDs and hide the form upon submission, 
-                            show a fake progress bar, and handle redirection once done.
-                        -->
-                        <form id="save-multiple-form" action="{{ route('admin.users.addMultiple.save') }}" 
-                            method="POST" class="flex justify-end w-full">
-                            @csrf
-                            @method('POST')
-
-                            <!-- Hidden Origin Input -->
-                            <input type="hidden" name="origin" value="{{ $origin }}">
-
-                            <button id="addUsersBtn" type="submit"
-                                    class="bg-red-900 hover:bg-red-700 text-white w-[90%] py-2">
-                                ADD USERS
-                            </button>
-                        </form>
-                    </div>
-                @endif
-
-                <!-- Success or Message Display -->
-                @if(isset($msg)) 
-                    <span class="font-bold italic text-red-700">{{ $msg }}</span>
-                @endif                                                                        
+                @endif                                                                
             </div>
         </div>
     </div>
 </x-app-layout>
-
-<!-- Progress Bar Overlay (hidden by default) -->
-<div id="progressModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
-    <div class="bg-white p-6 rounded-lg w-1/3 flex flex-col items-center">
-        <h2 class="text-xl font-bold mb-4">Adding Users...</h2>
-        <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
-            <div id="progressBar" class="bg-green-500 h-4 rounded-full" style="width: 0%;"></div>
-        </div>
-        <span id="progressText" class="text-gray-700 font-semibold">0%</span>
-    </div>
-</div>
 
 <style>
     a, button { 
         transition: 300ms;
     }
 </style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Toggle Show/Hide "Extra Items" in the table
-        const showAllButton = document.getElementById('showAllButton');
-        const hideButton = document.getElementById('hideButton');
-        const extraItems = document.getElementById('extra-items');
-
-        if (showAllButton && hideButton && extraItems) {
-            // Show All Button Click Event
-            showAllButton.addEventListener('click', function () {
-                extraItems.classList.remove('hidden');   // Show extra items
-                showAllButton.classList.add('hidden');   // Hide Show All button
-                hideButton.classList.remove('hidden');   // Show Hide button
-            });
-
-            // Hide Button Click Event
-            hideButton.addEventListener('click', function () {
-                extraItems.classList.add('hidden');      // Hide extra items
-                showAllButton.classList.remove('hidden');// Show Show All button
-                hideButton.classList.add('hidden');      // Hide Hide button
-            });
-        }
-
-        // Handle the form submission to show a progress bar
-        const saveForm      = document.getElementById('save-multiple-form');
-        const addUsersBtn   = document.getElementById('addUsersBtn');
-        const progressModal = document.getElementById('progressModal');
-        const progressBar   = document.getElementById('progressBar');
-        const progressText  = document.getElementById('progressText');
-
-        if (saveForm) {
-            // Intercept the form submission
-            saveForm.addEventListener('submit', function (e) {
-                e.preventDefault();  // Stop normal form submission
-                
-                // Hide all main content (the outer container) or disable form
-                document.querySelector('.w-full.flex.justify-center.py-8').style.display = 'none';
-
-                // Show the progress modal
-                progressModal.classList.remove('hidden');
-
-                // We will do an AJAX (Fetch) POST submission
-                const formData = new FormData(saveForm);
-                const url      = saveForm.getAttribute('action');
-
-                // Function to animate the progress bar from 0 to 100
-                // in small increments. The speed can be adjusted as desired.
-                let progress = 0;
-                const fakeProgress = setInterval(() => {
-                    if (progress < 90) {
-                        // Slowly increment until 90%, then wait for the server response
-                        progress++;
-                        progressBar.style.width = progress + '%';
-                        progressText.textContent = progress + '%';
-                    } 
-                    else {
-                        // Stop increasing artificially and wait for server response
-                        clearInterval(fakeProgress);
-                    }
-                }, 500);
-
-                // Now actually send the data to the server
-                fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not OK');
-                    }
-                    // If the server response is 2xx, assume success
-                    return response.text();
-                })
-                .then(data => {
-                    // Once server completes, fill progress bar to 100
-                    clearInterval(fakeProgress);
-                    progressBar.style.width = '100%';
-                    progressText.textContent = '100%';
-
-                    // Give a short pause for user to see 100% progress,
-                    // then redirect to "all.blade.php" (which is admin.users)
-                    setTimeout(() => {
-                        window.location.href = "{{ route('admin.users') }}";
-                    }, 600);
-                })
-                .catch(error => {
-                    clearInterval(fakeProgress);
-                    progressBar.style.width = '100%';
-                    progressText.textContent = 'Error';
-                    console.error('Error:', error);
-
-                    // Optionally show an alert or error message
-                    setTimeout(() => {
-                        alert('An error occurred while adding users. Check console for details.');
-                        // Reload or do something else
-                        window.location.reload();
-                    }, 1500);
-                });
-            });
-        }
-    });
-</script>

@@ -34,6 +34,9 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Imports\UserRecordsImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class UserRecordsController extends Controller
 {
@@ -618,11 +621,6 @@ class UserRecordsController extends Controller
         ]);
     }
 
-    public function addMultiple($origin = null)
-    {
-        return view('admin.records.users.add-multi', compact('origin'));
-    }
-
     public function store(Request $request)
     {
         // Define roles that only require limited information
@@ -917,215 +915,277 @@ class UserRecordsController extends Controller
         }
     }
 
+    public function addMultiple($origin = null)
+    {
+        return view('admin.records.users.add-multi', compact('origin'));
+    }
+
     public function load_multiple_users(Request $request)
     {
-        TempUser::truncate();
         $request->validate([
-            'file' => 'required|file|mimes:xlsx'
+            'file' => 'required|mimes:xlsx|max:10240',
+            'origin' => 'nullable|in:all,users'
         ]);
-        $file = $request->file('file');
-        $spreadsheet = IOFactory::load($file->getRealPath());
-        $sheet = $spreadsheet->getActiveSheet();
 
-        $count = 1;
-        $errors = [];
-        $validRows = [];
-        $seen_emp_ids = [];
-        $seen_emails = [];
+        // Set default origin if not provided
+        $origin = $request->input('origin', 'all');
 
-        foreach ($sheet->getRowIterator() as $row) {
-            $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false);
-
-            $rowData = [];
-            foreach ($cellIterator as $cell) {
-                $column = $cell->getColumn();
-                $value = $cell->getValue();
-                $rowData[$column] = $value;
-            }
-
-            if ($count < 8) {
-                $count++;
-                continue;
-            }
-
-            $currentRow = $count;
-            $rowErrors = [];
-
-            $emp_id = trim($rowData['A'] ?? '');
-            if (empty($emp_id)) {
-                $rowErrors[] = "Row {$currentRow}, Column A (Emp ID) is required.";
-            } else {
-                if (in_array($emp_id, $seen_emp_ids)) {
-                    $rowErrors[] = "Row {$currentRow}, Column A (Emp ID) '{$emp_id}' is duplicated in the file.";
-                } else {
-                    $seen_emp_ids[] = $emp_id;
+        try {
+            // Stores temp file for reference and delete later
+            $file = $request->file('file');
+            $filePath = $file->store('temp');
+            $fullPath = storage_path('app/' . $filePath); 
+            
+            $import = new UserRecordsImport(true); // validate data only
+            Excel::import($import, $fullPath);
+            
+            $failures = $import->failures();
+            
+            if (!empty($failures)) {
+                $errors = [];
+                
+                foreach ($failures as $failure) {
+                    $row = $failure->row();
+                    $attribute = $failure->attribute();
+                    $errorsForRow = $failure->errors();
+                    
+                    foreach ($errorsForRow as $error) {
+                        $errors[] = "Row {$row}, {$error}";
+                    }
                 }
-                if (Employee::where('emp_id', $emp_id)->exists()) {
-                    $rowErrors[] = "Row {$currentRow}, Column A (Emp ID) '{$emp_id}' already exists in the database.";
-                }
+                
+                \Storage::delete($filePath);
+                return back()->withErrors($errors)->withInput();
             }
-
-            $emp_fname = trim($rowData['B'] ?? '');
-            if (empty($emp_fname)) {
-                $rowErrors[] = "Row {$currentRow}, Column B (First Name) is required.";
-            }
-
-            $emp_lname = trim($rowData['D'] ?? '');
-            if (empty($emp_lname)) {
-                $rowErrors[] = "Row {$currentRow}, Column D (Last Name) is required.";
-            }
-
-            $emp_dept = trim($rowData['E'] ?? '');
-            if (empty($emp_dept)) {
-                $rowErrors[] = "Row {$currentRow}, Column E (Department) is required.";
-            } elseif (!Departments::where('code', $emp_dept)->exists()) {
-                $rowErrors[] = "Row {$currentRow}, Column E (Department) '{$emp_dept}' does not exist.";
-            }
-
-            $emp_gender = trim($rowData['F'] ?? '');
-            if (empty($emp_gender)){
-                $rowErrors[] = "Row {$currentRow}, Column F (Gender) is required.";
-            }
-
-            $email = trim($rowData['G'] ?? '');
-            if (empty($email)) {
-                $rowErrors[] = "Row {$currentRow}, Column G (Email) is required.";
-            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $rowErrors[] = "Row {$currentRow}, Column G (Email) '{$email}' is not a valid email.";
-            } else {
-                if (in_array(strtolower($email), $seen_emails)) {
-                    $rowErrors[] = "Row {$currentRow}, Column G (Email) '{$email}' is duplicated in the file.";
-                } else {
-                    $seen_emails[] = strtolower($email);
-                }
-                if (Employee_Login::where('email', $email)->exists()) {
-                    $rowErrors[] = "Row {$currentRow}, Column G (Email) '{$email}' already exists in the database.";
+            
+            // If validation passes, load preview data with row numbers
+            $excel = IOFactory::load($fullPath);
+            $preview = [];
+            
+            // Collect all employee IDs from Personal_Info to determine valid rows
+            $validRowNumbers = [];
+            if ($sheet = $excel->getSheetByName('Personal_Info')) {
+                $data = $sheet->toArray();
+                for ($i = 7; $i < count($data); $i++) { 
+                    // Check if Employee ID exists
+                    if (!empty($data[$i][0])) {
+                        $validRowNumbers[] = $i + 1;
+                    }
                 }
             }
-
-            $password = trim($rowData['H'] ?? '');
-            if (empty($password)) {
-                $rowErrors[] = "Row {$currentRow}, Column H (Password) is required.";
+            
+            // Helper function to check if a row has any data
+            $hasData = function($row) {
+                foreach ($row as $value) {
+                    if ($value !== null && $value !== '') {
+                        return true;
+                    }
+                }
+                return false;
+            };
+            
+            // Load Personal_Info
+            if ($sheet = $excel->getSheetByName('Personal_Info')) {
+                $data = $sheet->toArray();
+                $headers = $data[6]; 
+                for ($i = 7; $i < count($data); $i++) { 
+                    $rowNumber = $i + 1;
+                    // Only show rows that have Employee ID
+                    if (in_array($rowNumber, $validRowNumbers)) {
+                        // Ensure headers and data have same length
+                        $rowData = $data[$i];
+                        if (count($headers) === count($rowData)) {
+                            $combined = array_combine($headers, $rowData);
+                            $combined['__row_number__'] = $rowNumber;
+                            $preview['personal'][] = $combined;
+                        }
+                    }
+                }
             }
-
-            $role = trim($rowData['I'] ?? '');
-            if (empty($role)) {
-                $rowErrors[] = "Row {$currentRow}, Column I (Role) is required.";
-            } elseif (!in_array($role, ['Employee', 'SuperAdmin', 'HR Admin', 'Dean', 'IDC Admin', 'ISO Document Handler'])) {
-                $rowErrors[] = "Row {$currentRow}, Column I (Role) must be either Employee, SuperAdmin, HR Admin, Dean, IDC Admin or ISO Document Handler.";
+            
+            // Load Login_Info
+            if ($sheet = $excel->getSheetByName('Login_Info')) {
+                $data = $sheet->toArray();
+                $headers = $data[6];
+                for ($i = 7; $i < count($data); $i++) {
+                    $rowNumber = $i + 1;
+                    // Only show rows that have Employee ID and have data
+                    if (in_array($rowNumber, $validRowNumbers) && $hasData($data[$i])) {
+                        $rowData = $data[$i];
+                        if (count($headers) === count($rowData)) {
+                            $combined = array_combine($headers, $rowData);
+                            $combined['__row_number__'] = $rowNumber;
+                            $preview['login'][] = $combined;
+                        }
+                    }
+                }
             }
-
-            if (!empty($rowErrors)) {
-                $errors = array_merge($errors, $rowErrors);
-            } else {
-                $tempUserData = [
-                    'emp_id' => $emp_id,
-                    'emp_fname' => $emp_fname,
-                    'emp_mname' => trim($rowData['C'] ?? ''),
-                    'emp_lname' => $emp_lname,
-                    'emp_dept' => $emp_dept,
-                    'emp_gender' => $emp_gender,
-                    'email_address_1' => $email,
-                    'email' => $email,
-                    'password' => $password,
-                    'role' => $role,
-                ];
-                $validRows[] = $tempUserData;
+            
+            // Load Contact_Info
+            if ($sheet = $excel->getSheetByName('Contact_Info')) {
+                $data = $sheet->toArray();
+                $headers = $data[6];
+                for ($i = 7; $i < count($data); $i++) {
+                    $rowNumber = $i + 1;
+                    // Only show rows that have Employee ID and have data
+                    if (in_array($rowNumber, $validRowNumbers) && $hasData($data[$i])) {
+                        $rowData = $data[$i];
+                        if (count($headers) === count($rowData)) {
+                            $combined = array_combine($headers, $rowData);
+                            $combined['__row_number__'] = $rowNumber;
+                            $preview['contact'][] = $combined;
+                        }
+                    }
+                }
             }
-
-            $count++;
-        }
-
-        $origin = $request->input('origin');
-
-        if (!empty($errors)) {
-            return view('admin.records.users.add-multi')->with([
-                'import_errors' => $errors,
-                'origin' => $origin
+            
+            // Load Prov_Contact_Info
+            if ($sheet = $excel->getSheetByName('Prov_Contact_Info')) {
+                $data = $sheet->toArray();
+                $headers = $data[6];
+                for ($i = 7; $i < count($data); $i++) {
+                    $rowNumber = $i + 1;
+                    // Only show rows that have Employee ID and have data
+                    if (in_array($rowNumber, $validRowNumbers) && $hasData($data[$i])) {
+                        $rowData = $data[$i];
+                        if (count($headers) === count($rowData)) {
+                            $combined = array_combine($headers, $rowData);
+                            $combined['__row_number__'] = $rowNumber;
+                            $preview['provincial'][] = $combined;
+                        }
+                    }
+                }
+            }
+            
+            // Load Em_Contact_Info
+            if ($sheet = $excel->getSheetByName('Em_Contact_Info')) {
+                $data = $sheet->toArray();
+                $headers = $data[6];
+                for ($i = 7; $i < count($data); $i++) {
+                    $rowNumber = $i + 1;
+                    // Only show rows that have Employee ID and have data
+                    if (in_array($rowNumber, $validRowNumbers) && $hasData($data[$i])) {
+                        $rowData = $data[$i];
+                        if (count($headers) === count($rowData)) {
+                            $combined = array_combine($headers, $rowData);
+                            $combined['__row_number__'] = $rowNumber;
+                            $preview['emergency'][] = $combined;
+                        }
+                    }
+                }
+            }
+            
+            // Load Acc_Details
+            if ($sheet = $excel->getSheetByName('Acc_Details')) {
+                $data = $sheet->toArray();
+                $headers = $data[6]; 
+                for ($i = 7; $i < count($data); $i++) { 
+                    $rowNumber = $i + 1;
+                    // Only show rows that have Employee ID and have data
+                    if (in_array($rowNumber, $validRowNumbers) && $hasData($data[$i])) {
+                        $rowData = $data[$i];
+                        if (count($headers) === count($rowData)) {
+                            $combined = array_combine($headers, $rowData);
+                            $combined['__row_number__'] = $rowNumber;
+                            $preview['accounting'][] = $combined;
+                        }
+                    }
+                }
+            }
+            
+            // Load Hiring_Info
+            if ($sheet = $excel->getSheetByName('Hiring_Info')) {
+                $data = $sheet->toArray();
+                $headers = $data[6];
+                for ($i = 7; $i < count($data); $i++) {
+                    $rowNumber = $i + 1;
+                    // Only show rows that have Employee ID and have data
+                    if (in_array($rowNumber, $validRowNumbers) && $hasData($data[$i])) {
+                        $rowData = $data[$i];
+                        if (count($headers) === count($rowData)) {
+                            $combined = array_combine($headers, $rowData);
+                            $combined['__row_number__'] = $rowNumber;
+                            $preview['hiring'][] = $combined;
+                        }
+                    }
+                }
+            }
+            
+            return view('admin.records.users.add-multi', [
+                'origin' => $origin,
+                'excel_data' => $preview,
+                'file_path' => $filePath
             ]);
+            
+        } catch (\Exception $e) {
+            if (isset($filePath)) {
+                \Storage::delete($filePath);
+            }
+            return back()->with('error', 'Error reading Excel file: ' . $e->getMessage())->withInput();
         }
-
-        foreach ($validRows as $tempUserData) {
-            TempUser::create($tempUserData);
-        }
-
-        $data = TempUser::all();
-
-        return view('admin.records.users.add-multi')->with([
-            'excel_data' => $data,
-            'origin' => $origin
-        ]);
     }
 
     public function save_multiple_users(Request $request)
     {
-        ini_set('max_execution_time', 180);
-        $batchSize = 50;
-        $origin = $request->input('origin');
+        $request->validate([
+            'file_path' => 'required'
+        ]);
 
-        DB::beginTransaction();
         try {
-            TempUser::chunk($batchSize, function($tempUsers) {
-                $emp_ids = $tempUsers->pluck('emp_id')->toArray();
-                $emails = $tempUsers->pluck('email')->map(function($email) {
-                    return strtolower($email);
-                })->toArray();
-
-                $existing_emp_ids = Employee::whereIn('emp_id', $emp_ids)->pluck('emp_id')->toArray();
-                $existing_emails = Employee_Login::whereIn('email', $emails)->pluck('email')->map(function($email) {
-                    return strtolower($email);
-                })->toArray();
-
-                $empData = [];
-                $loginData = [];
-
-                foreach ($tempUsers as $tempUser) {
-                    if (in_array($tempUser->emp_id, $existing_emp_ids)
-                        || in_array(strtolower($tempUser->email), $existing_emails)) {
-                        continue;
+            $fullPath = storage_path('app/' . $request->file_path);
+            
+            if (!file_exists($fullPath)) {
+                return back()->with('error', 'File not found. Please upload the file again.');
+            }
+            
+            // Actual importing of data
+            $import = new UserRecordsImport(false);
+            Excel::import($import, $fullPath);
+            
+            // Check for any failures during import
+            $failures = $import->failures();
+            
+            if (!empty($failures)) {
+                $errors = [];
+                foreach ($failures as $failure) {
+                    $row = $failure->row();
+                    $errorsForRow = $failure->errors();
+                    
+                    foreach ($errorsForRow as $error) {
+                        $errors[] = "Row {$row}: {$error}";
                     }
-
-                    $empData[] = [
-                        'emp_id' => $tempUser->emp_id,
-                        'emp_fname' => $tempUser->emp_fname,
-                        'emp_mname' => $tempUser->emp_mname,
-                        'emp_lname' => $tempUser->emp_lname,
-                        'emp_dept' => $tempUser->emp_dept,
-                        'emp_gender' => $tempUser->emp_gender,
-                        'email_address_1' => $tempUser->email,
-                        'info_status' => 'Active',
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-
-                    $loginData[] = [
-                        'id' => $tempUser->emp_id,
-                        'email' => $tempUser->email,
-                        'password' => Hash::make($tempUser->password),
-                        'role' => $tempUser->role,
-                        'terminated' => 0,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
                 }
-
-                if (!empty($empData)) {
-                    Employee::insert($empData);
-                }
-                if (!empty($loginData)) {
-                    Employee_Login::insert($loginData);
-                }
-            });
-
-            DB::commit();
-            TempUser::truncate();
+                
+                \Storage::delete($request->file_path);
+                return back()->withErrors($errors);
+            }
+            
+            \Storage::delete($request->file_path);
 
             return redirect()->route('admin.users')->with('success', 'Users added successfully.');
+                
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            $errors = [];
+            
+            foreach ($failures as $failure) {
+                $row = $failure->row();
+                $errorsForRow = $failure->errors();
+                
+                foreach ($errorsForRow as $error) {
+                    $errors[] = "Row {$row}: {$error}";
+                }
+            }
+            
+            \Storage::delete($request->file_path);
+            return back()->withErrors($errors);
+            
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error saving multiple users: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'An error occurred while adding the users. Please try again.']);
+            if (isset($request->file_path)) {
+                \Storage::delete($request->file_path);
+            }
+            
+            return back()->with('error', 'Error importing data: ' . $e->getMessage());
         }
     }
 
