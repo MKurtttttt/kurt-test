@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Knowledge Hub')
+@section('title', 'Information Hub')
 
 @section('content')
 <div style="background-image: url('{{ asset('images/hau-side.jpg') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3;"></div>
@@ -8,8 +8,8 @@
         <!-- Header -->
         <div class="text-center mb-6">
             <img src="{{ asset('images/logo-circle.png') }}" class="mx-auto mb-4" alt="Logo Circle" style="width: 180px; height: 180px; object-fit: contain;" />
-            <h1 class="text-2xl font-bold" style="color: #70121D;">Knowledge Hub</h1>
-            <p class="mt-2" style="color: #5c5c5c;">Access institutional Knowledge Hub and resources</p>
+            <h1 class="text-2xl font-bold" style="color: #70121D;">Information Hub</h1>
+            <p class="mt-2" style="color: #5c5c5c;">Access institutional Information Hub and resources</p>
         </div>
         
         <hr class="opacity-100 my-4">
@@ -32,13 +32,13 @@
             <div class="relative">
                 <input
                     type="text"
-                    id="knowledge-hub-search"
-                    placeholder="Search Knowledge Hub Sites..."
+                    id="information-hub-search"
+                    placeholder="Search Information Hub Sites..."
                     class="w-full rounded-lg px-4 py-3 pr-16 shadow-sm text-sm focus:outline-none"
                     style="border: 2px solid #70121D; focus:ring: 2px solid #8B1538;"
                     autocomplete="off"
                 />
-                <button type="button" id="clear-knowledge-hub-search" class="absolute right-2 px-3 py-1 rounded-lg text-xs font-semibold transition" style="top: 50%; transform: translateY(-50%); background-color: #ffe066; color: #70121D; hover:background-color: #ffd700;">
+                <button type="button" id="clear-information-hub-search" class="absolute right-2 px-3 py-1 rounded-lg text-xs font-semibold transition" style="top: 50%; transform: translateY(-50%); background-color: #ffe066; color: #70121D; hover:background-color: #ffd700;">
                     Clear
                 </button>
             </div>
@@ -168,8 +168,8 @@
     });
 
     // Search functionality
-    const searchInput = document.getElementById('knowledge-hub-search');
-    const clearSearchBtn = document.getElementById('clear-knowledge-hub-search');
+    const searchInput = document.getElementById('information-hub-search');
+    const clearSearchBtn = document.getElementById('clear-information-hub-search');
     const searchResults = document.getElementById('search-results');
     const searchResultsContent = document.getElementById('search-results-content');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -284,7 +284,7 @@
                 </div>
             `;
         } else {
-            searchResultsContent.innerHTML = '<div class="p-4 text-center text-gray-500">No Knowledge Hub links found matching your search.</div>';
+            searchResultsContent.innerHTML = '<div class="p-4 text-center text-gray-500">No Information Hub links found matching your search.</div>';
         }
     }
 
@@ -341,14 +341,14 @@
         background-color: #e5e5e5 !important;
     }
 
-    /* Knowledge Hub Links with HAU gold */
-    a[href*="knowledge-hub"], a[href*="onedrive"] {
+    /* Information Hub Links with HAU gold */
+    a[href*="information-hub"], a[href*="onedrive"] {
         background-color: #ffe066 !important;
         color: #70121D !important;
         transition: all 0.3s ease;
     }
 
-    a[href*="knowledge-hub"]:hover, a[href*="onedrive"]:hover {
+    a[href*="information-hub"]:hover, a[href*="onedrive"]:hover {
         background-color: #ffd700 !important;
         color: #70121D !important;
     }

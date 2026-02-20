@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SubjectSeeder::class);
         $this->call(tags::class); 
         $this->call(SharepointSeeder::class);
-        $this->call(KnowledgeHubSeeder::class);
+        $this->call(InformationHubSeeder::class);
         $this->call(KpiSeeder::class);
         $this->call(KpiSegmentationSeeder::class);
         $this->call(KpiAccreditationSeeder::class);

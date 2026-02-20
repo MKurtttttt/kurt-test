@@ -5,7 +5,7 @@
 
             <!-- Back Button -->
             <div class="mb-4">
-                <a href="{{ route('knowledge-hub.edit-list') }}" 
+                <a href="{{ route('information-hub.edit-list') }}" 
                    class="inline-flex items-center bg-red-900 hover:bg-red-700 text-white px-4 py-2 rounded transition">
                     <img src="{{ asset('images/icons/back.png') }}" class="w-4 h-4 mr-2" alt="Back Icon">
                     Return to Link List
@@ -28,7 +28,7 @@
             <h1 class="text-2xl font-bold mb-4">Edit Link</h1>
 
             <!-- Update Form -->
-            <form method="POST" action="{{ route('knowledge-hub.update', ['id' => $link->id]) }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('information-hub.update', ['id' => $link->id]) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -118,7 +118,7 @@
             </form>
 
             <!-- Delete Form -->
-            <form action="{{ route('knowledge-hub.delete', $link->id) }}" method="POST" 
+            <form action="{{ route('information-hub.delete', $link->id) }}" method="POST" 
                   onsubmit="return confirm('Are you sure you want to delete this link? This will also delete the associated image.');" 
                   class="mt-4">
                 @csrf

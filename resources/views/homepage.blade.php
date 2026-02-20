@@ -72,17 +72,17 @@
                         </div>
                     </div>
 
-                    <!-- Knowledge Hub Card -->
+                    <!-- Information Hub Card -->
                     <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow mb-0 h-full flex flex-col md:col-span-2 md:max-w-md md:mx-auto" style="width: 100%;">
                         <div class="px-6 py-4" style="background: linear-gradient(135deg, #70121D 0%, #B8860B 100%);">
-                            <h4 class="text-white font-semibold text-lg">Knowledge Hub Resources</h4>
+                            <h4 class="text-white font-semibold text-lg">Information Hub Resources</h4>
                         </div>
                         <div class="p-6 flex-1 flex flex-col justify-between">
                             <div>
-                                <p class="text-sm text-gray-600 mb-4">Access Knowledge Hub</p>
+                                <p class="text-sm text-gray-600 mb-4">Access Information Hub</p>
                             </div>
-                            <a href="{{ route('knowledge-hub.public') }}" class="inline-flex items-center text-white rounded transition-colors" style="background: linear-gradient(135deg, #70121D 0%, #B8860B 100%); hover:opacity: 0.9; padding: 0.375rem 0.75rem; font-size: 0.95rem; min-width: 110px;">
-                                Browse Knowledge Hub
+                            <a href="{{ route('information-hub.public') }}" class="inline-flex items-center text-white rounded transition-colors" style="background: linear-gradient(135deg, #70121D 0%, #B8860B 100%); hover:opacity: 0.9; padding: 0.375rem 0.75rem; font-size: 0.95rem; min-width: 110px;">
+                                Browse Information Hub
                                 <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M14 4h6m0 0v6m0-6L10 14"></path>
                                 </svg>

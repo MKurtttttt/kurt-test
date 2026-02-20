@@ -4,21 +4,21 @@
         <div class="flex justify-center items-center w-full py-8">
             <div class="flex-col w-[95%] bg-white rounded-lg py-8">
                 <div class="px-8 pb-4">
-                    <a href="{{ route('knowledge-hub.dashboard') }}" class="inline-flex gap-1 items-center bg-red-900 hover:bg-red-700 px-6 py-1 text-white rounded-xl">
+                    <a href="{{ route('information-hub.dashboard') }}" class="inline-flex gap-1 items-center bg-red-900 hover:bg-red-700 px-6 py-1 text-white rounded-xl">
                         <img src="{{ asset('images/icons/back.png') }}" class="w-[20px] h-[20px]" alt="">
-                        <span>Return to Knowledge Hub</span>
+                        <span>Return to Information Hub</span>
                     </a>
                 </div>
                 <div class="w-full flex flex-col items-center justify-center px-8 py-4 leading-tight">
                     <img class="w-[120px] h-[120px] my-0" src="{{ asset('images/logo-circle.png') }}" />
-                    <h1 class="text-[3rem] font-bold text-gray-700"> ADD KNOWLEDGE HUB LINK </h1>
+                    <h1 class="text-[3rem] font-bold text-gray-700"> ADD INFORMATION HUB LINK </h1>
                     <span class="text-[0.7rem] text-gray-400">
-                        Please fill out the details below to add a new Knowledge Hub link. Make sure the information is accurate and categorized properly.
+                        Please fill out the details below to add a new Information Hub link. Make sure the information is accurate and categorized properly.
                     </span>
                 </div>
 
                 <div>
-                    <form class="flex-col w-full px-8" action="{{ route('knowledge-hub.store') }}" method="POST" enctype="multipart/form-data">
+                    <form class="flex-col w-full px-8" action="{{ route('information-hub.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('POST')
 

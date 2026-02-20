@@ -56,9 +56,9 @@
                 />
 
                 <x-navigation.side-nav-card 
-                    route="knowledge-hub.dashboard" 
-                    icon="images/icons/nav/knowledge.svg" 
-                    title="Knowledge Hub" 
+                    route="information-hub.dashboard" 
+                    icon="images/icons/nav/information.svg" 
+                    title="Information Hub" 
                 />
 
                 <x-navigation.side-nav-card 

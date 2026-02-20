@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class KnowledgeHubLinks extends Model
+class InformationHubLinks extends Model
 {
-    protected $table = 'knowledge_hub_links';
+    protected $table = 'information_hub_links';
 
     protected $fillable = [
         'category',

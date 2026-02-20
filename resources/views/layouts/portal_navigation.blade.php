@@ -144,9 +144,9 @@
 
             <x-navigation.side-nav-card
                 nav="portal"
-                route="knowledge-hub.dashboard" 
-                icon="images/icons/nav/knowledge.svg" 
-                title="Knowledge Hub" 
+                route="information-hub.dashboard" 
+                icon="images/icons/nav/information.svg" 
+                title="Information Hub" 
                 :excludedRoles="['ISO Document Handler']"
             />
 

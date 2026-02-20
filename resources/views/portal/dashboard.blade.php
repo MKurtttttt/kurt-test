@@ -139,9 +139,9 @@
             />
 
             <x-navigation.nav-card 
-                route="knowledge-hub.dashboard" 
-                icon="images/icons/nav/knowledge.png" 
-                title="Knowledge Hub" 
+                route="information-hub.dashboard" 
+                icon="images/icons/nav/information.png" 
+                title="Information Hub" 
                 :excludedRoles="['ISO Document Handler']"
             />
 

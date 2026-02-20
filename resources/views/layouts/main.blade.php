@@ -102,13 +102,13 @@
         
         /* Remove yellow background from specific navigation links */
         .nav-link[href*="sharepoint"].active,
-        .nav-link[href*="knowledge-hub"].active {
+        .nav-link[href*="information-hub"].active {
             background-color: transparent !important;
             background: transparent !important;
         }
 
         .nav-link[href*="sharepoint"]:hover,
-        .nav-link[href*="knowledge-hub"]:hover {
+        .nav-link[href*="information-hub"]:hover {
             background-color: #fef2f2 !important;
         }
         
@@ -199,8 +199,8 @@
                             <a href="{{ route('orgchart') }}" class="nav-link {{ Request::is('org-chart*') ? 'active' : '' }} px-4 py-2 rounded-lg text-sm font-medium text-red-900 hover:bg-red-50 transition-all duration-200">
                                 Organizational Chart
                             </a>
-                            <a href="{{ route('knowledge-hub.public') }}" class="nav-link {{ Request::is('knowledge-hub*') ? 'active' : '' }} px-4 py-2 rounded-lg text-sm font-medium text-red-900 hover:bg-red-50 transition-all duration-200">
-                                Knowledge Hub
+                            <a href="{{ route('information-hub.public') }}" class="nav-link {{ Request::is('information-hub*') ? 'active' : '' }} px-4 py-2 rounded-lg text-sm font-medium text-red-900 hover:bg-red-50 transition-all duration-200">
+                                Information Hub
                             </a>
                         </div>
                     </div>
@@ -231,8 +231,8 @@
                         <a href="{{ route('orgchart') }}" class="block px-4 py-3 rounded-lg text-base font-medium text-red-900 hover:bg-red-50 transition-colors duration-200 {{ Request::is('org-chart*') ? 'bg-red-50 border-l-4 border-red-600' : '' }}">
                             Organizational Chart
                         </a>
-                        <a href="{{ route('knowledge-hub.public') }}" class="block px-4 py-3 rounded-lg text-base font-medium text-red-900 hover:bg-red-50 transition-colors duration-200 {{ Request::is('knowledge-hub*') ? 'bg-red-50 border-l-4 border-red-600' : '' }}">
-                            Knowledge Hub
+                        <a href="{{ route('information-hub.public') }}" class="block px-4 py-3 rounded-lg text-base font-medium text-red-900 hover:bg-red-50 transition-colors duration-200 {{ Request::is('information-hub*') ? 'bg-red-50 border-l-4 border-red-600' : '' }}">
+                            Information Hub
                         </a>
                         
                         <!-- Mobile Login Button -->

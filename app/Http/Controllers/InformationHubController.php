@@ -4,16 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\KnowledgeHubLinks;
+use App\Models\InformationHubLinks;
 
-class KnowledgeHubController extends Controller
+class InformationHubController extends Controller
 {
     /**
-     * Display the public Knowledge Hub dashboard (no authentication required).
+     * Display the public Information Hub dashboard (no authentication required).
      */
     public function publicIndex()
     {
-        $allLinks = KnowLedgeHubLinks::orderBy('id')->get();
+        $allLinks = InformationHubLinks::orderBy('id')->get();
 
         $categories = $allLinks->pluck('category')->unique()->filter(function($v){return !empty($v);})->sort()->values()->toArray();
         $linksByCategory = [];
@@ -21,18 +21,18 @@ class KnowledgeHubController extends Controller
             $linksByCategory[$cat] = $allLinks->where('category', $cat)->groupBy('sub_category');
         }
 
-        return view('home.knowledge-hub-home', [
+        return view('home.information-hub-home', [
             'categories' => $categories,
             'linksByCategory' => $linksByCategory,
         ]);
     }
 
     /**
-     * Display the Knowledge Hub dashboard grouped by categories and departments.
+     * Display the Information Hub dashboard grouped by categories and departments.
      */
     public function index()
     {
-        $allLinks = KnowLedgeHubLinks::orderBy('id')->get();
+        $allLinks = InformationHubLinks::orderBy('id')->get();
 
         // Get all unique categories
         $category = $allLinks->pluck('category')->unique()->filter()->values();
@@ -43,36 +43,36 @@ class KnowledgeHubController extends Controller
             $linksByCategory[$cat] = $allLinks->where('category', $cat)->groupBy('sub_category');
         }
 
-        return view('knowledge-hub.knowledge-hub-dashboard', [
+        return view('information-hub.information-hub-dashboard', [
             'category' => $category,
             'linksByCategory' => $linksByCategory,
         ]);
     }
 
     /**
-     * Show the form for creating a new Knowledge Hub link.
+     * Show the form for creating a new Information Hub link.
      */
     public function create()
     {
-        $categories = collect(KnowledgeHubLinks::pluck('category')->unique()->filter(function($v){return !empty($v);})->values()->toArray())->sort()->values()->toArray();
+        $categories = collect(InformationHubLinks::pluck('category')->unique()->filter(function($v){return !empty($v);})->values()->toArray())->sort()->values()->toArray();
 
         // Group departments by category
         $subCatByCategory = [];
         foreach ($categories as $cat) {
             $subCatByCategory[$cat] = collect(
-                KnowledgeHubLinks::where('category', $cat)
+                InformationHubLinks::where('category', $cat)
                     ->pluck('sub_category')->unique()->filter(function($v){return !empty($v);})->values()->toArray()
             )->sort()->values()->toArray();
         }
 
-        return view('knowledge-hub.knowledge-hub-add', [
+        return view('information-hub.information-hub-add', [
             'categories' => $categories,
             'subCatByCategory' => $subCatByCategory,
         ]);
     }
 
     /**
-     * Store a newly created Knowledge Hub in storage.
+     * Store a newly created Information Hub in storage.
      */
     public function store(Request $request)
     {
@@ -89,44 +89,44 @@ class KnowledgeHubController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/knowledge-hub'), $imageName);
-            $validated['image_path'] = 'images/knowledge-hub/' . $imageName;
+            $image->move(public_path('images/information-hub'), $imageName);
+            $validated['image_path'] = 'images/information-hub/' . $imageName;
         }
 
-        KnowledgeHubLinks::create($validated);
+        InformationHubLinks::create($validated);
 
-        return redirect()->route('knowledge-hub.dashboard')->with('success', 'Knowledge Hub link added successfully!');
+        return redirect()->route('information-hub.dashboard')->with('success', 'information Hub link added successfully!');
     }
 
     /**
-     * Show the form to select which Knowledge Hub link to edit.
+     * Show the form to select which Information Hub link to edit.
      */
     public function editList()
     {
-        $links = KnowledgeHubLinks::orderBy('title')->get();
-        return view('knowledge-hub.knowledge-hub-edit-list', compact('links'));
+        $links = InformationHubLinks::orderBy('title')->get();
+        return view('information-hub.information-hub-edit-list', compact('links'));
     }
 
     /**
-     * Show the edit form for a specific Knowledge Hub link.
+     * Show the edit form for a specific Information Hub link.
      */
     public function edit($id)
     {
-        $link = KnowledgeHubLinks::findOrFail($id);
+        $link = InformationHubLinks::findOrFail($id);
 
         // Get all unique categories
-        $categories = collect(KnowledgeHubLinks::pluck('category')->unique()->filter(function($v){return !empty($v);})->values()->toArray())->sort()->values()->toArray();
+        $categories = collect(InformationHubLinks::pluck('category')->unique()->filter(function($v){return !empty($v);})->values()->toArray())->sort()->values()->toArray();
 
         // Group sub-categories by category
         $subCatByCategory = [];
         foreach ($categories as $cat) {
             $subCatByCategory[$cat] = collect(
-                KnowledgeHubLinks::where('category', $cat)
+                InformationHubLinks::where('category', $cat)
                     ->pluck('sub_category')->unique()->filter(function($v){return !empty($v);})->values()->toArray()
             )->sort()->values()->toArray();
         }
 
-        return view('knowledge-hub.knowledge-hub-edit', [
+        return view('information-hub.information-hub-edit', [
             'link' => $link,
             'categories' => $categories,
             'subCatByCategory' => $subCatByCategory,
@@ -134,11 +134,11 @@ class KnowledgeHubController extends Controller
     }
 
     /**
-     * Update the specified Knowledge Hub link.
+     * Update the specified information Hub link.
      */
     public function update(Request $request, $id)
     {
-        $link = KnowledgeHubLinks::findOrFail($id);
+        $link = InformationHubLinks::findOrFail($id);
 
         $validated = $request->validate([
             'title'         => 'required|string|max:255',
@@ -168,8 +168,8 @@ class KnowledgeHubController extends Controller
             // Upload new image
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/knowledge-hub'), $imageName);
-            $validated['image_path'] = 'images/knowledge-hub/' . $imageName;
+            $image->move(public_path('images/information-hub'), $imageName);
+            $validated['image_path'] = 'images/information-hub/' . $imageName;
         }
 
         // Remove image and remove_image from validated array if not uploading
@@ -178,16 +178,16 @@ class KnowledgeHubController extends Controller
 
         $link->update($validated);
 
-        return redirect()->route('knowledge-hub.edit-list')
-                ->with('msg', 'Knowledge Hub link updated successfully.');
+        return redirect()->route('information-hub.edit-list')
+                ->with('msg', 'Information Hub link updated successfully.');
     }
 
     /**
-     * Remove the specified Knowledge Hub link from storage.
+     * Remove the specified Information Hub link from storage.
      */
     public function destroy($id)
     {
-        $link = KnowledgeHubLinks::findOrFail($id);
+        $link = InformationHubLinks::findOrFail($id);
         
         // Delete the image file if it exists
         if ($link->image_path && file_exists(public_path($link->image_path))) {
@@ -197,8 +197,8 @@ class KnowledgeHubController extends Controller
         // Delete the database record
         $link->delete();
 
-        return redirect()->route('knowledge-hub.edit-list')
-            ->with('msg', 'Knowledge Hub link deleted successfully.');
+        return redirect()->route('information-hub.edit-list')
+            ->with('msg', 'Information Hub link deleted successfully.');
     }
 
     /**
@@ -206,8 +206,8 @@ class KnowledgeHubController extends Controller
      */
     public function selectForm()
     {
-        $links = KnowledgeHubLinks::orderBy('label')->get();
-        return view('knowledge-hub.select-link', compact('links'));
+        $links = InformationHubLinks::orderBy('label')->get();
+        return view('information-hub.select-link', compact('links'));
     }
 
     /**
@@ -221,6 +221,6 @@ class KnowledgeHubController extends Controller
 
         $id = decrypt($validated['link_id']);
 
-        return redirect()->route('knowledge-hub.edit', ['id' => $id]);
+        return redirect()->route('information-hub.edit', ['id' => $id]);
     }
 }

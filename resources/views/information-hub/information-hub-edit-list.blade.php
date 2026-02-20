@@ -18,7 +18,7 @@
         <h1 class="text-2xl font-bold mb-4">Select a Link to Edit</h1>
 
         <!-- Back Button -->
-        <a href="{{ route('knowledge-hub.dashboard') }}" 
+        <a href="{{ route('information-hub.dashboard') }}" 
            class="inline-flex items-center bg-red-900 hover:bg-red-700 text-white px-4 py-2 rounded mb-4 transition">
             <img src="{{ asset('images/icons/back.png') }}" class="w-4 h-4 mr-2" alt="Back Icon">
             Return to Dashboard
@@ -81,11 +81,11 @@
                             <td class="px-4 py-2 type-cell">{{ $link->type }}</td>
                             <td class="px-4 py-2">
                                 <div class="flex gap-2">
-                                    <a href="{{ route('knowledge-hub.edit', ['id' => $link->id]) }}"
+                                    <a href="{{ route('information-hub.edit', ['id' => $link->id]) }}"
                                        class="bg-red-900 text-white px-3 py-1 rounded hover:bg-red-700 transition">
                                         Edit
                                     </a>
-                                    <form action="{{ route('knowledge-hub.delete', ['id' => $link->id]) }}" 
+                                    <form action="{{ route('information-hub.delete', ['id' => $link->id]) }}" 
                                           method="POST" 
                                           class="inline"
                                           onsubmit="return confirm('Are you sure you want to delete this link: {{ $link->title }}?');">

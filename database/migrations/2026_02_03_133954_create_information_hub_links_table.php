@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('knowledge_hub_links', function (Blueprint $table) {
+        Schema::create('information_hub_links', function (Blueprint $table) {
             $table->id();
             $table->string('category')->nullable();
             $table->string('sub_category')->nullable();
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('knowledge_hub_links');
+        Schema::dropIfExists('information_hub_links');
     }
 };

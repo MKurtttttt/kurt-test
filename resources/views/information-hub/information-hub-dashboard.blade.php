@@ -1,4 +1,4 @@
-<!-- This is the Knowledge Hub Sites dashboard -->
+<!-- This is the Information Hub Sites dashboard -->
 <x-app-layout>
     <div class="min-h-screen bg-gray-50">
         <div class="w-full flex justify-center py-8">
@@ -29,8 +29,8 @@
                             </button>
                             <div id="adminDropdownMenu" class="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden z-20">
                                 <div class="py-1">
-                                    <a href="{{ route('knowledge-hub.add') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Add Link</a>
-                                    <a href="{{ route('knowledge-hub.edit-list') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit Link</a>
+                                    <a href="{{ route('information-hub.add') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Add Link</a>
+                                    <a href="{{ route('information-hub.edit-list') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit Link</a>
                                 </div>
                             </div>
                         </div>
@@ -56,8 +56,8 @@
                     <div style="position: relative; display: flex; align-items: center;">
                         <input
                             type="text"
-                            id="knowledge-hub-search"
-                            placeholder="Search Knowledge Hub Sites..."
+                            id="information-hub-search"
+                            placeholder="Search Information Hub Sites..."
                             style="width: 100%; border: 2px solid #fca5a5; border-radius: 8px; padding: 12px 80px 12px 16px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-size: 14px; outline: none;"
                             autocomplete="off"
                             onfocus="this.style.borderColor='#dc2626'; this.style.boxShadow='0 0 0 2px rgba(220, 38, 38, 0.2)';"
@@ -65,7 +65,7 @@
                         >
                         <button 
                             type="button" 
-                            id="clear-knowledge-hub-search" 
+                            id="clear-information-hub-search" 
                             style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background-color: #fee2e2; color: #b91c1c; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; transition: background-color 0.2s;"
                             onmouseover="this.style.backgroundColor='#fecaca';"
                             onmouseout="this.style.backgroundColor='#fee2e2';"
@@ -206,8 +206,8 @@
     });
 
     // Search functionality
-    const searchInput = document.getElementById('knowledge-hub-search');
-    const clearSearchBtn = document.getElementById('clear-knowledge-hub-search');
+    const searchInput = document.getElementById('information-hub-search');
+    const clearSearchBtn = document.getElementById('clear-information-hub-search');
     const searchResults = document.getElementById('search-results');
     const searchResultsContent = document.getElementById('search-results-content');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -323,7 +323,7 @@
                 </div>
             `;
         } else {
-            searchResultsContent.innerHTML = '<div class="p-4 text-center text-gray-500">No Knowledge Hub links found matching your search.</div>';
+            searchResultsContent.innerHTML = '<div class="p-4 text-center text-gray-500">No Information Hub links found matching your search.</div>';
         }
     }
 
