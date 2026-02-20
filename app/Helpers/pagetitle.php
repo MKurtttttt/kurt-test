@@ -298,6 +298,8 @@ class pagetitle
             // KPIs
             case 'kpis.dashboard':
             case 'kpis.show':
+            case 'kpis.edit':
+            case 'kpis.add':
                 $curr_page = 'KPIs';
                 break;
 

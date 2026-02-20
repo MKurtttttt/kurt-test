@@ -526,9 +526,6 @@ Route::middleware('auth','revalidate')->group(function () {
     // Export KPI List to Excel
     Route::get('/kpis/export', [KpiController::class, 'export'])->name('kpis.export-all');
 
-    // AJAX search for KPI dashboard
-    Route::get('/kpis/ajax-search', [KpiController::class, 'ajaxSearch'])->name('kpis.ajax-search');
-
     // Advanced search for KPI library
     Route::get('/kpis/advanced-search', [KpiController::class, 'advancedSearch'])->name('kpis.advanced-search');
     

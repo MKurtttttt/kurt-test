@@ -5,11 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Kpi;
 use App\Exports\KpiExport;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Border;
 use Maatwebsite\Excel\Facades\Excel;
 
 class KpiController extends Controller
@@ -19,59 +14,9 @@ class KpiController extends Controller
      */
     public function dashboard(Request $request)
     {
-        $search = $request->input('search');
-        $sortBy = $request->input('sort_by', 'id'); // Default to id
-        $advancedSearch = $request->hasAny(['name', 'objective', 'theme', 'perspective', 'code', 'category']);
-        $searchParams = $request->only(['name', 'objective', 'theme', 'perspective', 'code', 'category']);
+        $kpis = Kpi::query()->get();
 
-        $kpis = Kpi::query()
-            ->when($search, function ($query, $search) {
-                // Use word boundary regex for more precise matching
-                $query->whereRaw('measure_name REGEXP ?', ["\\b{$search}"])
-                      ->orWhereRaw('measure_code REGEXP ?', ["\\b{$search}"])
-                      ->orWhereRaw('perspective REGEXP ?', ["\\b{$search}"])
-                      ->orWhereRaw('objective REGEXP ?', ["\\b{$search}"])
-                      ->orWhereRaw('strategic_theme REGEXP ?', ["\\b{$search}"])
-                      ->orWhereRaw('description REGEXP ?', ["\\b{$search}"]);
-            })
-            // Advanced search filters 
-            ->when($request->filled('objective'), function ($query) use ($request) {
-                $query->where('objective', 'LIKE', '%' . $request->objective . '%');
-            })
-            ->when($request->filled('theme'), function ($query) use ($request) {
-                $query->where('strategic_theme', 'LIKE', '%' . $request->theme . '%');
-            })
-            ->when($request->filled('perspective'), function ($query) use ($request) {
-                $query->where('perspective', 'LIKE', '%' . $request->perspective . '%');
-            })
-            ->when($request->filled('code'), function ($query) use ($request) {
-                $query->where('measure_code', 'LIKE', '%' . $request->code . '%');
-            })
-            ->when($request->filled('category'), function ($query) use ($request) {
-                $query->where('category', $request->category);
-            })
-            // Sorting
-            ->when($sortBy === 'code', function ($query) {
-                $query->orderBy('measure_code', 'asc');
-            })
-            ->when($sortBy === 'name', function ($query) {
-                $query->orderBy('measure_name', 'asc');
-            })
-            ->when($sortBy === 'objective', function ($query) {
-                $query->orderBy('objective', 'asc');
-            })
-            ->when($sortBy === 'theme', function ($query) {
-                $query->orderBy('strategic_theme', 'asc');
-            })
-            ->when($sortBy === 'perspective', function ($query) {
-                $query->orderBy('perspective', 'asc');
-            })
-            ->when($sortBy === 'id', function ($query) {
-                $query->orderBy('id', 'asc');
-            })
-            ->get();
-
-        return view('kpis.kpi-dashboard', compact('kpis', 'sortBy', 'search', 'advancedSearch', 'searchParams'));
+        return view('kpis.kpi-dashboard', compact('kpis'));
     }
     /**
      * Show details for a single KPI.
@@ -206,43 +151,6 @@ class KpiController extends Controller
         $kpi->delete();
         return redirect()->route('kpis.dashboard')->with('success', 'KPI deleted successfully!');
     }
-
-    public function ajaxSearch(Request $request)
-    {
-        $search = $request->input('search');
-        $sortBy = $request->input('sort_by', 'id'); // Default to id
-
-        $kpis = Kpi::when($search, function ($query, $search) {
-            // Use word boundary regex for more precise matching
-            return $query->whereRaw('measure_name REGEXP ?', ["\\b{$search}"])
-                         ->orWhereRaw('measure_code REGEXP ?', ["\\b{$search}"])
-                         ->orWhereRaw('perspective REGEXP ?', ["\\b{$search}"])
-                         ->orWhereRaw('objective REGEXP ?', ["\\b{$search}"])
-                         ->orWhereRaw('strategic_theme REGEXP ?', ["\\b{$search}"])
-                         ->orWhereRaw('description REGEXP ?', ["\\b{$search}"]);
-        })
-        ->when($sortBy === 'perspective', function ($query) {
-            $query->orderBy('perspective', 'asc');
-        })
-        ->when($sortBy === 'objective', function ($query) {
-            $query->orderBy('objective', 'asc');
-        })
-        ->when($sortBy === 'theme', function ($query) {
-            $query->orderBy('strategic_theme', 'asc');
-        })
-        ->when($sortBy === 'code', function ($query) {
-            $query->orderBy('measure_code', 'asc');
-        })
-        ->when($sortBy === 'name', function ($query) {
-            $query->orderBy('measure_name', 'asc');
-        })
-        ->when($sortBy === 'id', function ($query) {
-            $query->orderBy('id', 'asc');
-        })
-        ->get();
-
-        return view('kpis.kpi-dashboard', compact('kpis', 'search'));
-    }
     
     public function export(?Kpi $kpi = null)
     {
@@ -252,8 +160,106 @@ class KpiController extends Controller
         return Excel::download(new KpiExport(), 'KPI_List.xlsx');
     }
 
-    public function advancedSearch()
+    public function advancedSearch(Request $request)
     {
+        $source = $request->get('source', 'default');
+
+        if ($source === 'advanced-search') {
+            
+            $kpis = Kpi::query()
+                // Basic filters
+                ->when($request->filled('category'), function ($query) use ($request) {
+                    $query->where('category', $request->category);
+                })
+                ->when($request->filled('code'), function ($query) use ($request) {
+                    $query->where('measure_code', 'LIKE', '%' . $request->code . '%');
+                })
+                ->when($request->filled('measure_owner'), function ($query) use ($request) {
+                    $query->where('measure_owner', 'LIKE', '%' . $request->measure_owner . '%');
+                })
+                ->when($request->filled('perspective'), function ($query) use ($request) {
+                    $query->where('perspective', 'LIKE', '%' . $request->perspective . '%');
+                })
+                ->when($request->filled('theme'), function ($query) use ($request) {
+                    $query->where('strategic_theme', 'LIKE', '%' . $request->theme . '%');
+                })
+                ->when($request->filled('objective'), function ($query) use ($request) {
+                    $query->where('objective', 'LIKE', '%' . $request->objective . '%');
+                })
+                ->when($request->filled('objective_owner'), function ($query) use ($request) {
+                    $query->where('objective_owner', 'LIKE', '%' . $request->objective_owner . '%');
+                })
+                ->when($request->filled('measure_type'), function ($query) use ($request) {
+                    $query->where('measure_type', 'LIKE', '%' . $request->measure_type . '%');
+                })
+                ->when($request->filled('collection_frequency'), function ($query) use ($request) {
+                    $query->where('collection_frequency', 'LIKE', '%' . $request->collection_frequency . '%');
+                })
+                ->when($request->filled('reporting_frequency'), function ($query) use ($request) {
+                    $query->where('reporting_frequency', 'LIKE', '%' . $request->reporting_frequency . '%');
+                })
+                ->when($request->filled('verified_by'), function ($query) use ($request) {
+                    $query->where('verified_by', 'LIKE', '%' . $request->verified_by . '%');
+                })
+                ->when($request->filled('validated_by'), function ($query) use ($request) {
+                    $query->where('validated_by', 'LIKE', '%' . $request->validated_by . '%');
+                })
+                
+                // Segmentations filters
+                ->when($request->filled('segmentation'), function ($query) use ($request) {
+                    $query->whereHas('segmentations', function ($q) use ($request) {
+                        $q->where('segmentation', 'LIKE', '%' . $request->segmentation . '%');
+                    });
+                })
+                ->when($request->filled('seg_code'), function ($query) use ($request) {
+                    $query->whereHas('segmentations', function ($q) use ($request) {
+                        $q->where('code', 'LIKE', '%' . $request->seg_code . '%');
+                    });
+                })
+                ->when($request->filled('seg_owner'), function ($query) use ($request) {
+                    $query->whereHas('segmentations', function ($q) use ($request) {
+                        $q->where('owner', 'LIKE', '%' . $request->seg_owner . '%');
+                    });
+                })
+                ->when($request->filled('target_level'), function ($query) use ($request) {
+                    $query->whereHas('segmentations', function ($q) use ($request) {
+                        $q->where('target_level', 'LIKE', '%' . $request->target_level . '%');
+                    });
+                })
+                
+                // Accreditations filters
+                ->when($request->filled('accrediting_body_id'), function ($query) use ($request) {
+                    $query->whereHas('accreditations', function ($q) use ($request) {
+                        $q->where('accrediting_body_id', 'LIKE', '%' . $request->accrediting_body_id . '%');
+                    });
+                })
+                ->when($request->filled('accrediting_body_name'), function ($query) use ($request) {
+                    $query->whereHas('accreditations', function ($q) use ($request) {
+                        $q->where('accrediting_body_name', 'LIKE', '%' . $request->accrediting_body_name . '%');
+                    });
+                })
+                ->when($request->filled('program_unit'), function ($query) use ($request) {
+                    $query->whereHas('accreditations', function ($q) use ($request) {
+                        $q->where('program_unit', 'LIKE', '%' . $request->program_unit . '%');
+                    });
+                })
+                
+                // Dimensions filters
+                ->when($request->filled('dimensions'), function ($query) use ($request) {
+                    $query->whereHas('dimensions', function ($q) use ($request) {
+                        $q->where('dimensions', 'LIKE', '%' . $request->dimensions . '%');
+                    });
+                })
+                ->when($request->filled('dim_descriptions'), function ($query) use ($request) {
+                    $query->whereHas('dimensions', function ($q) use ($request) {
+                        $q->where('description', 'LIKE', '%' . $request->dim_descriptions . '%');
+                    });
+                })
+                ->get();
+
+            return view('kpis.kpi-dashboard', compact('kpis'));
+        }
+
         return view('kpis.kpi-advanced-search');
     }
 }

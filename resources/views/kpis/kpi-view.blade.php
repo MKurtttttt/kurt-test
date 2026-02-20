@@ -13,7 +13,7 @@
             </a>
 
             @if(Auth::user()->role === 'SuperAdmin')
-                <a href="{{ route('kpis.edit', $kpi->measure_code) }}" class="inline-flex gap-1 items-center bg-amber-300 hover:bg-amber-500 px-6 py-1 text-white rounded-xl">
+                <a href="{{ route('kpis.edit', $kpi->measure_code) }}" class="inline-flex gap-1 items-center bg-amber-400 hover:bg-amber-500 px-6 py-1 text-white rounded-xl">
                     <span>Edit</span>
                 </a>
 

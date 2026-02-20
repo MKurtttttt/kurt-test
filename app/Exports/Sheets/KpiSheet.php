@@ -326,12 +326,17 @@ class KpiSheet implements WithTitle, WithEvents
         // Reset array keys
         $columns = array_values($columns);
         
+        $lastCol = chr(65 + count($columns) - 1);
+        
         // Add column headers dynamically
         foreach ($columns as $index => $column) {
             $col = chr(65 + $index);
             $sheet->setCellValue("{$col}{$currentRow}", ucwords(str_replace('_', ' ', $column)));
             $eventSheet->styleHeading("{$col}{$currentRow}");
         }
+        
+        // Add border to header row
+        $sheet->getStyle("A{$currentRow}:{$lastCol}{$currentRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         $currentRow++;
         
         // Add segmentation data
@@ -344,9 +349,11 @@ class KpiSheet implements WithTitle, WithEvents
             }
             
             // Style all columns
-            $lastCol = chr(65 + count($columns) - 1);
             $eventSheet->styleContent("A{$currentRow}:{$lastCol}{$currentRow}");
-            $sheet->getRowDimension($currentRow)->setRowHeight(30);
+            
+            // Add border to data row
+            $sheet->getStyle("A{$currentRow}:{$lastCol}{$currentRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getRowDimension($currentRow)->setRowHeight(60);
             
             $currentRow++;
         }
@@ -379,6 +386,7 @@ class KpiSheet implements WithTitle, WithEvents
         });
         
         $columns = array_values($columns);
+        $lastCol = chr(65 + count($columns) - 1);
         
         // Add column headers dynamically
         foreach ($columns as $index => $column) {
@@ -386,6 +394,9 @@ class KpiSheet implements WithTitle, WithEvents
             $sheet->setCellValue("{$col}{$currentRow}", ucwords(str_replace('_', ' ', $column)));
             $eventSheet->styleHeading("{$col}{$currentRow}");
         }
+        
+        // Add border to header row
+        $sheet->getStyle("A{$currentRow}:{$lastCol}{$currentRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         $currentRow++;
         
         // Add accreditation data
@@ -397,9 +408,11 @@ class KpiSheet implements WithTitle, WithEvents
                 $sheet->setCellValue("{$col}{$currentRow}", $data[$column] ?? '');
             }
             
-            $lastCol = chr(65 + count($columns) - 1);
             $eventSheet->styleContent("A{$currentRow}:{$lastCol}{$currentRow}");
-            $sheet->getRowDimension($currentRow)->setRowHeight(30);
+            
+            // Add border to data row
+            $sheet->getStyle("A{$currentRow}:{$lastCol}{$currentRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getRowDimension($currentRow)->setRowHeight(60);
             
             $currentRow++;
         }
@@ -432,6 +445,7 @@ class KpiSheet implements WithTitle, WithEvents
         });
         
         $columns = array_values($columns);
+        $lastCol = chr(65 + count($columns) - 1);
         
         // Add column headers dynamically
         foreach ($columns as $index => $column) {
@@ -439,6 +453,9 @@ class KpiSheet implements WithTitle, WithEvents
             $sheet->setCellValue("{$col}{$currentRow}", ucwords(str_replace('_', ' ', $column)));
             $eventSheet->styleHeading("{$col}{$currentRow}");
         }
+        
+        // Add border to header row
+        $sheet->getStyle("A{$currentRow}:{$lastCol}{$currentRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         $currentRow++;
         
         // Add dimension data
@@ -450,9 +467,11 @@ class KpiSheet implements WithTitle, WithEvents
                 $sheet->setCellValue("{$col}{$currentRow}", $data[$column] ?? '');
             }
             
-            $lastCol = chr(65 + count($columns) - 1);
             $eventSheet->styleContent("A{$currentRow}:{$lastCol}{$currentRow}");
-            $sheet->getRowDimension($currentRow)->setRowHeight(30);
+            
+            // Add border to data row
+            $sheet->getStyle("A{$currentRow}:{$lastCol}{$currentRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getRowDimension($currentRow)->setRowHeight(60);
             
             $currentRow++;
         }
