@@ -113,6 +113,7 @@ class IsoDocumentController extends Controller
                 'classification'=> $document['classification'],
                 'source_type'=> $document['source'],
                 'specific_type'=> $document['specificType'],
+                'status' => 'pending',
                 'revising_master_document_id' => $document['revisingMasterId'] ?? null,
             ]);
         }
@@ -169,6 +170,7 @@ class IsoDocumentController extends Controller
                 'classification' => $document['classification'],
                 'source_type' => $document['source'],
                 'specific_type' => $document['specificType'],
+                'status' => 'pending',
                 'revising_master_document_id' => $document['revisingMasterId'] ?? null,
             ]);
         }
@@ -177,6 +179,9 @@ class IsoDocumentController extends Controller
     public function submitToIDC(IsoTicket $ticket){
         // Auth check
         $this->authTicketCheck($ticket);
+        
+        // Update the statuses of the documents to submitted to idc
+        $ticket->documents()->update(['status' => 'submitted_to_idc']);
 
         // Testing Feature: Generate ticketing number
         $ticketNumber = $this->generateTicketNumber();
@@ -486,8 +491,6 @@ class IsoDocumentController extends Controller
                             'status' => 'Active',
                             'registered_at' => $document->registered_at,
                             'source' => 'ticket',
-                            'ticket_id' => $ticket->id,
-                            'ticket_document_id' =>$document->id,
                         ]);
                     } elseif ($document->classification === 'revision'){
                         $originalDoc = IsoMasterDocument::find($document->revising_master_document_id);
@@ -517,8 +520,6 @@ class IsoDocumentController extends Controller
                             'status' => 'Active',
                             'registered_at' => $document->registered_at,
                             'source' => 'ticket',
-                            'ticket_id'=> $ticket->id,
-                            'ticket_document_id' => $document->id,
                         ]);
                     } elseif ($document->classification === 'deletion'){
                         $docToDelete = IsoMasterDocument::find($document->revising_master_document_id);
@@ -548,8 +549,6 @@ class IsoDocumentController extends Controller
                             'registered_at' => $document->registered_at,
                             'deleted_at' => now(),
                             'source' => 'ticket',
-                            'ticket_id' => $ticket->id,
-                            'ticket_document_id' => $document->id,
                         ]);
                     }
                     $document->update([
