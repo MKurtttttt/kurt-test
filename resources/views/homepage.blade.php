@@ -25,7 +25,15 @@
             <div class="flex flex-row">
                 <img src="{{ asset('images/icons/eye-2.svg') }}" class = "w-6 h-6"/>
                 <div class="px-2">
-                    {{ $count }} {{ ucfirst($period) }} Visitors               
+                    @if ($period === "daily")
+                        @if ($count === 1)
+                            {{ $count }} Visitor Today
+                        @else
+                            {{ $count }} Visitors Today
+                        @endif
+                    @else 
+                        {{ $count }} {{ ucfirst($period) }} Visitors
+                    @endif          
                 </div>
             </div>
             <p style="color: #B8860B;"></p>

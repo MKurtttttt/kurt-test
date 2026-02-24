@@ -61,9 +61,17 @@ Route::middleware('auth','revalidate')->group(function () {
     })->name('portal.profile');
 
     /*------------------------------------------------------------------
-    | 3. TEACHING LOADS
+    | 3. EMPLOYMENT AND ACADEMIC MODULE
     |------------------------------------------------------------------*/
-    Route::get('hau_ep/teaching-loads', function () {
+    Route::get('/emp-acad-module', function () {
+        $userInfo = Employee::where('emp_id', Auth::user()->id)->first();
+        return view('portal.emp-acad-module')->with(['userInfo' => $userInfo]);
+    })->name('portal.emp-acad-module');
+
+    /*------------------------------------------------------------------
+    | 4. TEACHING LOADS
+    |------------------------------------------------------------------*/
+    Route::get('emp-acad-module/teaching-loads', function () {
         // Get current semester configuration
         $reg_cs = semconfig::where('id', 1)->first();
         $tri_cs = semconfig::where('id', 2)->first();
@@ -102,9 +110,9 @@ Route::middleware('auth','revalidate')->group(function () {
     })->name('portal.loads');
 
     /*------------------------------------------------------------------
-    | 4. HIRING HISTORY
+    | 5. HIRING HISTORY
     |------------------------------------------------------------------*/
-    Route::get('hau_ep/hiring-history', function () {
+    Route::get('emp-acad-module/hiring-history', function () {
         return view('portal.pages.hiring.main')->with([
             'hirings' => HiringHistory::where('emp_id', Auth::user()->id)
                 ->orderBy('created_at', 'desc')->get(),
@@ -113,91 +121,91 @@ Route::middleware('auth','revalidate')->group(function () {
     })->name('portal.hiring');
 
     /*------------------------------------------------------------------
-    | 5. ORGANIZATIONS
+    | 6. ORGANIZATIONS
     |------------------------------------------------------------------*/
-    Route::get('hau_ep/organization-memberships', [OrgController::class, 'create'])
+    Route::get('emp-acad-module/organization-memberships', [OrgController::class, 'create'])
         ->name('portal.org');
-    Route::get('hau_ep/organization-memberships/add', [OrgController::class, 'create_add'])
+    Route::get('emp-acad-module/organization-memberships/add', [OrgController::class, 'create_add'])
         ->name('portal.org.add');
-    Route::get('hau_ep/organization-memberships/edit/{user}/{id}', [OrgController::class, 'create_edit'])
+    Route::get('emp-acad-module/organization-memberships/edit/{user}/{id}', [OrgController::class, 'create_edit'])
         ->where('id', '.*')
         ->name('portal.org.edit');
-    Route::put('hau_ep/organization-memberships/update/{id}', [OrgController::class, 'update'])
+    Route::put('emp-acad-module/organization-memberships/update/{id}', [OrgController::class, 'update'])
         ->where('id', '.*')
         ->name('portal.org.update');
-    Route::post('hau_ep/organization-memberships/store', [OrgController::class, 'store'])
+    Route::post('emp-acad-module/organization-memberships/store', [OrgController::class, 'store'])
         ->name('portal.org.store');
-    Route::delete('hau_ep/organization-memberships/delete', [OrgController::class, 'destroy'])
+    Route::delete('emp-acad-module/organization-memberships/delete', [OrgController::class, 'destroy'])
         ->name('portal.org.delete');
-    Route::delete('hau_ep/organization-memberships/clear', function () {
+    Route::delete('emp-acad-module/organization-memberships/clear', function () {
         orgs::where('emp_id', Auth::user()->id)->delete();
         return redirect()->route('portal.org')->with(['msg' => "All records deleted."]);
     })->name('portal.org.clear');
 
     /*------------------------------------------------------------------
-    | 6. RESEARCH & PUBLICATION
+    | 7. RESEARCH & PUBLICATION
     |------------------------------------------------------------------*/
     // Main Page & Submission Types
-    Route::get('hau_ep/research-and-publications', [ResPub::class, 'create'])
+    Route::get('emp-acad-module/research-and-publications', [ResPub::class, 'create'])
         ->name('portal.respub');
-    Route::get('hau_ep/research-and-publications/add-new', [ResPub::class, 'createType'])
+    Route::get('emp-acad-module/research-and-publications/add-new', [ResPub::class, 'createType'])
         ->name('portal.respub.type');
-    Route::get('hau_ep/research-and-publications/add-new/research', [ResPub::class, 'loadResearch'])
+    Route::get('emp-acad-module/research-and-publications/add-new/research', [ResPub::class, 'loadResearch'])
         ->name('portal.respub.add.research');
-    Route::get('hau_ep/research-and-publications/add-new/publication', [ResPub::class, 'loadPublication'])
+    Route::get('emp-acad-module/research-and-publications/add-new/publication', [ResPub::class, 'loadPublication'])
         ->name('portal.respub.add.publication');
 
     // Success and Edit pages
-    Route::get('hau_ep/research-and-publications/add-new/success', function () {
+    Route::get('emp-acad-module/research-and-publications/add-new/success', function () {
         return view('portal.pages.respub.success');
     })->name('portal.respub.success');
-    Route::get('hau_ep/research-and-publications/edit/success', function () {
+    Route::get('emp-acad-module/research-and-publications/edit/success', function () {
         return view('portal.pages.respub.edit_success');
     })->name('portal.respub.edit_success');
 
     // View, Edit, and Update
-    Route::get('hau_ep/research-and-publications/view/{id}', [ResPub::class, 'viewItem'])
+    Route::get('emp-acad-module/research-and-publications/view/{id}', [ResPub::class, 'viewItem'])
         ->name('portal.respub.view');
-    Route::get('hau_ep/research-and-publications/edit/{id}', [ResPub::class, 'createEdit'])
+    Route::get('emp-acad-module/research-and-publications/edit/{id}', [ResPub::class, 'createEdit'])
         ->name('portal.respub.edit');
-    Route::put('hau_ep/research-and-publications/edit/{id}', [ResPub::class, 'editItem'])
+    Route::put('emp-acad-module/research-and-publications/edit/{id}', [ResPub::class, 'editItem'])
         ->name('portal.respub.update');
 
     // Store new Research & Publication entries
-    Route::post('hau_ep/research-and-publications/store-research', [ResPub::class, 'storeResearch'])
+    Route::post('emp-acad-module/research-and-publications/store-research', [ResPub::class, 'storeResearch'])
         ->name('portal.respub.store.research');
-    Route::post('hau_ep/research-and-publications/store-publication', [ResPub::class, 'storePublication'])
+    Route::post('emp-acad-module/research-and-publications/store-publication', [ResPub::class, 'storePublication'])
         ->name('portal.respub.store.publication');
 
     // Delete route
-    Route::delete('hau_ep/research-and-publications/delete/{id}', [ResPub::class, 'destroy'])
+    Route::delete('emp-acad-module/research-and-publications/delete/{id}', [ResPub::class, 'destroy'])
         ->name('portal.respub.delete');
 
 
     /*------------------------------------------------------------------
-    | 7. CERTIFICATIONS
+    | 8. CERTIFICATIONS
     |------------------------------------------------------------------*/
-    Route::get('hau_ep/certifications', [certificationController::class, 'create'])
+    Route::get('emp-acad-module/certifications', [certificationController::class, 'create'])
         ->name('portal.certifications');
-    Route::get('hau_ep/certifications/approved', [certificationController::class, 'createApproved'])
+    Route::get('emp-acad-module/certifications/approved', [certificationController::class, 'createApproved'])
         ->name('portal.certifications.approved');
-    Route::get('hau_ep/certifications/pending', [certificationController::class, 'createPending'])
+    Route::get('emp-acad-module/certifications/pending', [certificationController::class, 'createPending'])
         ->name('portal.certifications.pending');
-    Route::get('hau_ep/certifications/to-review', [certificationController::class, 'createToreview'])
+    Route::get('emp-acad-module/certifications/to-review', [certificationController::class, 'createToreview'])
         ->name('portal.certifications.toreview');
-    Route::get('hau_ep/certifications/{id}', [certificationController::class, 'viewItem'])
+    Route::get('emp-acad-module/certifications/{id}', [certificationController::class, 'viewItem'])
         ->name('portal.certifications.view');
-    Route::get('hau_ep/certifications/edit/{id}', [certificationController::class, 'edit'])
+    Route::get('emp-acad-module/certifications/edit/{id}', [certificationController::class, 'edit'])
         ->name('portal.certifications.edit');
-    Route::put('hau_ep/certifications/update/{id}', [certificationController::class, 'update'])
+    Route::put('emp-acad-module/certifications/update/{id}', [certificationController::class, 'update'])
         ->name('portal.certifications.update');
-    Route::delete('hau_ep/certifications/del/{id}', [certificationController::class, 'destroy'])
+    Route::delete('emp-acad-module/certifications/del/{id}', [certificationController::class, 'destroy'])
         ->name('portal.certifications.delete');
 
     /*------------------------------------------------------------------
-    | 8. TRAININGS
+    | 9. TRAININGS
     |------------------------------------------------------------------*/
-    Route::get('hau_ep/trainings/', function () {
+    Route::get('emp-acad-module/trainings/', function () {
         $approvedTrainings = Trainings::where('emp_id', Auth::user()->id)
             ->where('status', 'Approved')
             ->orderBy('created_at', 'asc')->get();
@@ -236,30 +244,30 @@ Route::middleware('auth','revalidate')->group(function () {
         ]);
     })->name('portal.training');
 
-    Route::get('hau_ep/trainings/{id}', function ($id) {
+    Route::get('emp-acad-module/trainings/{id}', function ($id) {
         return view('portal.pages.trainings.view')->with([
             'data' => Trainings::where('id', $id)->first()
         ]);
     })->name('portal.training.view');
 
-    Route::get('hau_ep/trainings/edit/{id}', function ($id) {
+    Route::get('emp-acad-module/trainings/edit/{id}', function ($id) {
         return view('portal.pages.trainings.edit')->with([
             'training_types' => tags::where('category', 'training_type')->get(),
             'data'         => Trainings::where('id', $id)->first()
         ]);
     })->name('portal.training.edit');
 
-    Route::put('hau_ep/trainings/update/{id}', [TrainingsController::class, 'update'])
+    Route::put('emp-acad-module/trainings/update/{id}', [TrainingsController::class, 'update'])
         ->name('portal.training.update');
-    Route::delete('hau_ep/trainings/del/{id}', [TrainingsController::class, 'destroy'])
+    Route::delete('emp-acad-module/trainings/del/{id}', [TrainingsController::class, 'destroy'])
         ->name('portal.training.delete');
-    Route::patch('hau_ep/trainings/resubmit/{id}', [TrainingsController::class, 'resubmit'])
+    Route::patch('emp-acad-module/trainings/resubmit/{id}', [TrainingsController::class, 'resubmit'])
         ->name('portal.training.resubmit');
 
     /*------------------------------------------------------------------
-    | 9. LICENSES
+    | 10. LICENSES
     |------------------------------------------------------------------*/
-    Route::get('hau_ep/licenses', function () {
+    Route::get('emp-acad-module/licenses', function () {
         return view('portal.pages.license.main')->with([
             "approved" => Licenses::where('emp_id', Auth::user()->id)
                 ->where('status', 'Approved')
@@ -271,28 +279,28 @@ Route::middleware('auth','revalidate')->group(function () {
         ]);
     })->name('portal.license');
 
-    Route::get('hau_ep/licenses/{id}', function ($id) {
+    Route::get('emp-acad-module/licenses/{id}', function ($id) {
         return view('portal.pages.license.view')->with([
             'data' => Licenses::where('id', $id)->first()
         ]);
     })->name('portal.license.view');
 
-    Route::get('hau_ep/license/edit/{id}', function ($id) {
+    Route::get('emp-acad-module/license/edit/{id}', function ($id) {
         return view('portal.pages.license.edit')->with([
             'data'          => Licenses::where('id', $id)->first(),
             'license_types' => tags::where('category', 'license_type')->get()
         ]);
     })->name('portal.license.edit');
 
-    Route::put('hau_ep/license/update/{id}', [LicenseController::class, 'update'])
+    Route::put('emp-acad-module/license/update/{id}', [LicenseController::class, 'update'])
         ->name('portal.license.update');
-    Route::delete('hau_ep/licenses/delete/{id}', [LicenseController::class, 'destroy'])
+    Route::delete('emp-acad-module/licenses/delete/{id}', [LicenseController::class, 'destroy'])
         ->name('portal.license.delete');
 
     /*------------------------------------------------------------------
-    | 10. EDUCATIONAL BACKGROUND
+    | 11. EDUCATIONAL BACKGROUND
     |------------------------------------------------------------------*/
-    Route::get('hau_ep/education', function () {
+    Route::get('emp-acad-module/education', function () {
         $approved = Education::where([
             'emp_id' => Auth::user()->id,
             'status' => 'Approved'
@@ -315,27 +323,27 @@ Route::middleware('auth','revalidate')->group(function () {
         ]);
     })->name('portal.edu-bg');
 
-    Route::get('hau_ep/education/edit/{id}', function ($id) {
+    Route::get('emp-acad-module/education/edit/{id}', function ($id) {
         return view('portal.pages.edu-bg.edit')->with([
             'data' => Education::where('id', $id)->first()
         ]);
     })->name('portal.edu-bg.edit');
 
-    Route::put('hau_ep/education/update/{id}', [EducationalBGController::class, 'update'])
+    Route::put('emp-acad-module/education/update/{id}', [EducationalBGController::class, 'update'])
         ->name('portal.edu-bg.update');
 
-    Route::get('hau_ep/education/{id}', function ($id) {
+    Route::get('emp-acad-module/education/{id}', function ($id) {
         $data = Education::where('id', $id)->first();
         return view('portal.pages.edu-bg.view')->with(['data' => $data]);
     })->name('portal.edu-bg.view');
 
-    Route::delete('hau_ep/education/delete/{id}', [EducationalBGController::class, 'destroy'])
+    Route::delete('emp-acad-module/education/delete/{id}', [EducationalBGController::class, 'destroy'])
         ->name('portal.edu-bg.delete');
 
     /*------------------------------------------------------------------
-    | 11. EMPLOYMENT
+    | 12. EMPLOYMENT
     |------------------------------------------------------------------*/
-    Route::get('hau_ep/employment-history', function () {
+    Route::get('emp-acad-module/employment-history', function () {
         $approved = Employment::where([
             'emp_id' => Auth::user()->id,
             'status' => 'Approved'
@@ -358,95 +366,95 @@ Route::middleware('auth','revalidate')->group(function () {
         ]);
     })->name('portal.employment');
 
-    Route::get('hau_ep/employment-history/edit/{id}', function ($id) {
+    Route::get('emp-acad-module/employment-history/edit/{id}', function ($id) {
         return view('portal.pages.employments.edit')->with([
             'data' => Employment::where('id', $id)->first()
         ]);
     })->name('portal.employment.edit');
 
-    Route::put('hau_ep/employment-history/update/{id}', [EmploymentController::class, 'update'])
+    Route::put('emp-acad-module/employment-history/update/{id}', [EmploymentController::class, 'update'])
         ->name('portal.employment.update');
 
-    Route::get('hau_ep/employment-history/{id}', function ($id) {
+    Route::get('emp-acad-module/employment-history/{id}', function ($id) {
         $data = Employment::where('id', $id)->first();
         return view('portal.pages.employments.view')->with(['data' => $data]);
     })->name('portal.employment.view');
 
-    Route::delete('hau_ep/employment-history/delete/{id}', [EmploymentController::class, 'destroy'])
+    Route::delete('emp-acad-module/employment-history/delete/{id}', [EmploymentController::class, 'destroy'])
         ->name('portal.employment.delete');
 
     /*------------------------------------------------------------------
-    | 12. DEPENDENTS
+    | 13. DEPENDENTS
     |------------------------------------------------------------------*/
-    Route::get('/hau_ep/dependents', [DependencyController::class, 'loadDependencies'])
+    Route::get('/emp-acad-module/dependents', [DependencyController::class, 'loadDependencies'])
         ->name('portal.dependencies');
-    Route::get('/hau_ep/dependent/s', [DependencyController::class, 'searchDependency'])
+    Route::get('/emp-acad-module/dependent/s', [DependencyController::class, 'searchDependency'])
         ->name('portal.dependencies.search');
-    Route::get('/hau_ep/dependents/add', [DependencyController::class, 'loadAdd'])
+    Route::get('/emp-acad-module/dependents/add', [DependencyController::class, 'loadAdd'])
         ->name('portal.dependencies.add');
-    Route::get('hau_ep/dependents/edit/{id}', [DependencyController::class, 'loadEdit'])
+    Route::get('emp-acad-module/dependents/edit/{id}', [DependencyController::class, 'loadEdit'])
         ->name('portal.dependencies.edit');
-    Route::get('hau_ep/dependents/view/{id}', [DependencyController::class, 'viewItem'])
+    Route::get('emp-acad-module/dependents/view/{id}', [DependencyController::class, 'viewItem'])
         ->name('portal.dependencies.view');
-    Route::post('/hau_ep/dependents/add', [DependencyController::class, 'addDependent'])
+    Route::post('/emp-acad-module/dependents/add', [DependencyController::class, 'addDependent'])
         ->name('portal.dependencies.addnew');
-    Route::delete('/hau_ep/dependents/del/{dep_id}', [DependencyController::class, 'destroy'])
+    Route::delete('/emp-acad-module/dependents/del/{dep_id}', [DependencyController::class, 'destroy'])
         ->name('portal.dependencies.delete');
-    Route::delete('/hau_ep/dependents/del', [DependencyController::class, 'clearAll'])
+    Route::delete('/emp-acad-module/dependents/del', [DependencyController::class, 'clearAll'])
         ->name('portal.dependencies.clear');
-    Route::put('hau_ep/dependents/update/{id}', [DependencyController::class, 'updateDependent'])
+    Route::put('emp-acad-module/dependents/update/{id}', [DependencyController::class, 'updateDependent'])
         ->name('portal.dependencies.update');
 
     /*------------------------------------------------------------------
-    | 13. PENDING REQUESTS
+    | 14. PENDING REQUESTS
     |------------------------------------------------------------------*/
-    Route::get('hau_ep/pending-requests', [PendingController::class, 'create'])
+    Route::get('emp-acad-module/pending-requests', [PendingController::class, 'create'])
         ->name('portal.pending');
-    Route::get('hau_ep/pending-requests/{id}', [PendingController::class, 'viewInfo'])
+    Route::get('emp-acad-module/pending-requests/{id}', [PendingController::class, 'viewInfo'])
         ->name('portal.pending.view');
-    Route::delete('hau_ep/pending_requests/del/{id}', [PendingController::class, 'destroyRequest'])
+    Route::delete('emp-acad-module/pending_requests/del/{id}', [PendingController::class, 'destroyRequest'])
         ->name('portal.pending.delete');
 
     /*------------------------------------------------------------------
-    | 14. FILING APPLICATION
+    | 15. FILING APPLICATION
     |------------------------------------------------------------------*/
-    Route::get('hau_ep/file-application/type', [FilingController::class, 'loadTypes'])
+    Route::get('emp-acad-module/file-application/type', [FilingController::class, 'loadTypes'])
         ->name('portal.filing.type');
-    Route::get('hau_ep/file-application/certification', [FilingController::class, 'loadCertification'])
+    Route::get('emp-acad-module/file-application/certification', [FilingController::class, 'loadCertification'])
         ->name('portal.filing.certification');
-    Route::get('hau_ep/file-applicaton/education', function () {
+    Route::get('emp-acad-module/file-applicaton/education', function () {
         return view('portal.pages.filing.edu-bg');
     })->name('portal.filing.edu-bg');
-    Route::get('hau_ep/file-applicaton/employment', function () {
+    Route::get('emp-acad-module/file-applicaton/employment', function () {
         return view('portal.pages.filing.employment');
     })->name('portal.filing.employment');
-    Route::get('hau_ep/file-application/license', function () {
+    Route::get('emp-acad-module/file-application/license', function () {
         return view('portal.pages.filing.license')->with([
             'license_types' => tags::where('category', 'license_type')->get()
         ]);
     })->name('portal.filing.license');
-    Route::get('hau_ep/file-application/training', function () {
+    Route::get('emp-acad-module/file-application/training', function () {
         return view('portal.pages.filing.training')->with([
             'training_types' => tags::where('category', 'training_type')->get()
         ]);
     })->name('portal.filing.training');
-    Route::get('hau_ep/file-application/success', [FilingController::class, 'loadSuccess'])
+    Route::get('emp-acad-module/file-application/success', [FilingController::class, 'loadSuccess'])
         ->name('portal.filing.success');
 
     // Filing - POST methods for adding new entries
-    Route::post('hau_ep/file-application/certification/add', [certificationController::class, 'store'])
+    Route::post('emp-acad-module/file-application/certification/add', [certificationController::class, 'store'])
         ->name('portal.filing.certification.add');
-    Route::post('hau_ep/file-application/education/add', [EducationalBGController::class, 'store'])
+    Route::post('emp-acad-module/file-application/education/add', [EducationalBGController::class, 'store'])
         ->name('portal.filing.edu-bg.add');
-    Route::post('hau_ep/file-application/employment/add', [EmploymentController::class, 'store'])
+    Route::post('emp-acad-module/file-application/employment/add', [EmploymentController::class, 'store'])
         ->name('portal.filing.employment.add');
-    Route::post('hau_ep/file-application/license/add', [LicenseController::class, 'store'])
+    Route::post('emp-acad-module/file-application/license/add', [LicenseController::class, 'store'])
         ->name('portal.filing.license.add');
-    Route::post('hau_ep/file-application/training/add', [TrainingsController::class, 'store'])
+    Route::post('emp-acad-module/file-application/training/add', [TrainingsController::class, 'store'])
         ->name('portal.filing.training.add');
 
     /*------------------------------------------------------------------
-    | 15. ADDITIONAL PROFILE UPDATE ROUTES
+    | 16. ADDITIONAL PROFILE UPDATE ROUTES
     | (These routes update various parts of the user profile)
     |------------------------------------------------------------------*/
     Route::put('/hau_ep/profile/update/personal-data/{id}', [PortalController::class, 'updatePersonal'])
@@ -465,7 +473,7 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('update-pic');
 
     /*------------------------------------------------------------------
-    | 16. PROFILE EDIT VIEWS
+    | 17. PROFILE EDIT VIEWS
     | (These routes display the edit forms for profile sections)
     |------------------------------------------------------------------*/
     // Edit Personal Data - with gender options
@@ -509,17 +517,17 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('profile.changepic');
     
     /*------------------------------------------------------------------
-    | 17. SharePoint Sites
+    | 18. SharePoint Sites
     |------------------------------------------------------------------*/
     Route::get('sharepoint-sites/dashboard', [SharepointController::class, 'index'])->name('sharepoint-sites.dashboard');
 
     /*------------------------------------------------------------------
-    | 18. Knowledge Hub
+    | 19. Knowledge Hub
     |------------------------------------------------------------------*/
     Route::get('knowledge-hub/dashboard', [KnowledgeHubController::class, 'index'])->name('knowledge-hub.dashboard');
     
     /*------------------------------------------------------------------
-    | 19. KPI Library
+    | 20. KPI Library
     |------------------------------------------------------------------*/
     Route::get('/kpis/dashboard', [KpiController::class, 'dashboard'])->name('kpis.dashboard');
     
@@ -536,7 +544,7 @@ Route::middleware('auth','revalidate')->group(function () {
     Route::get('/kpis/{kpi}/export', [KpiController::class, 'export'])->name('kpis.export');
 
     /*------------------------------------------------------------------
-    | 20. ISO Document Handling
+    | 21. ISO Document Handling
     |------------------------------------------------------------------*/
     Route::get('/iso/document', [IsoDocumentController::class, 'loadDocument'])
         ->name('iso.document');
@@ -559,7 +567,7 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('iso.document.submit');
 
     /*------------------------------------------------------------------
-    | 21. ISO IDC Document Handling
+    | 22. ISO IDC Document Handling
     |------------------------------------------------------------------*/
     // IDC Management Routes
     Route::get('/iso/idc/dashboard', [IsoDocumentController::class,'loadIdcDashboard'])
@@ -572,7 +580,7 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('iso.idc.reset.system');
     
     /*------------------------------------------------------------------
-    | 22. ISO Document Management
+    | 23. ISO Document Management
     |------------------------------------------------------------------*/
     Route::patch('/iso/idc/{ticket}/register', [IsoDocumentController::class, 'registerTicket'])
         ->name('iso.idc.register.ticket');
@@ -590,7 +598,7 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('iso.management.template');
 
     /*------------------------------------------------------------------
-    | 23. Visit Counter
+    | 24. Visit Counter
     |------------------------------------------------------------------*/
     Route::get('/visitor-count/visitors', [VisitorController::class, 'index'])
         ->name('visitor-count.dashboard');

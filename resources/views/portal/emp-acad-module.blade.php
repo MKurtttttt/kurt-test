@@ -1,8 +1,3 @@
-<!-- 
-    This is the employee dashboard.
-    This is different from the dean, hr, and super.
--->
-
 <x-app-layout>
     <div class = "profile_card"> 
         <div class = "profile_card_box"> 
@@ -35,53 +30,84 @@
                 </div>  
             </div> 
         </div>         
-    </div> 
-
+    </div>
     <div class="w-full flex justify-center py-4">
-        <div class="w-[85%] grid grid-cols-5 gap-4 auto-rows-[200px]">
+            <div class="w-[85%] grid grid-cols-5 gap-4 auto-rows-[200px]">
             
             <x-navigation.nav-card 
-                route="portal.profile" 
-                icon="images/icons/portal_nav/profile.svg" 
-                title="Profile" 
-            />
-            
-            <x-navigation.nav-card 
-                route="portal.emp-acad-module" 
-                icon="images/icons/portal_nav/emp-acad.svg" 
-                title="Employment & Academic Modules" 
+                route="portal.loads" 
+                icon="images/icons/portal_nav/loads.svg" 
+                title="Teaching Loads" 
             />
 
             <x-navigation.nav-card 
-                route="sharepoint-sites.dashboard" 
-                icon="images/icons/nav/sharepoint.png" 
-                title="SharePoint Sites" 
-                :excludedRoles="['ISO Document Handler']"
+                route="portal.hiring" 
+                icon="images/icons/portal_nav/hiring.png" 
+                title="Hiring History" 
             />
 
             <x-navigation.nav-card 
-                route="information-hub.dashboard" 
-                icon="images/icons/nav/information.png" 
-                title="Information Hub" 
-                :excludedRoles="['ISO Document Handler']"
+                route="portal.org" 
+                icon="images/icons/portal_nav/organization.svg" 
+                title="Organization" 
             />
 
             <x-navigation.nav-card 
-                route="kpis.dashboard" 
-                icon="images/icons/nav/kpi.png" 
-                title="KPIs" 
-                :excludedRoles="['ISO Document Handler']"
+                route="portal.respub" 
+                icon="images/icons/portal_nav/research.svg" 
+                title="Research & Publication" 
             />
 
             <x-navigation.nav-card 
-                route="iso.document" 
-                icon="images/icons/portal_nav/iso.png" 
-                title="ISO Document Handling" 
-                :excludedRoles="['Employee', 'Dean', 'HR Admin']"
+                route="portal.certifications" 
+                icon="images/icons/portal_nav/cert.svg" 
+                title="Certifications" 
             />
 
+            <x-navigation.nav-card 
+                route="portal.training" 
+                icon="images/icons/portal_nav/training.svg" 
+                title="Trainings" 
+            />
+
+            <x-navigation.nav-card 
+                route="portal.license" 
+                icon="images/icons/portal_nav/license.png" 
+                title="License" 
+            />
+
+            <x-navigation.nav-card 
+                route="portal.edu-bg" 
+                icon="images/icons/portal_nav/education.png" 
+                title="Educational Background" 
+            />
+
+            <x-navigation.nav-card 
+                route="portal.employment" 
+                icon="images/icons/portal_nav/employment.png" 
+                title="Employment" 
+            />
+
+            <x-navigation.nav-card 
+                route="portal.dependencies" 
+                icon="images/icons/portal_nav/dep.svg" 
+                title="Dependents" 
+            />
+
+            <x-navigation.nav-card 
+                route="portal.pending" 
+                icon="images/icons/portal_nav/pending.svg" 
+                title="Pending Requests" 
+            />
+
+            <x-navigation.nav-card 
+                route="portal.filing.type" 
+                icon="images/icons/portal_nav/send.svg" 
+                title="Filing Application" 
+            />
         </div>
     </div>
+
 </x-app-layout>
 
 <style> 

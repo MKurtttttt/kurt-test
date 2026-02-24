@@ -3,8 +3,6 @@
     <div class= "min-h-screen">
         <div class = "profile_card" > 
             <div class = "profile_card_box">
-                
-                <div class = "square"> </div> 
                 <div class = "left"> 
 
                 @if(Auth::user()->user->profile_picture)
@@ -33,10 +31,10 @@
                         
                         <img src = "{{asset('storage/dept/logo/'. $userInfo->department->logo)}}"/> 
                         @else
-                        <img src="{{asset('images/hau-logo.png')}}" alt="">
+                        <img src="{{asset('images/logo-circle.png')}}" alt="">
                         @endif
                     @else 
-                        <img src="{{asset('images/hau-logo.png')}}" alt="">
+                        <img src="{{asset('images/logo-circle.png')}}" alt="">
                     @endif
 
                     </div>  
@@ -218,16 +216,6 @@
     .logo img { 
         width: 200px; 
         height: 200px;
-    }
-    .square{ 
-        z-index: 1;
-        position: absolute;
-        background-color: #70121D;
-        width: 180px; 
-        height: 180px;
-        rotate: 45deg;
-        left: 90%;
-        top: 2rem;
     }
 
 </style> 

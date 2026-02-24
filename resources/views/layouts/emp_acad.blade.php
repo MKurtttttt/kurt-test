@@ -4,7 +4,7 @@
 
         <div class = "w-full flex flex-col items-center mt-8"> 
 
-            <h1 class="mb-2 font-extrabold text-xl">HAU-IDMO Portal</h1>
+            <h1 class="mb-2 font-extrabold text-xl">Employment & Academic Modules</h1>
             <!-- profile card -->
             <div class="w-[90%] grid grid-cols-[20%_80%] bg-red-800 rounded-md py-2 px-1 text-white border border-white border-opacity-10">
                 <div class="flex justify-center items-center">
@@ -23,69 +23,106 @@
 
         <hr class="w-[90%] rounded-xl opacity-1 my-4">
 
-        <div class = "navigation_links flex flex-col items-center py-2"> 
+        <div class = "navigation_links flex flex-col items-center py-2">
+            
             <x-navigation.side-nav-card
                 nav="portal"
-                route="portal.dashboard" 
+                route="portal.emp-acad-module" 
                 icon="images/icons/nav/dashboard.svg" 
                 title="Dashboard" 
             />
 
             <x-navigation.side-nav-card
                 nav="portal"
-                route="portal.profile" 
-                icon="images/icons/portal_nav/profile.svg" 
-                title="Profile"
+                route="portal.loads" 
+                icon="images/icons/portal_nav/loads.png" 
+                title="Teaching Loads" 
             />
 
             <x-navigation.side-nav-card
                 nav="portal"
-                route="portal.emp-acad-module" 
-                icon="images/icons/portal_nav/emp-acad.png" 
-                title="Employment & Academic Modules" 
+                route="portal.hiring" 
+                icon="images/icons/portal_nav/hiring.png" 
+                title="Hiring History" 
             />
 
             <x-navigation.side-nav-card
                 nav="portal"
-                route="sharepoint-sites.dashboard" 
-                icon="images/icons/nav/sharepoint.svg" 
-                title="SharePoint Sites" 
-                :excludedRoles="['ISO Document Handler']"
+                route="portal.org" 
+                icon="images/icons/portal_nav/organization.svg" 
+                title="Organizations" 
             />
 
             <x-navigation.side-nav-card
                 nav="portal"
-                route="information-hub.dashboard" 
-                icon="images/icons/nav/information.svg" 
-                title="Information Hub" 
-                :excludedRoles="['ISO Document Handler']"
+                route="portal.respub" 
+                icon="images/icons/portal_nav/research.svg" 
+                title="Research & Publication" 
             />
 
             <x-navigation.side-nav-card
                 nav="portal"
-                route="kpis.dashboard" 
-                icon="images/icons/nav/kpi.png" 
-                title="KPIs" 
-                :excludedRoles="['ISO Document Handler']"
+                route="portal.certifications" 
+                icon="images/icons/portal_nav/cert.svg" 
+                title="Certifications" 
             />
 
             <x-navigation.side-nav-card
                 nav="portal"
-                route="iso.document" 
-                icon="images/icons/portal_nav/iso.png" 
-                title="ISO Document Handling" 
-                :excludedRoles="['Employee', 'Dean', 'HR Admin']"
+                route="portal.training" 
+                icon="images/icons/portal_nav/training.svg" 
+                title="Trainings" 
             />
 
-            @if(Auth::user()->role !== 'Employee' && Auth::user()->role !== 'ISO Document Handler' && Auth::user()->role !== 'IDC Admin')
-                <!-- A LINK NAVIGATION  -->
-                <div class="w-full flex justify-center my-4">
-                    <a href="{{route('dashboard')}}" class="w-[90%] flex items-center justify-center px-4 py-1 gap-2 bg-white hover:bg-gray-200 rounded-xl">
-                    <img src="{{asset('images/icons/back_maroon.png')}}" alt="" class="w-[20px] h-[20px">
-                        <span class="text-red-900 font-semibold">Back to Main Dashboard</span>
-                    </a>
-                </div>
-            @endif
+            <x-navigation.side-nav-card
+                nav="portal"
+                route="portal.license" 
+                icon="images/icons/portal_nav/license.png" 
+                title="Licenses" 
+            />
+
+            <x-navigation.side-nav-card
+                nav="portal"
+                route="portal.edu-bg" 
+                icon="images/icons/portal_nav/education.png" 
+                title="Educational Background" 
+            />
+
+            <x-navigation.side-nav-card
+                nav="portal"
+                route="portal.employment" 
+                icon="images/icons/portal_nav/employment.png" 
+                title="Employment" 
+            />
+
+            <x-navigation.side-nav-card
+                nav="portal"
+                route="portal.dependencies" 
+                icon="images/icons/portal_nav/dep.svg" 
+                title="Dependents" 
+            />
+
+            <x-navigation.side-nav-card
+                nav="portal"
+                route="portal.pending" 
+                icon="images/icons/portal_nav/pending.svg" 
+                title="Pending Requests" 
+            />
+
+            <x-navigation.side-nav-card
+                nav="portal"
+                route="portal.filing.type" 
+                icon="images/icons/portal_nav/send.svg" 
+                title="Filing Application" 
+            />
+
+            <div class="w-full flex justify-center my-4">
+                <a href="{{route('portal.dashboard')}}" class="w-[90%] flex items-center justify-center px-4 py-1 gap-2 bg-white hover:bg-gray-200 rounded-xl">
+                <img src="{{asset('images/icons/back_maroon.png')}}" alt="" class="w-[20px] h-[20px">
+                    <span class="text-red-900 font-semibold">Back to Portal Dashboard</span>
+                </a>
+            </div>
+            
         </div> 
     </aside>
 </div>

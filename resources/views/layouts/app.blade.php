@@ -204,11 +204,17 @@
             @endphp
 
             @if (Str::contains($currentPath, 'hau_ep') || (Auth::user()->role === 'Employee') || (Auth::user()->role === 'ISO Document Handler') || (Auth::user()->role === 'IDC Admin'))
-                @include('layouts.portal_navigation')
+                @if (Str::contains($currentPath, 'emp-acad-module'))
+                    @include('layouts.emp_acad')
+                @else
+                    @include('layouts.portal_navigation')
+                @endif
             @elseif (Str::contains($currentPath, 'admin'))
                 @include('layouts.admin_nav')
             @elseif (Str::contains($currentPath, 'manage-emps'))
                 @include('layouts.manage_emps')
+            @elseif (Str::contains($currentPath, 'emp-acad-module'))
+                @include('layouts.emp_acad')
             @else
                 @include('layouts.navigation')
             @endif

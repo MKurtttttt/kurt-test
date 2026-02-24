@@ -57,8 +57,8 @@
     <div class="min-h-screen grid grid-cols-1 md:grid-cols-2">
         <!-- Image Section -->
         <div class="hidden md:flex bg-cover bg-center justify-center items-center left"
-             style="background-image: url('{{ asset('images/hau-bg.png') }}');">
-            <img src="{{ asset('images/hau-logo.png') }}" class="hau-banner" alt="HAU Logo">
+            style="background-image: url('{{ asset('images/hau-bg.png') }}');">
+            <img src="{{ asset('images/logo-circle.png') }}" class="hau-banner" alt="HAU Logo">
         </div>
 
         <!-- Form Section -->

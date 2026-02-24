@@ -26,7 +26,7 @@
                         <h1 class="text-gray-500 text-[1.7rem] font-bold">Education</h1>
                         <div class="w-full flex py-1 gap-2">
                             <a class="maroon bg-red-900 text-white rounded-[25px] px-12 py-8 font-semibold flex flex-col items-center justify-center" href="{{ route('admin.loads.db') }}">
-                                <img src="{{ asset('images/icons/portal_nav/loads.png') }}" alt="Teaching Loads Icon">
+                                <img src="{{ asset('images/icons/portal_nav/loads.png') }}" alt="Teaching Loads Icon" class="h-24 w-24">
                                 <h1>Teaching Loads</h1>
                             </a>
 
