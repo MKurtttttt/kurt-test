@@ -542,7 +542,7 @@ function getStatusColor($status){
             case 'eoms':
                 return specificType ? `${specificType} ${officeCode}` : '';
             case 'records':
-                return specificType ? `${specificType.replace('0', '')}RMM ${officeCode}` : '';
+                return specificType ? `${specificType.replace('0', '')}RMM${"-"+officeCode}` : '';
             case 'others':
                 return null; //skip auto-fill for others
             default:
