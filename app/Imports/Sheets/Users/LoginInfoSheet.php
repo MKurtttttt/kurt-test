@@ -53,7 +53,7 @@ class LoginInfoSheet implements ToCollection, WithHeadingRow, WithValidation, Sk
                 'required',
                 Rule::exists('tbl_tags', 'item')
                     ->where(function ($query) {
-                        $query->where('category', 'role');
+                        $query->where('category', 'roles');
                     }),
             ],
             'password' => 'required'
