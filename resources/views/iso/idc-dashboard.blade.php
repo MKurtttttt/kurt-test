@@ -184,6 +184,7 @@ function getStatusColor($status){
                                             <button 
                                                 class="view-details-btn text-blue-600 hover:text-blue-800 text-sm font-semibold"
                                                 data-ticket-id='{{ $ticket->id }}'
+                                                data-ticket-number='{{ $ticket->ticket_number }}'
                                                 data-ticket-section='{{ $ticket->originating_section }}'
                                                 data-ticket-status='{{ $ticket->status }}'
                                                 data-ticket-created='{{ $ticket->created_at->format('M d, Y h:i A') }}'
@@ -339,7 +340,8 @@ function getStatusColor($status){
     // Handle "View Details" button clicks
     document.addEventListener('click', (e)=> {
         if (e.target.classList.contains('view-details-btn')){
-            const ticketId = e.target.dataset.ticketId;
+            // const ticketId = e.target.dataset.ticketId;
+            const ticketNumber = e.target.dataset.ticketNumber;
             const section = e.target.dataset.ticketSection;
             const status = e.target.dataset.ticketStatus;
             const created = e.target.dataset.ticketCreated;
@@ -360,7 +362,8 @@ function getStatusColor($status){
             }
 
             // Fill modal with data
-            document.getElementById('detail_ticket_id').textContent = '#' + ticketId;
+            // document.getElementById('detail_ticket_id').textContent = '#' + ticketId;
+            document.getElementById('detail_ticket_number').textContent = ticketNumber;
             document.getElementById('detail_section').textContent = section;
             document.getElementById('detail_created').textContent = created;
             document.getElementById('detail_creator').textContent = creator;

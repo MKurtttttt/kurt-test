@@ -58,6 +58,10 @@ function getStatusColor($status){
                 class="hover:bg-gray-100 text-gray-400 font-semibold px-8 py-2 {{ ($statusFilter ?? 'all') === 'all' ? 'active_link' : '' }}">
                 My Tickets
             </a>
+            <a href="{{ route('iso.document', ['status' => 'pending', 'search' => $search ?? null]) }}"
+                class="hover:bg-gray-100 text-gray-400 font-semibold px-8 py-2 {{ ($statusFilter ?? 'all') === 'pending' ? 'active_link' : ''}}">
+                Pending
+            </a>
             <a href="{{ route('iso.document', ['status' => 'submitted_to_idc', 'search' => $search ?? null]) }}"
                 class="hover:bg-gray-100 text-gray-400 font-semibold px-8 py-2 {{ ($statusFilter ?? 'all') === 'submitted_to_idc' ? 'active_link' : '' }}">
                 Submitted to IDC
@@ -161,6 +165,7 @@ function getStatusColor($status){
                                         <button 
                                             class="view-details-btn text-blue-600 hover:text-blue-800 text-sm font-semibold"
                                             data-ticket-id='{{ $ticket->id }}'
+                                            data-ticket-number='{{ $ticket->ticket_number }}'
                                             data-ticket-section='{{ $ticket->originating_section }}'
                                             data-ticket-status='{{ $ticket->status }}'
                                             data-ticket-created='{{ $ticket->created_at->format('M d, Y h:i A') }}'
@@ -873,7 +878,8 @@ function getStatusColor($status){
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('view-details-btn')) {
             // Get the ticket data from the button's data attributes
-            const ticketId = e.target.dataset.ticketId;
+            // const ticketId = e.target.dataset.ticketId;
+            const ticketNumber = e.target.dataset.ticketNumber;
             const section = e.target.dataset.ticketSection;
             const status = e.target.dataset.ticketStatus;
             const created = e.target.dataset.ticketCreated;
@@ -896,7 +902,8 @@ function getStatusColor($status){
             // const documents = JSON.parse(documentsJson);
             
             // Fill the modal with the data
-            document.getElementById('detail_ticket_id').textContent = '#' + ticketId;
+            // document.getElementById('detail_ticket_id').textContent = '#' + ticketId;
+            document.getElementById('detail_ticket_number').textContent = ticketNumber;
             document.getElementById('detail_section').textContent = section;
             document.getElementById('detail_created').textContent = created;
             document.getElementById('detail_creator').textContent = creator;

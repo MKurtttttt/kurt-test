@@ -4,7 +4,7 @@
 <div id="details_modal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
-            <h2 class="text-xl font-bold">Ticket Details - <span id="detail_ticket_id"></span></h2>
+            <h2 class="text-xl font-bold">Ticket Details: <span id="detail_ticket_number"></span></h2>
             <button id="close_details_modal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
         </div>
         
