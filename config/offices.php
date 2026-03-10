@@ -35,7 +35,7 @@ return [
         'AAC-SBA' => '(AAC-SBA) School of Business & Accountancy',
         'AAC-SEA' => '(AAC-SEA) School of Engineering & Architecture',
         'AAC-SED' => '(AAC-SED) School of Education',
-        'AAC-SNA' => '(AAC-SNA) SChool of Nursing & Allied Medical Sciences',
+        'AAC-SNA' => '(AAC-SNA) School of Nursing & Allied Medical Sciences',
         'AAC-SOC' => '(AAC-SOC) School of Computing',
         'AAC-STM' => '(AAC-STM) School of Hospitality & Tourism Management',
         'AAC-URO' => '(AAC-URO) University Research Office',
@@ -65,7 +65,7 @@ return [
         'FRM-ASA' => '(FRM-ASA) Ancillary Services Accounting',
         'FRM-ASE' => '(FRM-ASE) Ancillary Services',
         'FRM-ATO' => '(FRM-ATO) Accounting',
-        'FRM-GRT' => '(FRM-GRT) Grants Accounttant',
+        'FRM-GRT' => '(FRM-GRT) Grants Accountant',
         'FRM-PAO' => '(FRM-PAO) Payroll',
 
         // RSS

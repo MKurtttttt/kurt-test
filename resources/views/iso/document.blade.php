@@ -440,7 +440,7 @@ function getStatusColor($status){
             '(FRM-ASA) Ancillary Services Accounting',
             '(FRM-ASE) Ancillary Services',
             '(FRM-ATO) Accounting',
-            '(FRM-GRT) Grants Accounttant',
+            '(FRM-GRT) Grants Accountant',
             '(FRM-PAO) Payroll'
         ],
         rss: [
