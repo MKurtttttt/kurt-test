@@ -35,7 +35,7 @@ function getStatusColor($status){
         <div class="w-[95%] px-4 flex my-4 items-center">
             <img src="{{ asset('images/icons/portal_nav/iso-title.png') }}" class="w-[100px] h-[100px] mr-4"/>
             <div class="w-full flex flex-col justify-center">
-                <h1 class="text-[1.5rem] font-bold leading-tight">ISO Document Handler Ticket System</h1>
+                <h1 class="text-[1.5rem] font-bold leading-tight">ISO Document Handler Ticketing System</h1>
                 <span class="text-gray-500 text-sm"> Document Modification / Creation Notice (DMCN) Tracking</span>
             </div>
             <!-- DEBUG/ADMIN links - Only visible to roles that has SuperAdmin or IDC Admin -->
