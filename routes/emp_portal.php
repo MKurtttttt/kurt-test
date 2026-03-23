@@ -51,6 +51,17 @@ Route::middleware('auth','revalidate')->group(function () {
         return view('portal.dashboard')->with(['userInfo' => $userInfo]);
     })->name('portal.dashboard');
 
+    // Privacy routes
+    Route::post('/privacy-agree', function () {
+        session()->forget('show_privacy_modal');
+        return response()->json(['success' => true]);
+    })->name('privacy.agree');
+
+    Route::get('/privacy-decline', function () {
+        Auth::logout();
+        return redirect('/');
+    })->name('privacy.decline');
+
     /*------------------------------------------------------------------
     | 2. PROFILE
     |------------------------------------------------------------------*/

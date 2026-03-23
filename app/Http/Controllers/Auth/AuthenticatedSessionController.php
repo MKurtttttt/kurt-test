@@ -64,7 +64,9 @@ class AuthenticatedSessionController extends Controller
         
         Auth::login($user);
 
-
+        if($user->role !== 'SuperAdmin') {
+            session(['show_privacy_modal' => true]);
+        }
 
         $request->session()->regenerate();
 

@@ -117,6 +117,96 @@
             </div>
         </div>
     </div>
+
+    @if(session('show_privacy_modal')) 
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50" id="privacy-modal">
+        
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 overflow-hidden">
+            
+            <!-- Header -->
+            <div class="px-6 py-4 border-b">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    Data Privacy Notice
+                </h2>
+            </div>
+
+            <!-- Body -->
+            <div class="px-6 py-4 text-gray-600 text-sm leading-relaxed max-h-[400px] overflow-y-auto">
+                <p class="mb-3">Your privacy is important to us.</p>
+
+                <p class="mb-3">
+                    By proceeding, you acknowledge that the personal information you provide in this system will be collected, processed, and stored by the institution for legitimate administrative and operational purposes. These may include employee record management, institutional reporting, compliance with regulatory requirements, and other official functions of the University.
+                </p>
+
+                <p class="mb-3">
+                    All personal data will be handled in accordance with the principles of transparency, legitimate purpose, and proportionality as required by the Data Privacy Act of 2012 and the guidelines of the National Privacy Commission.
+                </p>
+
+                <p class="mb-3">
+                    Your information will only be accessed by authorized personnel and will not be disclosed to third parties without your consent unless required by law.
+                </p>
+
+                <p class="mb-3">
+                    By marking the checkbox and clicking "Agree”, you confirm that you have read and understood this notice and consent to the processing of your personal data.
+                </p>
+
+                <p>
+                    For concerns, you may contact the University’s Data Protection Officer.
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 border-t bg-gray-50">
+                
+                <!-- Checkbox -->
+                <div class="flex items-start gap-2 mb-4">
+                    <input type="checkbox" id="agree-checkbox" class="mt-1 w-4 h-4 text-red-900 border-gray-300 rounded focus:ring-red-900">
+                    <label for="agree-checkbox" class="text-sm text-gray-700">
+                        I have read and agree to the data privacy policy
+                    </label>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex justify-end gap-3">
+                    <button id="decline-btn" 
+                        class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
+                        Decline
+                    </button>
+
+                    <button id="agree-btn" 
+                        class="px-5 py-2 text-sm font-medium rounded-lg bg-red-900 text-white hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed transition"
+                        disabled>
+                        Agree
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('agree-checkbox').addEventListener('change', function() {
+            document.getElementById('agree-btn').disabled = !this.checked;
+        });
+
+        document.getElementById('agree-btn').addEventListener('click', function() {
+            fetch('{{ route("privacy.agree") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            }).then(response => response.json()).then(data => {
+                if(data.success) {
+                    document.getElementById('privacy-modal').remove();
+                }
+            });
+        });
+
+        document.getElementById('decline-btn').addEventListener('click', function() {
+            window.location.href = '{{ route("privacy.decline") }}';
+        });
+    </script>
+    @endif
 </x-app-layout>
 
 <style> 
