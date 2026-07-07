@@ -38,7 +38,7 @@ class DepartmentSeeder extends Seeder
         ]);
 
         Departments::create([ 
-            'code' => 'CFS',
+            'code' => 'ICFSI',
             'dept' => 'Institute for Christian Formation & Social Integration', 
             'logo' => ''
         ]);

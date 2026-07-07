@@ -16,21 +16,9 @@
         </p>
     </div>
 
-    {{-- Main Container --}}
-    <div class="w-full flex justify-center z-10 relative mb-16 px-4">
-        <div class="w-full max-w-7xl shadow-2xl rounded-2xl overflow-hidden" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.65); border-radius: 1rem;">
-            
-            {{-- Card Header --}}
-            <div class="flex items-center gap-3 px-6 py-4 border-b" style="background: rgba(255,255,255,0.8); border-color: rgba(197,160,89,0.2);">
-                <div class="w-1 h-6 rounded-full flex-shrink-0" style="background: linear-gradient(180deg, #c5a059, #d4af37);"></div>
-                <span class="text-sm font-bold text-gray-700" style="font-family: 'Playfair Display', serif;">Organizational Chart</span>
-            </div>
-
-            {{-- Chart Container --}}
-            <div class="oie-chart-wrap" style="padding-top: 40px; padding-bottom: 40px;">
-                <div id="orgchart"></div>
-            </div>
-        </div>
+    {{-- Chart Container --}}
+    <div class="oie-chart-wrap">
+        <div id="orgchart"></div>
     </div>
 
     @push('scripts')
@@ -43,61 +31,53 @@
         //Data
         const DATA = {
             id: "president",
-            name: "MR. LEOPOLDO JAIME N. VALDES",
+            name: "Mr. Leopoldo Jaime N. Valdes",
             title: "University President",
-            image: "{{ asset('images/profiles/ay2026-2027/president.webp') }}",
-            level: 1,
+            image: "{{ asset('images/profiles/president.jpg') }}",
             children: [
                 {
                     id: "director",
-                    name: "ENGR. ANNE MARIE A. MANGILIMAN",
-                    title: "OIC-Director | Chief Quality Officer\nInstitutional Effectiveness",
-                    image: "{{ asset('images/profiles/ay2026-2027/director.webp') }}",
-                    level: 2,
+                    name: "Engr. Anne Marie A. Mangiliman",
+                    title: "OIC-Director | Chief Quality Institutional Effectiveness",
+                    image: "{{ asset('images/profiles/director.png') }}",
                     children: [
                         {
                             id: "qa",
-                            name: "DR. ALMA THERESA D. MANALOTO",
-                            title: "Head\nQuality Assurance",
-                            image: "{{ asset('images/profiles/ay2026-2027/qa.webp') }}",
-                            level: 3
+                            name: "Dr. Alma Theresa D. Manaloto",
+                            title: "Head, Quality Assurance",
+                            image: "{{ asset('images/profiles/qa.png') }}"
                         },
                         {
                             id: "planning",
-                            name: "ENGR. ANNE MARIE A. MANGILIMAN",
-                            title: "Head\nInstitutional Planning, Research, & Publications",
-                            image: "{{ asset('images/profiles/ay2026-2027/planning.webp') }}",
-                            level: 3,
+                            name: "Engr. Anne Marie A. Mangiliman",
+                            title: "Head, Institutional Planning, Research & Publications",
+                            image: "{{ asset('images/profiles/planning.png') }}",
                             children: [
                                 {
                                     id: "staff1",
-                                    name: "MS. BIANCA YSABEL L. NAVARRO",
-                                    title: "Coordinator\nInstitutional Planning, Research, & Publications",
-                                    image: "{{ asset('images/profiles/ay2026-2027/staff1.webp') }}",
-                                    level: 4
+                                    name: "Ms. Bianca Ysabel L. Navarro",
+                                    title: "Coordinator Institutional Planning, Research, & Publications",
+                                    image: "{{ asset('images/profiles/staff1.png') }}"
                                 }
                             ]
                         },
                         {
                             id: "database",
-                            name: "ENGR. MARIA ELENA Y. TIMBANG",
-                            title: "Head\nInstitutional Database Management",
-                            image: "{{ asset('images/profiles/ay2026-2027/database.webp') }}",
-                            level: 3
+                            name: "Engr. Maria Elena Y. Timbang",
+                            title: "Head, Institutional Database Management Office",
+                            image: "{{ asset('images/profiles/database.png') }}"
                         },
                         {
                             id: "document",
-                            name: "MS. AVIGAIL P. MAGBAG",
+                            name: "Ms. Corazon Q. Mallari",
                             title: "Institutional Document Controller",
-                            image: "{{ asset('images/profiles/ay2026-2027/document.webp') }}",
-                            level: 3,
+                            image: "{{ asset('images/profiles/document.png') }}",
                             children: [
                                 {
                                     id: "staff2",
-                                    name: "MS. ANGELA JOY D. VILLAR",
-                                    title: "Staff\nInstitutional Document Controller",
-                                    image: "{{ asset('images/profiles/ay2026-2027/staff2.webp') }}",
-                                    level: 4
+                                    name: "Ms. Angela Joy D. Villar",
+                                    title: "Staff, Institutional Document Controller",
+                                    image: "{{ asset('images/profiles/staff2.png') }}"
                                 }
                             ]
                         }
@@ -111,7 +91,7 @@
         const AVATAR_BORDER = 3;
         const AVATAR_ABOVE  = AVATAR_R + AVATAR_BORDER;
         const AVATAR_CY     = -10;    
-        const NODE_W        = 260;
+        const NODE_W        = 210;
         const NODE_H        = 130;
         const H_GAP         = 48;
         const V_GAP         = 120;
@@ -308,7 +288,7 @@
 
         // Text wrap helper 
         function wrapText(text, str, maxW, startY, lineH) {
-            const maxChars = Math.floor(maxW / 7.5);
+            const maxChars = Math.floor(maxW / 6.2);
             const words    = str.split(' ');
             let line       = [], lineIndex = 0;
             words.forEach((word, wi) => {

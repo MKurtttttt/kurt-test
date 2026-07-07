@@ -613,18 +613,19 @@ Route::middleware('auth','revalidate')->group(function () {
     Route::get('iso/management/template', [IsoManagementController::class, 'downloadTemplate'])
         ->name('iso.management.template');
 
-    // ISO Management Departments CRUD
-    Route::get('/iso/management/departments', [IsoManagementController::class, 'listDepartments'])
+
+    // ISO Management - Department CRUD
+    Route::get('iso/management/departments', [IsoManagementController::class, 'departmentsIndex'])
         ->name('iso.management.departments.index');
-    Route::get('/iso/management/departments/create', [IsoManagementController::class, 'createDepartment'])
+    Route::get('iso/management/departments/create', [IsoManagementController::class, 'departmentsCreate'])
         ->name('iso.management.departments.create');
-    Route::post('/iso/management/departments/store', [IsoManagementController::class, 'storeDepartment'])
+    Route::post('iso/management/departments', [IsoManagementController::class, 'departmentsStore'])
         ->name('iso.management.departments.store');
-    Route::get('/iso/management/departments/{id}/edit', [IsoManagementController::class, 'editDepartment'])
+    Route::get('iso/management/departments/{id}/edit', [IsoManagementController::class, 'departmentsEdit'])
         ->name('iso.management.departments.edit');
-    Route::put('/iso/management/departments/{id}', [IsoManagementController::class, 'updateDepartment'])
+    Route::put('iso/management/departments/{id}', [IsoManagementController::class, 'departmentsUpdate'])
         ->name('iso.management.departments.update');
-    Route::delete('/iso/management/departments/{id}', [IsoManagementController::class, 'destroyDepartment'])
+    Route::delete('iso/management/departments/{id}', [IsoManagementController::class, 'departmentsDestroy'])
         ->name('iso.management.departments.destroy');
 
     /*------------------------------------------------------------------
@@ -636,4 +637,5 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('visitor-count.homepage-period');
     Route::delete('/visitor-count/clear', [VisitorController::class, 'clearAll'])
         ->name('visitor-count.clear');
+
 });

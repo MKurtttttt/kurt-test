@@ -393,7 +393,9 @@
         width: 90%;
         max-width: 900px;
         max-height: 90vh;
-        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
@@ -403,10 +405,14 @@
         align-items: center;
         padding: 1.5rem;
         border-bottom: 1px solid #e5e7eb;
+        background: white;
+        flex-shrink: 0;
     }
 
     .modal-body {
         padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
     }
 </style>
 

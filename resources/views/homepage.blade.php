@@ -1,121 +1,102 @@
-@extends('layouts.main')
+@extends('layouts.home')
 
 @section('title', 'Office of Institutional Effectiveness')
 
 @section('content')
-    <!-- Background Image -->
-    <div style="background-image: url('{{ asset('images/hau-lib.jpg') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3;"></div>
-    
-    <!-- Image Banner -->
-    <div class="relative" style="background-image: url('{{ asset('images/hau-bg.png') }}'); background-size: cover; background-position: center; height: 16rem; min-height: 256px; overflow: hidden; position: relative; z-index: 1;">
-        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center;">
-            <div style="text-align: center; color: white;">
-                <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem; color: white;">
-                    Office of Institutional Effectiveness
-                </h1>
+    <!-- Hero Section -->
+    <div class="flex flex-col items-center justify-center pt-10 md:pt-14 px-4 relative z-10 w-full" style="min-height: 78vh;">
+        
+        <!-- Hero Title -->
+        <h1 class="page-hero-title text-3xl md:text-5xl lg:text-6xl text-center mb-10 md:mb-14 drop-shadow-lg">
+            Office of Institutional Effectiveness
+        </h1>
+
+        <!-- Welcome Glass Card -->
+        <div class="rounded-2xl p-8 mb-10 w-full max-w-2xl text-white shadow-2xl relative overflow-hidden" style="background: rgba(255,255,255,0.18); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.45); box-shadow: 0 12px 48px rgba(0,0,0,0.22); border-radius: 1rem;">
+            
+            <!-- Decorative top accent line -->
+            <div class="absolute top-0 left-0 right-0 h-1 rounded-t-2xl" style="background: linear-gradient(90deg, #c5a059, #d4af37, #c5a059);"></div>
+
+            <!-- Gradient overlay -->
+            <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
+            
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 pt-2">
+                
+                <!-- Left side: Welcome & Login -->
+                <div class="flex-1 text-center md:text-left">
+                    <div class="inline-block text-xs font-bold uppercase tracking-[0.18em] mb-3 px-3 py-1 rounded-full" style="background: rgba(197,160,89,0.25); color: #f0d080; border: 1px solid rgba(197,160,89,0.35);">HAU — OIE</div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-3 drop-shadow-md" style="font-family: 'Playfair Display', serif;">Welcome to OIE</h2>
+                    <p class="text-sm md:text-base font-light mb-8 leading-relaxed" style="color: rgba(255,255,255,0.85);">
+                        Access the central hub for institutional data, planning and review, and quality assurance.
+                    </p>
+                    
+                    <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-xl" style="background: linear-gradient(135deg, #c5a059 0%, #d4af37 50%, #aa7c11 100%); color: #2b1a00; box-shadow: 0 4px 18px rgba(212,175,55,0.45); border-radius: 0.75rem;">
+                        <i class="fas fa-lock mr-2 text-xs opacity-75"></i>
+                        <span>Login for Full Dashboard</span>
+                        <i class="fas fa-arrow-right ml-2 text-xs opacity-75 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+                
+                <!-- Right side: Visitor count -->
+                <div class="flex flex-col items-center justify-center p-5 rounded-2xl w-full md:w-auto md:min-w-[140px]" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 1rem;">
+                    <i class="fas fa-eye text-2xl mb-2" style="color: rgba(255,255,255,0.7);"></i>
+                    <div class="text-4xl md:text-5xl font-bold text-white mb-1" style="font-family: 'Playfair Display', serif; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                        {{ $count }}
+                    </div>
+                    <div class="text-xs font-bold uppercase tracking-widest" style="color: rgba(255,255,255,0.65);">
+                        @if ($period === "daily")
+                            Visitor{{ $count !== 1 ? 's' : '' }} Today
+                        @else 
+                            {{ ucfirst($period) }} Visitors
+                        @endif 
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
+    
+    <!-- Quick Access Section -->
+    <div class="w-full relative z-10" style="background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, #ffffff 10%);">
+        <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-10" style="padding-top: 4.2rem; padding-bottom: 4.8rem;">
 
-    <!-- Main Content Area -->
-    <div class="max-w-6xl mx-auto px-4 py-12" style="position: relative; z-index: 1; margin-top: 2rem;">
-        <!-- Welcome Message -->
-    <div class="border-l-4 p-6 rounded-r-lg" style="background-color: #FFF8DC; border-left-color: #B8860B; max-width: 900px; width: 100%; margin-left: auto; margin-right: auto; margin-bottom: 2.5rem;">
-            <h2 class="text-xl font-semibold mb-2" style="color: #70121D;">Welcome to the Office of Institutional Effectiveness</h2>
-            <div class="flex flex-row">
-                <img src="{{ asset('images/icons/eye-2.svg') }}" class = "w-6 h-6"/>
-                <div class="px-2">
-                    @if ($period === "daily")
-                        @if ($count === 1)
-                            {{ $count }} Visitor Today
-                        @else
-                            {{ $count }} Visitors Today
-                        @endif
-                    @else 
-                        {{ $count }} {{ ucfirst($period) }} Visitors
-                    @endif          
-                </div>
+            <!-- Section Label -->
+            <div class="flex items-center gap-4" style="margin-bottom: 2rem;">
+                <div class="h-px flex-1" style="background: linear-gradient(90deg, transparent, #e8dfc7);"></div>
+                <span class="text-xs font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full" style="background: rgba(197,160,89,0.1); color: #8a6a1e; border: 1px solid rgba(197,160,89,0.3);">Quick Access</span>
+                <div class="h-px flex-1" style="background: linear-gradient(90deg, #e8dfc7, transparent);"></div>
             </div>
-            <p style="color: #B8860B;"></p>
-        </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                
+                @php
+                $quickCards = [
+                    ['icon' => 'fas fa-folder-open', 'title' => 'SharePoint Resources', 'route' => route('sharepoint.public'), 'desc' => 'Browse department and office SharePoint sites'],
+                    ['icon' => 'fas fa-sitemap', 'title' => 'Organizational Chart', 'route' => route('orgchart'), 'desc' => 'View the current OIE organizational structure'],
+                    ['icon' => 'fas fa-book-open', 'title' => 'Information Hub', 'route' => route('information-hub.public'), 'desc' => 'Access institutional knowledge and resources'],
+                    ['icon' => 'far fa-window-maximize', 'title' => 'Full Dashboard', 'route' => route('login'), 'desc' => 'Login to access the full management system'],
+                ];
+                @endphp
 
-        <!-- Quick Access Grid -->
-        <div class="mb-16">
-            <h3 class="text-2xl font-bold text-gray-900 mb-8 text-center">Quick Access</h3>
-            <div class="max-w-4xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch justify-center">
-                    <!-- SharePoint Card -->
-                    <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow mb-0 h-full flex flex-col" style="width: 100%;">
-                        <div class="px-6 py-4" style="background: linear-gradient(135deg, #70121D 0%, #B8860B 100%);">
-                            <h4 class="text-white font-semibold text-lg">SharePoint Resources</h4>
+                @foreach($quickCards as $card)
+                <a href="{{ $card['route'] }}" class="quick-card group flex flex-col rounded-2xl overflow-hidden border border-[#ede8d8] bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1" style="border-radius: 1rem;">
+                    <!-- Card Icon Area -->
+                    <div class="p-6 pb-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background: linear-gradient(135deg, rgba(197,160,89,0.15) 0%, rgba(212,175,55,0.1) 100%); border: 1px solid rgba(197,160,89,0.25); border-radius: 0.75rem;">
+                            <i class="{{ $card['icon'] }} text-xl" style="color: #c5a059;"></i>
                         </div>
-                        <div class="p-6 flex-1 flex flex-col justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600 mb-4">Access SharePoint links on ISO, Planning and Review, and Quality Assurance.</p>
-                            </div>
-                            <a href="{{ route('sharepoint.public') }}" class="inline-flex items-center text-white rounded transition-colors" style="background: linear-gradient(135deg, #70121D 0%, #B8860B 100%); hover:opacity: 0.9; padding: 0.375rem 0.75rem; font-size: 0.95rem; min-width: 110px;">
-                                Browse SharePoint Sites
-                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M14 4h6m0 0v6m0-6L10 14"></path>
-                                </svg>
-                            </a>
-                        </div>
+                        <h4 class="text-base font-bold text-gray-800 mb-1 leading-snug">{{ $card['title'] }}</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed">{{ $card['desc'] }}</p>
                     </div>
-                    
-                    <!-- Org Chart Card -->
-                    <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow mb-0 h-full flex flex-col" style="width: 100%;">
-                        <div class="px-6 py-4" style="background: linear-gradient(135deg, #70121D 0%, #B8860B 100%);">
-                            <h4 class="text-white font-semibold text-lg">Organizational Chart</h4>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600 mb-4">View the OIE's organizational structure and team hierarchy.</p>
-                            </div>
-                            <a href="{{ route('orgchart') }}" class="inline-flex items-center text-white rounded transition-colors" style="background: linear-gradient(135deg, #70121D 0%, #B8860B 100%); hover:opacity: 0.9; padding: 0.375rem 0.75rem; font-size: 0.95rem; min-width: 110px;">
-                                View Org Chart
-                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M14 4h6m0 0v6m0-6L10 14"></path>
-                                </svg>
-                            </a>
-                        </div>
+                    <!-- Card Footer -->
+                    <div class="mt-auto px-6 py-3 flex items-center justify-between text-xs font-semibold" style="background: linear-gradient(90deg, rgba(197,160,89,0.08), rgba(212,175,55,0.12)); border-top: 1px solid rgba(197,160,89,0.2); color: #8a6a1e;">
+                        <span>Open</span>
+                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                     </div>
+                </a>
+                @endforeach
 
-                    <!-- Information Hub Card -->
-                    <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow mb-0 h-full flex flex-col md:col-span-2 md:max-w-md md:mx-auto" style="width: 100%;">
-                        <div class="px-6 py-4" style="background: linear-gradient(135deg, #70121D 0%, #B8860B 100%);">
-                            <h4 class="text-white font-semibold text-lg">Information Hub Resources</h4>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600 mb-4">Access Information Hub</p>
-                            </div>
-                            <a href="{{ route('information-hub.public') }}" class="inline-flex items-center text-white rounded transition-colors" style="background: linear-gradient(135deg, #70121D 0%, #B8860B 100%); hover:opacity: 0.9; padding: 0.375rem 0.75rem; font-size: 0.95rem; min-width: 110px;">
-                                Browse Information Hub
-                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M14 4h6m0 0v6m0-6L10 14"></path>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Login Section (Smaller) -->
-    <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden mt-8" style="max-width: 370px; width: 100%; margin-left: auto; margin-right: auto;">
-            <div class="px-4 py-2" style="background: linear-gradient(135deg, #70121D 0%, #B8860B 100%);">
-                <h4 class="text-white font-semibold text-base">Full Dashboard Access</h4>
-            </div>
-            <div class="p-4">
-                <div class="flex flex-col items-center text-center">
-                    <p class="text-gray-600 text-sm mb-3">Login to access advanced features.</p>
-                    <a href="{{ route('login') }}" class="text-white px-4 py-1.5 rounded font-medium text-sm transition-colors" style="background: linear-gradient(135deg, #70121D 0%, #B8860B 100%); min-width: 140px;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                        Login to Dashboard
-                    </a>
-                </div>
             </div>
         </div>
     </div>
 @endsection
-
-

@@ -188,25 +188,25 @@ class SharepointSeeder extends Seeder
         }
 
 
-        // INSTITUTE FOR CHRISTIAN FORMATION & SOCIAL INTEGRATION (CFS) links
+        // INSTITUTE FOR CHRISTIAN FORMATION & SOCIAL INTEGRATION (ICFSI) links
         $CFSLinks = [
-            [ //CFS-CES: OFFICE OF COMMUNITY EXTENSION SERVICES
-                'office' => 'CFS-CES: OFFICE OF COMMUNITY EXTENSION SERVICES',
+            [ //ICFSI-CES: OFFICE OF COMMUNITY EXTENSION SERVICES
+                'office' => 'ICFSI-CES: OFFICE OF COMMUNITY EXTENSION SERVICES',
                 'label' => 'ISO-CFS',
                 'url' => 'https://hauph.sharepoint.com/sites/ISO-CFS/Shared%20Documents/Forms/AllItems.aspx'
             ],
-            [ //CFS-CMO: CAMPUS MINISTRY OFFICE
-                'office' => 'CFS-CMO: CAMPUS MINISTRY OFFICE',
+            [ //ICFSI-CMO: CAMPUS MINISTRY OFFICE
+                'office' => 'ICFSI-CMO: CAMPUS MINISTRY OFFICE',
                 'label' => 'ISO-CFS',
                 'url' => 'https://hauph.sharepoint.com/sites/ISO-CFS/Shared%20Documents/Forms/AllItems.aspx'
             ],
-            [ //CFS-CLE: CHRISTIAN LIVING EDUCATION
-                'office' => 'CFS-CLE: CHRISTIAN LIVING EDUCATION',
+            [ //ICFSI-CLE: CHRISTIAN LIVING EDUCATION
+                'office' => 'ICFSI-CLE: CHRISTIAN LIVING EDUCATION',
                 'label' => 'ISO-CFS',
                 'url' => 'https://hauph.sharepoint.com/sites/ISO-CFS/Shared%20Documents/Forms/AllItems.aspx'
             ],
-            [ //CFS-CEP: CHARACTER EDUCATION PROGRAM DESK
-                'office' => 'CFS-CEP: CHARACTER EDUCATION PROGRAM DESK',
+            [ //ICFSI-CEP: CHARACTER EDUCATION PROGRAM DESK
+                'office' => 'ICFSI-CEP: CHARACTER EDUCATION PROGRAM DESK',
                 'label' => 'ISO-CFS',
                 'url' => 'https://hauph.sharepoint.com/sites/ISO-CFS/Shared%20Documents/Forms/AllItems.aspx'
             ],
@@ -217,7 +217,7 @@ class SharepointSeeder extends Seeder
                 'label' => $item['label'],
                 'url' => $item['url'],
                 'category' => 'ISO',
-                'department' => 'INSTITUTE FOR CHRISTIAN FORMATION & SOCIAL INTEGRATION (CFS)',
+                'department' => 'INSTITUTE FOR CHRISTIAN FORMATION & SOCIAL INTEGRATION (ICFSI)',
                 'office' => $item['office'],
                 'description' => 'This site serves as HAU’s central repository for documentation related to the university\'s Year-End Review. It provides access to institutional reports, performance evaluations, and other records that summarize the university\'s achievements and challenges over the past year.',
             ]);
