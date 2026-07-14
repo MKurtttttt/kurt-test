@@ -36,6 +36,7 @@ use App\Http\Controllers\SharepointController;
 use App\Http\Controllers\KnowledgeHubController;
 use App\Http\Controllers\IsoDocumentController;
 use App\Http\Controllers\IsoManagementController;
+use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\VisitorController;
 
 //
@@ -627,6 +628,20 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('iso.management.departments.update');
     Route::delete('iso/management/departments/{id}', [IsoManagementController::class, 'departmentsDestroy'])
         ->name('iso.management.departments.destroy');
+
+    // ISO Management - Policy CRUD
+    Route::get('iso/management/policies', [PolicyController::class, 'index'])
+        ->name('iso.management.policies.index');
+    Route::get('iso/management/policies/create', [PolicyController::class, 'create'])
+        ->name('iso.management.policies.create');
+    Route::post('iso/management/policies', [PolicyController::class, 'store'])
+        ->name('iso.management.policies.store');
+    Route::get('iso/management/policies/{id}/edit', [PolicyController::class, 'edit'])
+        ->name('iso.management.policies.edit');
+    Route::put('iso/management/policies/{id}', [PolicyController::class, 'update'])
+        ->name('iso.management.policies.update');
+    Route::delete('iso/management/policies/{id}', [PolicyController::class, 'destroy'])
+        ->name('iso.management.policies.destroy');
 
     /*------------------------------------------------------------------
     | 24. Visit Counter

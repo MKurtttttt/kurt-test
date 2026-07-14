@@ -124,9 +124,9 @@
             <div class="px-6 py-4 border-t bg-gray-50">
                 
                 <!-- Checkbox -->
-                <div class="flex items-start gap-2 mb-4">
-                    <input type="checkbox" id="agree-checkbox" class="mt-1 w-4 h-4 text-red-900 border-gray-300 rounded focus:ring-red-900">
-                    <label for="agree-checkbox" class="text-sm text-gray-700">
+                <div class="flex items-center gap-3 mb-4">
+                    <input type="checkbox" id="agree-checkbox" class="w-6 h-6 text-red-900 border-gray-300 rounded focus:ring-red-900 cursor-pointer">
+                    <label for="agree-checkbox" class="text-sm font-semibold text-gray-700 cursor-pointer select-none">
                         I have read and agree to the data privacy policy
                     </label>
                 </div>

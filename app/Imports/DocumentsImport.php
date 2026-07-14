@@ -69,6 +69,20 @@ class DocumentsImport implements ToCollection, WithHeadingRow
         }
     }
 
+    protected function parseExcelDate($value, $default = null) {
+        if (empty($value)) {
+            return $default;
+        }
+        try {
+            if (is_numeric($value)) {
+                return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
+            }
+            return Carbon::parse($value);
+        } catch (\Exception $e) {
+            return $default;
+        }
+    }
+
     protected function importRow($row, $rowNumber){
         // \Log::info("Row {$rowNumber} data: ", $row->toArray());
         $isOriginal = (int)$row['current_revision'] === 0;
@@ -78,15 +92,10 @@ class DocumentsImport implements ToCollection, WithHeadingRow
         $originatingSection = OfficeMapper::map($row['originating_section']);
         $sourceType = OfficeMapper::normalizeSourceType($row['source_type']);
 
-        $registeredAt = !empty($row['registered_at'])
-                        ? Carbon::parse($row['registered_at'])
-                        : now();
-        $supersededAt = !empty($row['superseded_at'])
-                        ? Carbon::parse($row['superseded_at'])
-                        : null;
-        $deletedAt = !empty($row['deleted_at'])
-                    ?Carbon::parse($row['deleted_at'])
-                    : null;
+        $registeredAt = $this->parseExcelDate($row['registered_at'], now());
+        $supersededAt = $this->parseExcelDate($row['superseded_at'], null);
+        $deletedAt = $this->parseExcelDate($row['deleted_at'], null);
+
         // Revision Logic
         if(!$isOriginal){
             $original = IsoMasterDocument::where('document_code', $row['document_code'])
@@ -132,7 +141,7 @@ class DocumentsImport implements ToCollection, WithHeadingRow
         }
 
         //Get the value of the deleted date
-        $deletedDate = $row['deleted_at'];
+        $deletedDate = $this->parseExcelDate($row['deleted_at'], now());
         // Mark original as superseded
         $docToDelete->update([
             'status' => 'Superseded',
@@ -144,9 +153,9 @@ class DocumentsImport implements ToCollection, WithHeadingRow
         $sourceType = OfficeMapper::normalizeSourceType($row['source_type']);
 
         // Create deletion record audit
-        $deletedAt = !empty($row['deleted_at'])
-                ? Carbon:: parse($row['deleted_at'])
-                : now();
+        $deletedAt = $this->parseExcelDate($row['deleted_at'], now());
+        $registeredAt = $this->parseExcelDate($row['registered_at'], $docToDelete->registered_at);
+
         // \Log::info("Creating Deletion record with registered_at: " . $docToDelete->registered_at);
         IsoMasterDocument::create([
             'document_code' => $docToDelete->document_code,
@@ -158,7 +167,7 @@ class DocumentsImport implements ToCollection, WithHeadingRow
             'is_original' => false,
             'original_document_id' => $docToDelete->original_document_id ?? $docToDelete->id,
             'status' => 'Deleted',
-            'registered_at' => $row['registered_at'],
+            'registered_at' => $registeredAt,
             'deleted_at' => $deletedAt,
             'source' => 'excel',
         ]);

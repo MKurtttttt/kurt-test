@@ -8,7 +8,7 @@ return [
         'records',
         'policies',
         'others',
-    ],
+    ], 
     'mappings' => [
         //OOP - Office of the president
         'OOP' => '(OOP) Office of the President',

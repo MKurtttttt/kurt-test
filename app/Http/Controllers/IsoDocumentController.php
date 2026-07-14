@@ -623,7 +623,7 @@ class IsoDocumentController extends Controller
                         $originalDoc->timestamps = false; // Debug: Remove this if ever
                         $originalDoc->update([
                             'status' => 'Superseded',
-                            'superseded_at'=> now(),
+                            'superseded_at'=> $document->registered_at,
                         ]);
                         $originalDoc->timestamps = true; //This too
 
@@ -653,7 +653,7 @@ class IsoDocumentController extends Controller
                         $docToDelete->timestamps = false;
                         $docToDelete->update([
                             'status' => 'Superseded',
-                            'superseded_at' => now()
+                            'superseded_at' => $document->registered_at,
                         ]);
                         $docToDelete->timestamps = true;
 

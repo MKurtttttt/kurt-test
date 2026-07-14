@@ -21,9 +21,15 @@ class InformationHubController extends Controller
             $linksByCategory[$cat] = $allLinks->where('category', $cat)->groupBy('sub_category');
         }
 
+        // Manually append Policies category for public home index view
+        $categories[] = 'Policies';
+
+        $policies = \App\Models\Policy::where('status', 'Active')->orderBy('title', 'asc')->get()->groupBy('category')->sortKeys(SORT_NATURAL | SORT_FLAG_CASE);
+
         return view('home.information-hub-home', [
             'categories' => $categories,
             'linksByCategory' => $linksByCategory,
+            'policies' => $policies,
         ]);
     }
 
@@ -43,9 +49,12 @@ class InformationHubController extends Controller
             $linksByCategory[$cat] = $allLinks->where('category', $cat)->groupBy('sub_category');
         }
 
+        $policies = \App\Models\Policy::where('status', 'Active')->orderBy('title', 'asc')->get()->groupBy('category')->sortKeys(SORT_NATURAL | SORT_FLAG_CASE);
+
         return view('information-hub.information-hub-dashboard', [
             'category' => $category,
             'linksByCategory' => $linksByCategory,
+            'policies' => $policies,
         ]);
     }
 
