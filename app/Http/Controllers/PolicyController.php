@@ -98,13 +98,33 @@ class PolicyController extends Controller
             'policy_date'      => 'nullable|string|max:100',
         ]);
 
+        $code = $request->document_code ? trim($request->document_code) : null;
+        $rev = $request->filled('revision_count') ? intval($request->revision_count) : 0;
+        $title = trim($request->title);
+
+        // Check for duplicates
+        $duplicateQuery = Policy::query();
+        if ($code) {
+            $duplicateQuery->where('document_code', $code)->where('revision_count', $rev);
+        } else {
+            $duplicateQuery->where('title', $title)->where('revision_count', $rev);
+        }
+
+        if ($duplicateQuery->exists()) {
+            return back()->withInput()->withErrors([
+                'document_code' => $code 
+                    ? "A policy with document code '{$code}' and revision '{$rev}' already exists."
+                    : "A policy with title '{$title}' and revision '{$rev}' already exists."
+            ]);
+        }
+
         Policy::create([
-            'title'            => trim($request->title),
+            'title'            => $title,
             'url'              => trim($request->url),
             'category'         => trim($request->category),
             'description'      => trim($request->description),
-            'document_code'    => $request->document_code ? trim($request->document_code) : null,
-            'revision_count'   => $request->filled('revision_count') ? intval($request->revision_count) : 0,
+            'document_code'    => $code,
+            'revision_count'   => $rev,
             'effectivity_date' => $request->effectivity_date ?: null,
             'policy_date'      => $request->policy_date ? trim($request->policy_date) : null,
         ]);
@@ -140,16 +160,36 @@ class PolicyController extends Controller
             'document_code'    => 'nullable|string|max:100',
             'revision_count'   => 'nullable|integer|min:0',
             'effectivity_date' => 'nullable|date',
-            'policy_date'      => 'nullable|string|max:100',
+            'policy_date' => 'nullable|string|max:100',
         ]);
 
+        $code = $request->document_code ? trim($request->document_code) : null;
+        $rev = $request->filled('revision_count') ? intval($request->revision_count) : 0;
+        $title = trim($request->title);
+
+        // Check for duplicates (excluding the current record)
+        $duplicateQuery = Policy::where('id', '!=', $id);
+        if ($code) {
+            $duplicateQuery->where('document_code', $code)->where('revision_count', $rev);
+        } else {
+            $duplicateQuery->where('title', $title)->where('revision_count', $rev);
+        }
+
+        if ($duplicateQuery->exists()) {
+            return back()->withInput()->withErrors([
+                'document_code' => $code 
+                    ? "A policy with document code '{$code}' and revision '{$rev}' already exists."
+                    : "A policy with title '{$title}' and revision '{$rev}' already exists."
+            ]);
+        }
+
         $policy->update([
-            'title'            => trim($request->title),
+            'title'            => $title,
             'url'              => trim($request->url),
             'category'         => trim($request->category),
             'description'      => trim($request->description),
-            'document_code'    => $request->document_code ? trim($request->document_code) : null,
-            'revision_count'   => $request->filled('revision_count') ? intval($request->revision_count) : 0,
+            'document_code'    => $code,
+            'revision_count'   => $rev,
             'effectivity_date' => $request->effectivity_date ?: null,
             'policy_date'      => $request->policy_date ? trim($request->policy_date) : null,
         ]);

@@ -1,6 +1,6 @@
 <x-app-layout>
 <div class="min-h-screen py-8 bg-gray-50/50 pb-[450px]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Breadcrumb & Back -->
         <div class="mb-6 flex justify-between items-center">
@@ -28,7 +28,7 @@
         @endif
 
         <!-- Card Container -->
-        <div class="bg-white shadow border border-gray-200 transition-all duration-300" style="border-radius: 16px;">
+        <div class="bg-white shadow border border-gray-200 transition-all duration-300 overflow-hidden" style="border-radius: 16px;">
             <!-- Header Block -->
             <div class="p-6 text-white" style="background-color: #70121D; border-bottom: 4px solid #c5a059; border-top-left-radius: 15px; border-top-right-radius: 15px;">
                 <h2 class="text-2xl font-bold tracking-tight">Policies Directory</h2>
@@ -37,7 +37,7 @@
 
             <!-- Search & Filter Form Bar -->
             <div class="bg-gray-50/50 p-5 border-b border-gray-100 flex justify-center bg-gradient-to-b from-gray-50/50 to-white">
-                <form method="GET" action="{{ route('iso.management.policies.index') }}" class="w-full max-w-5xl">
+                <form method="GET" action="{{ route('iso.management.policies.index') }}" class="w-full">
                     <!-- Main Search Row -->
                     <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
                         <!-- Search Text Input -->
@@ -143,8 +143,6 @@
                             </div>
                         </div>
                     </div>
-                        </div>
-                    </div>
                 </form>
             </div>
 
@@ -153,24 +151,22 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider bg-white">
-                            <th class="px-6 py-4 whitespace-nowrap w-[15%]">Document Code</th>
-                            <th class="px-6 py-4 w-[35%]">Title & Details</th>
-                            <th class="px-6 py-4 whitespace-nowrap w-[15%]">Category</th>
-                            <th class="px-6 py-4 text-center whitespace-nowrap w-[10%]">Revision</th>
+                            <th class="px-6 py-4 whitespace-nowrap w-[12%]">Document Code</th>
+                            <th class="px-6 py-4 w-[32%]">Title & Details</th>
+                            <th class="px-6 py-4 whitespace-nowrap w-[12%]">Category</th>
+                            <th class="px-6 py-4 text-center whitespace-nowrap w-[8%]">Revision</th>
                             <th class="px-6 py-4 whitespace-nowrap w-[12%]">Effectivity Date</th>
                             <th class="px-6 py-4 text-center whitespace-nowrap w-[8%]">Policy Date</th>
-                            <th class="px-6 py-4 whitespace-nowrap w-[12%]">Document Link</th>
-                            <th class="px-6 py-4 text-right whitespace-nowrap w-[8%]">Actions</th>
+                            <th class="px-6 py-4 whitespace-nowrap w-[10%]">Document Link</th>
+                            <th class="px-6 py-4 text-right whitespace-nowrap w-[6%]">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 text-sm text-gray-600 bg-white">
                         @forelse($policies as $policy)
                             <tr class="policy-row transition-colors">
                                 <!-- Document Code -->
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-1 bg-gray-100 text-gray-700 border border-gray-200/60 rounded-md font-semibold text-xs uppercase tracking-wider">
-                                        {{ $policy->document_code ?: 'N/A' }}
-                                    </span>
+                                <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-700 text-xs tracking-wider uppercase">
+                                    {{ $policy->document_code ?: 'N/A' }}
                                 </td>
                                 <!-- Title & Details -->
                                 <td class="px-6 py-4">
@@ -180,10 +176,8 @@
                                     @endif
                                 </td>
                                 <!-- Category -->
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border border-gray-200 bg-gray-50 text-gray-700">
-                                        {{ $policy->category ?: 'General' }}
-                                    </span>
+                                <td class="px-6 py-4 whitespace-nowrap font-semibold text-gray-750 text-xs">
+                                    {{ $policy->category ?: 'General' }}
                                 </td>
                                 <!-- Revision Count -->
                                 <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-gray-700">
