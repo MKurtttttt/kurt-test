@@ -389,13 +389,14 @@
                         
                         <!-- Cards Grid -->
                         <div class="ih-cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); width:100%;">
-                            ${groups[key].map(p => {
+                             ${groups[key].map(p => {
                                 const badgeBg = 'rgba(197,160,89,0.12)';
                                 const badgeColor = '#8a6a1e';
                                 const badgeLabel = 'Document';
                                 const typeIcon = 'fas fa-file-pdf';
+                                const hasUrl = p.url && p.url.trim() !== '';
                                 
-                                return `
+                                return hasUrl ? `
                                     <a href="${p.url}" target="_blank" class="ih-resource-card" title="${p.description ?? p.title}">
                                         {{-- Thumbnail --}}
                                         <div class="ih-card-thumb">
@@ -444,6 +445,55 @@
                                             </div>
                                         </div>
                                     </a>
+                                ` : `
+                                    <div class="ih-resource-card opacity-75" style="cursor: default;" title="${p.description ?? p.title}">
+                                        {{-- Thumbnail --}}
+                                        <div class="ih-card-thumb">
+                                            <div class="ih-card-thumb-placeholder" style="background: linear-gradient(135deg, rgba(156,163,175,0.08), rgba(156,163,175,0.05));">
+                                                <i class="fas fa-file-pdf" style="font-size:2rem; color:rgba(156,163,175,0.4);"></i>
+                                            </div>
+                                            {{-- Type badge overlay --}}
+                                            <span class="ih-type-badge" style="background:rgba(156,163,175,0.12); color:#6b7280; border-color:rgba(156,163,175,0.2);">
+                                                <i class="fas fa-clock" style="font-size:8px;"></i>
+                                                Pending Link
+                                            </span>
+                                        </div>
+
+                                        {{-- Body --}}
+                                        <div class="ih-card-body">
+                                            <p class="ih-card-title" style="color: #6b7280;">${p.title}</p>
+                                            ${p.description ? `<p class="ih-card-desc">${p.description}</p>` : ''}
+                                            
+                                            <!-- Metadata Pills -->
+                                            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; margin-top:4px;">
+                                                ${p.document_code ? `
+                                                    <span style="font-size:10px; font-weight:600; color:#6b7280; background:rgba(156,163,175,0.08); padding:3px 7px; border-radius:6px; text-transform:uppercase; letter-spacing:0.02em; white-space:nowrap; border: 1px solid rgba(156,163,175,0.15);">
+                                                        Code: ${p.document_code}
+                                                    </span>
+                                                ` : ''}
+                                                ${p.revision_count !== null && p.revision_count !== undefined ? `
+                                                    <span style="font-size:10px; font-weight:600; color:#6b7280; background:rgba(156,163,175,0.08); padding:3px 7px; border-radius:6px; white-space:nowrap; border: 1px solid rgba(156,163,175,0.15);">
+                                                        Rev: ${p.revision_count === 0 ? 'Original' : p.revision_count}
+                                                    </span>
+                                                ` : ''}
+                                                ${p.effectivity_date ? `
+                                                    <span style="font-size:10px; font-weight:600; color:#6b7280; background:rgba(156,163,175,0.08); padding:3px 7px; border-radius:6px; white-space:nowrap; border: 1px solid rgba(156,163,175,0.15);">
+                                                        Effective: ${p.effectivity_date}
+                                                    </span>
+                                                ` : ''}
+                                                ${p.policy_date ? `
+                                                    <span style="font-size:10px; font-weight:600; color:#6b7280; background:rgba(156,163,175,0.08); padding:3px 7px; border-radius:6px; white-space:nowrap; border: 1px solid rgba(156,163,175,0.15);">
+                                                        Year: ${p.policy_date}
+                                                    </span>
+                                                ` : ''}
+                                            </div>
+
+                                            <div class="ih-card-cta text-gray-400 font-semibold italic" style="color: #9ca3af; background: none; border: none; padding: 0;">
+                                                <i class="fas fa-exclamation-circle" style="font-size:9px;"></i>
+                                                Link pending upload
+                                            </div>
+                                        </div>
+                                    </div>
                                 `;
                             }).join('')}
                         </div>

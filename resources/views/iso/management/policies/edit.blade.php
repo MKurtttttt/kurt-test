@@ -49,15 +49,14 @@
 
                 <!-- URL -->
                 <div>
-                    <label for="url" class="block text-sm font-bold text-gray-700 mb-1.5">Document Link URL <span class="text-red-500">*</span></label>
+                    <label for="url" class="block text-sm font-bold text-gray-700 mb-1.5">Document Link URL</label>
                     <input type="url" 
                            name="url" 
                            id="url" 
                            value="{{ old('url', $policy->url) }}" 
-                           required 
                            placeholder="e.g. https://hauph.sharepoint.com/.../document.pdf" 
                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-950 focus:border-red-950 text-gray-800 shadow-sm">
-                    <small class="text-gray-400 block mt-1.5">Provide the full URL link to the official policy document.</small>
+                    <small class="text-gray-400 block mt-1.5">Provide the full URL link to the official policy document (optional).</small>
                 </div>
 
                 <!-- Category -->

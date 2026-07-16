@@ -89,7 +89,7 @@ class PolicyController extends Controller
 
         $request->validate([
             'title'            => 'required|string|max:255',
-            'url'              => 'required|url|max:1000',
+            'url'              => 'nullable|url|max:1000',
             'category'         => 'nullable|string|max:255',
             'description'      => 'nullable|string|max:1000',
             'document_code'    => 'nullable|string|max:100',
@@ -120,7 +120,7 @@ class PolicyController extends Controller
 
         Policy::create([
             'title'            => $title,
-            'url'              => trim($request->url),
+            'url'              => $request->url ? trim($request->url) : null,
             'category'         => trim($request->category),
             'description'      => trim($request->description),
             'document_code'    => $code,
@@ -154,7 +154,7 @@ class PolicyController extends Controller
 
         $request->validate([
             'title'            => 'required|string|max:255',
-            'url'              => 'required|url|max:1000',
+            'url'              => 'nullable|url|max:1000',
             'category'         => 'nullable|string|max:255',
             'description'      => 'nullable|string|max:1000',
             'document_code'    => 'nullable|string|max:100',
@@ -185,7 +185,7 @@ class PolicyController extends Controller
 
         $policy->update([
             'title'            => $title,
-            'url'              => trim($request->url),
+            'url'              => $request->url ? trim($request->url) : null,
             'category'         => trim($request->category),
             'description'      => trim($request->description),
             'document_code'    => $code,

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('category')->nullable();
-            $table->text('url');
+            $table->text('url')->nullable();
             $table->text('description')->nullable();
             $table->string('status')->default('Active');
             $table->string('document_code')->nullable();
