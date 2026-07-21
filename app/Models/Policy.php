@@ -8,7 +8,7 @@ class Policy extends Model
 {
     protected $fillable = [
         'title',
-        'category',
+        'category_id',
         'url',
         'description',
         'status',
@@ -21,4 +21,9 @@ class Policy extends Model
     protected $casts = [
         'revision_count' => 'integer',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(PolicyCategory::class, 'category_id');
+    }
 }

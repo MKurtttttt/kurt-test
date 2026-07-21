@@ -1,6 +1,7 @@
 <x-app-layout>
     <!-- This is where the table of links to choose which one to edit -->
-    <div class="p-6">
+    <div class="w-full flex justify-center py-8" style="min-height: 90vh; background-color: #edf2f7;">
+        <div class="w-[95%] flex flex-col bg-white rounded-2xl px-8 py-8 shadow-lg" style="height: fit-content;">
         @if(session('msg'))
             <div id="success-msg-popup" style="position:fixed;top:90px;left:50%;transform:translateX(-50%);z-index:9999;min-width:300px;max-width:90vw;box-shadow:0 2px 12px rgba(0,0,0,0.15);background:#d1fae5;border:2px solid #10b981;color:#065f46;padding:18px 32px;font-size:1.1rem;border-radius:12px;text-align:center;transition:opacity 0.7s;">
                 <strong>Success!</strong> {{ session('msg') }}
@@ -141,8 +142,8 @@
                 icon.style.color = '#70121D';
 
                 rows.sort((a, b) => {
-                    const aValue = a.dataset[column].toLowerCase();
-                    const bValue = b.dataset[column].toLowerCase();
+                    const aValue = (a.dataset[column] || '').toLowerCase();
+                    const bValue = (b.dataset[column] || '').toLowerCase();
                     
                     if (newState === 'asc') {
                         return aValue.localeCompare(bValue);
@@ -169,6 +170,8 @@
 
             function performSearch() {
                 const searchValue = searchInput.value.toLowerCase().trim();
+                const urlParams = new URLSearchParams(window.location.search);
+                const categoryFilter = urlParams.get('category');
                 const rows = document.querySelectorAll('.searchable-row');
                 let visibleCount = 0;
 
@@ -176,13 +179,16 @@
                     const titleCell = row.querySelector('.title-cell');
                     
                     // Get original text from data attributes
-                    const title = row.dataset.title.toLowerCase();
+                    const title = (row.dataset.title || '').toLowerCase();
+                    const rowCategory = (row.dataset.category || '').toLowerCase();
 
                     // Reset title cell to original text first
-                    titleCell.innerHTML = row.dataset.title;
+                    titleCell.innerHTML = row.dataset.title || '';
 
-                    // Search by title only
-                    if (searchValue === '' || title.includes(searchValue)) {
+                    const matchesSearch = searchValue === '' || title.includes(searchValue);
+                    const matchesCategory = !categoryFilter || rowCategory === categoryFilter.toLowerCase();
+
+                    if (matchesSearch && matchesCategory) {
                         row.style.display = '';
                         visibleCount++;
                         
@@ -196,7 +202,7 @@
                 });
 
                 // Show/hide no results message
-                if (visibleCount === 0 && searchValue !== '') {
+                if (visibleCount === 0 && (searchValue !== '' || categoryFilter)) {
                     noResults.classList.remove('hidden');
                 } else {
                     noResults.classList.add('hidden');
@@ -210,6 +216,9 @@
                 performSearch();
                 searchInput.focus();
             });
+
+            // Run filter on initial page load
+            performSearch();
         </script>
 
         <style>
@@ -237,5 +246,6 @@
                 color: #70121D;
             }
         </style>
+        </div>
     </div>
 </x-app-layout>

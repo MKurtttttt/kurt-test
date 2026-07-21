@@ -60,22 +60,22 @@
 
                 <!-- Category -->
                 <div>
-                    <label for="category-select" class="block text-sm font-bold text-gray-700 mb-1.5">Category</label>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <select id="category-select" class="w-full sm:w-1/2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-950 focus:border-red-950 bg-white text-gray-700 shadow-sm">
-                            <option value="">-- Custom Category --</option>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat }}">{{ $cat }}</option>
-                            @endforeach
-                        </select>
-                        <input type="text" 
-                               name="category" 
-                               id="category" 
-                               value="{{ old('category') }}" 
-                               placeholder="Type custom category name..." 
-                               class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-950 focus:border-red-950 text-gray-800 shadow-sm">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label for="category_id" class="block text-sm font-bold text-gray-700">Category <span class="text-red-500">*</span></label>
+                        <a href="{{ route('iso.management.policy-categories.index') }}" target="_blank" class="text-xs font-bold text-[#70121D] hover:underline flex items-center gap-1">
+                            <i class="bi bi-gear-fill"></i> Manage Categories
+                        </a>
                     </div>
-                    <small class="text-gray-400 block mt-1.5">Select an existing category or enter a custom one (e.g. Student Affairs, Academic, Human Resources).</small>
+                    <select name="category_id" 
+                            id="category_id" 
+                            required 
+                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-950 focus:border-red-950 bg-white text-gray-700 shadow-sm">
+                        <option value="">-- Select Category --</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+                    <small class="text-gray-400 block mt-1.5">Select the category this policy document belongs to. To add a new category, click "Manage Categories" above.</small>
                 </div>
                 
                 <!-- Classifications Grid -->

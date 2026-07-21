@@ -73,7 +73,7 @@
 
                         @if (strtolower($cat) === 'policies')
                             {{-- Custom Grid Layout for Policies --}}
-                            @if ($policies->isEmpty())
+                            @if ($policyCategories->isEmpty())
                                 <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#9ca3af; padding:4rem 0;">
                                     <i class="fas fa-folder-open" style="font-size:3rem; margin-bottom:1rem; opacity:0.3;"></i>
                                     <p style="font-size:0.875rem;">No policies available in this category yet.</p>
@@ -81,8 +81,10 @@
                             @else
                                 <p class="text-xs text-gray-400 mb-5 uppercase tracking-widest font-semibold">Browse by Category</p>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 animate-fade-in">
-                                    @foreach ($policies as $categoryName => $catPolicies)
+                                    @foreach ($policyCategories as $catRecord)
                                         @php
+                                            $categoryName = $catRecord->name;
+                                            $catPolicies = $policies[$categoryName] ?? collect();
                                             $categoryIcons = [
                                                 'academic'   => 'fa-book-open',
                                                 'admin'      => 'fa-building',
@@ -158,10 +160,10 @@
                                                  </div>
                                                  {{-- Text --}}
                                                  <div class="flex-1 min-w-0 pr-8">
-                                                     <h3 class="font-bold text-white text-xs md:text-sm uppercase tracking-wider leading-snug mb-0.5 transition-colors duration-300 group-hover:text-[#e6c17a]" style="color: #ffffff !important; font-family: 'Inter', sans-serif; margin: 0 0 2px;">
+                                                     <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wider leading-snug mb-0.5 transition-colors duration-300 group-hover:text-[#e6c17a]" style="color: #ffffff !important; font-family: 'Inter', sans-serif; margin: 0 0 2px;">
                                                          {{ $label }}
                                                      </h3>
-                                                     <p class="text-[11px] font-medium flex items-center gap-1.5" style="color: rgba(255,255,255,0.6); margin: 0;">
+                                                     <p class="text-[13px] font-medium flex items-center gap-1.5" style="color: rgba(255,255,255,0.6); margin: 0;">
                                                          <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#e6c17a] opacity-75"></span>
                                                          {{ $count }} {{ Str::plural('policy', $count) }}
                                                      </p>
@@ -306,7 +308,9 @@
     // ── Policies Data for Modal ────────────────────────────
     @php
         $policiesForJs = [];
-        foreach ($policies as $catName => $items) {
+        foreach ($policyCategories as $catRecord) {
+            $catName = $catRecord->name;
+            $items = $policies[$catName] ?? collect();
             $policiesForJs[$catName] = $items->map(function($p) {
                 return [
                     'id' => $p->id,

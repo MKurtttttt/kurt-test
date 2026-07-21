@@ -37,6 +37,7 @@ use App\Http\Controllers\KnowledgeHubController;
 use App\Http\Controllers\IsoDocumentController;
 use App\Http\Controllers\IsoManagementController;
 use App\Http\Controllers\PolicyController;
+use App\Http\Controllers\PolicyCategoryController;
 use App\Http\Controllers\VisitorController;
 
 //
@@ -642,6 +643,16 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('iso.management.policies.update');
     Route::delete('iso/management/policies/{id}', [PolicyController::class, 'destroy'])
         ->name('iso.management.policies.destroy');
+
+    // ISO Management - Policy Category CRUD
+    Route::get('iso/management/policy-categories', [PolicyCategoryController::class, 'index'])
+        ->name('iso.management.policy-categories.index');
+    Route::post('iso/management/policy-categories', [PolicyCategoryController::class, 'store'])
+        ->name('iso.management.policy-categories.store');
+    Route::put('iso/management/policy-categories/{id}', [PolicyCategoryController::class, 'update'])
+        ->name('iso.management.policy-categories.update');
+    Route::delete('iso/management/policy-categories/{id}', [PolicyCategoryController::class, 'destroy'])
+        ->name('iso.management.policy-categories.destroy');
 
     /*------------------------------------------------------------------
     | 24. Visit Counter

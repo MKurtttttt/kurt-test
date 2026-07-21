@@ -29,12 +29,20 @@
                             </button>
                             <div id="adminDropdownMenu" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden z-20">
                                 <div class="py-1">
-                                    <div class="px-4 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Links</div>
-                                    <a href="{{ route('information-hub.add') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Add Link</a>
-                                    <a href="{{ route('information-hub.edit-list') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit Link</a>
-                                    <a href="{{ route('information-hub.edit-list') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Delete Link</a>
-                                    <div class="border-t border-gray-100 my-1"></div>
-                                    <a href="{{ route('iso.management.policies.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-semibold text-red-900">Manage Policies</a>
+                                    {{-- Links options section --}}
+                                    @php
+                                        $firstCategory = isset($category) && count($category) > 0 ? $category->first() : '';
+                                    @endphp
+                                    <div id="dropdown-links-section">
+                                        <div class="px-4 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Links</div>
+                                        <a id="dropdown-add-link-btn" href="{{ route('information-hub.add', ['category' => $firstCategory]) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Add Link</a>
+                                        <a id="dropdown-edit-link-btn" href="{{ route('information-hub.edit-list', ['category' => $firstCategory]) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit Link</a>
+                                        <a id="dropdown-delete-link-btn" href="{{ route('information-hub.edit-list', ['category' => $firstCategory]) }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Delete Link</a>
+                                    </div>
+                                    {{-- Policies options section --}}
+                                    <div id="dropdown-policies-section" class="hidden">
+                                        <a href="{{ route('iso.management.policies.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-semibold text-red-900">Manage Policies</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -307,7 +315,7 @@
                 @endforeach
 
                 <div id="tab-policies" class="tab-content hidden" style="border: 2px solid #70121D; border-radius: 0.75rem; padding: 2rem;">
-                    @if($policies->isEmpty())
+                    @if($policyCategories->isEmpty())
                         <div class="text-center py-12 text-gray-400">
                             <svg class="mx-auto w-12 h-12 mb-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
@@ -317,8 +325,10 @@
                     @else
                         <p class="text-xs text-gray-400 mb-5 uppercase tracking-widest font-semibold">Browse by Category</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-                            @foreach ($policies as $subCategory => $subCatPolicies)
+                            @foreach ($policyCategories as $catRecord)
                                 @php
+                                    $subCategory = $catRecord->name;
+                                    $subCatPolicies = $policies[$subCategory] ?? collect();
                                     $categoryIcons = [
                                         'academic'   => 'bi-book-half',
                                         'admin'      => 'bi-building-fill',
@@ -388,10 +398,10 @@
                                         </div>
                                         {{-- Text --}}
                                         <div class="flex-1 min-w-0 pr-8">
-                                            <h3 class="font-bold text-white text-xs md:text-sm uppercase tracking-wider leading-snug mb-0.5 transition-colors duration-300 group-hover:text-[#e6c17a]" style="color: #ffffff !important; font-family: 'Inter', sans-serif; margin: 0 0 2px;">
+                                            <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wider leading-snug mb-0.5 transition-colors duration-300 group-hover:text-[#e6c17a]" style="color: #ffffff !important; font-family: 'Inter', sans-serif; margin: 0 0 2px;">
                                                 {{ $label }}
                                             </h3>
-                                            <p class="text-[11px] font-medium flex items-center gap-1.5" style="color: rgba(255,255,255,0.6); margin: 0;">
+                                            <p class="text-[13px] font-medium flex items-center gap-1.5" style="color: rgba(255,255,255,0.6); margin: 0;">
                                                 <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#e6c17a] opacity-75"></span>
                                                 {{ $count }} {{ Str::plural('document', $count) }}
                                             </p>
@@ -619,7 +629,9 @@
 {{-- Store policies data for JS --}}
 @php
     $policiesForJs = [];
-    foreach ($policies as $cat => $items) {
+    foreach ($policyCategories as $catRecord) {
+        $cat = $catRecord->name;
+        $items = $policies[$cat] ?? collect();
         $policiesForJs[$cat] = $items->map(function($p) {
             return [
                 'title'            => $p->title,
@@ -936,9 +948,39 @@
                 
                 // Activate the clicked tab
                 btn.classList.add('active');
-                const targetTab = document.getElementById(btn.getAttribute('data-tab'));
+                const targetTabId = btn.getAttribute('data-tab');
+                const targetTab = document.getElementById(targetTabId);
                 if (targetTab) {
                     targetTab.classList.remove('hidden');
+                }
+
+                // Dynamically adjust admin dropdown options depending on active tab
+                const linksSection = document.getElementById('dropdown-links-section');
+                const policiesSection = document.getElementById('dropdown-policies-section');
+                if (linksSection && policiesSection) {
+                    if (targetTabId === 'tab-policies') {
+                        linksSection.classList.add('hidden');
+                        policiesSection.classList.remove('hidden');
+                    } else {
+                        linksSection.classList.remove('hidden');
+                        policiesSection.classList.add('hidden');
+
+                        // Dynamically update URLs with active category query param
+                        const categoryName = btn.textContent.trim();
+                        const addLinkBtn = document.getElementById('dropdown-add-link-btn');
+                        const editLinkBtn = document.getElementById('dropdown-edit-link-btn');
+                        const deleteLinkBtn = document.getElementById('dropdown-delete-link-btn');
+
+                        if (addLinkBtn) {
+                            addLinkBtn.href = `{{ route('information-hub.add') }}?category=${encodeURIComponent(categoryName)}`;
+                        }
+                        if (editLinkBtn) {
+                            editLinkBtn.href = `{{ route('information-hub.edit-list') }}?category=${encodeURIComponent(categoryName)}`;
+                        }
+                        if (deleteLinkBtn) {
+                            deleteLinkBtn.href = `{{ route('information-hub.edit-list') }}?category=${encodeURIComponent(categoryName)}`;
+                        }
+                    }
                 }
             });
         });

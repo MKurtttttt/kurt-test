@@ -24,12 +24,23 @@ class InformationHubController extends Controller
         // Manually append Policies category for public home index view
         $categories[] = 'Policies';
 
-        $policies = \App\Models\Policy::where('status', 'Active')->orderBy('title', 'asc')->get()->groupBy('category')->sortKeys(SORT_NATURAL | SORT_FLAG_CASE);
+        $policies = \App\Models\Policy::with('category')
+            ->where('status', 'Active')
+            ->whereHas('category')
+            ->orderBy('title', 'asc')
+            ->get()
+            ->groupBy(function($policy) {
+                return $policy->category->name;
+            })
+            ->sortKeys(SORT_NATURAL | SORT_FLAG_CASE);
+
+        $policyCategories = \App\Models\PolicyCategory::orderBy('name', 'asc')->get();
 
         return view('home.information-hub-home', [
             'categories' => $categories,
             'linksByCategory' => $linksByCategory,
             'policies' => $policies,
+            'policyCategories' => $policyCategories,
         ]);
     }
 
@@ -49,12 +60,23 @@ class InformationHubController extends Controller
             $linksByCategory[$cat] = $allLinks->where('category', $cat)->groupBy('sub_category');
         }
 
-        $policies = \App\Models\Policy::where('status', 'Active')->orderBy('title', 'asc')->get()->groupBy('category')->sortKeys(SORT_NATURAL | SORT_FLAG_CASE);
+        $policies = \App\Models\Policy::with('category')
+            ->where('status', 'Active')
+            ->whereHas('category')
+            ->orderBy('title', 'asc')
+            ->get()
+            ->groupBy(function($policy) {
+                return $policy->category->name;
+            })
+            ->sortKeys(SORT_NATURAL | SORT_FLAG_CASE);
+
+        $policyCategories = \App\Models\PolicyCategory::orderBy('name', 'asc')->get();
 
         return view('information-hub.information-hub-dashboard', [
             'category' => $category,
             'linksByCategory' => $linksByCategory,
             'policies' => $policies,
+            'policyCategories' => $policyCategories,
         ]);
     }
 

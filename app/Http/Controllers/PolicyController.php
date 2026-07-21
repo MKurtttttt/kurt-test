@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Policy;
+use App\Models\PolicyCategory;
 use Illuminate\Support\Facades\Auth;
 
 class PolicyController extends Controller
@@ -23,9 +24,9 @@ class PolicyController extends Controller
     {
         $this->authorizeManagement();
 
-        $dbQuery = Policy::query();
+        $dbQuery = Policy::query()->with('category');
         $searchQuery = $request->input('query');
-        $category = $request->input('category');
+        $categoryId = $request->input('category');
         $revisionFilter = $request->input('revision_filter');
         $policyYear = $request->input('policy_year');
 
@@ -37,8 +38,8 @@ class PolicyController extends Controller
             });
         }
 
-        if (!empty($category)) {
-            $dbQuery->where('category', $category);
+        if (!empty($categoryId)) {
+            $dbQuery->where('category_id', $categoryId);
         }
 
         if ($revisionFilter === 'original') {
@@ -56,13 +57,13 @@ class PolicyController extends Controller
 
         $policies = $dbQuery->orderBy('title', 'asc')->paginate(20);
         
-        $categories = Policy::pluck('category')->unique()->filter()->sort(SORT_FLAG_CASE | SORT_NATURAL)->values()->toArray();
+        $categories = PolicyCategory::orderBy('name', 'asc')->get();
         $policyYears = Policy::whereNotNull('policy_date')->pluck('policy_date')->unique()->filter()->sort()->values()->toArray();
 
         return view('iso.management.policies.index', compact(
             'policies', 
             'searchQuery', 
-            'category', 
+            'categoryId', 
             'categories', 
             'revisionFilter', 
             'policyYear', 
@@ -76,7 +77,7 @@ class PolicyController extends Controller
     public function create()
     {
         $this->authorizeManagement();
-        $categories = Policy::pluck('category')->unique()->filter()->sort(SORT_FLAG_CASE | SORT_NATURAL)->values()->toArray();
+        $categories = PolicyCategory::orderBy('name', 'asc')->get();
         return view('iso.management.policies.create', compact('categories'));
     }
 
@@ -90,12 +91,15 @@ class PolicyController extends Controller
         $request->validate([
             'title'            => 'required|string|max:255',
             'url'              => 'nullable|url|max:1000',
-            'category'         => 'nullable|string|max:255',
+            'category_id'      => 'required|exists:policy_categories,id',
             'description'      => 'nullable|string|max:1000',
             'document_code'    => 'nullable|string|max:100',
             'revision_count'   => 'nullable|integer|min:0',
             'effectivity_date' => 'nullable|date',
             'policy_date'      => 'nullable|string|max:100',
+        ], [
+            'category_id.required' => 'Please select a policy category.',
+            'category_id.exists' => 'The selected policy category is invalid.',
         ]);
 
         $code = $request->document_code ? trim($request->document_code) : null;
@@ -121,7 +125,7 @@ class PolicyController extends Controller
         Policy::create([
             'title'            => $title,
             'url'              => $request->url ? trim($request->url) : null,
-            'category'         => trim($request->category),
+            'category_id'      => $request->category_id,
             'description'      => trim($request->description),
             'document_code'    => $code,
             'revision_count'   => $rev,
@@ -140,7 +144,7 @@ class PolicyController extends Controller
     {
         $this->authorizeManagement();
         $policy = Policy::findOrFail($id);
-        $categories = Policy::pluck('category')->unique()->filter()->sort(SORT_FLAG_CASE | SORT_NATURAL)->values()->toArray();
+        $categories = PolicyCategory::orderBy('name', 'asc')->get();
         return view('iso.management.policies.edit', compact('policy', 'categories'));
     }
 
@@ -155,12 +159,15 @@ class PolicyController extends Controller
         $request->validate([
             'title'            => 'required|string|max:255',
             'url'              => 'nullable|url|max:1000',
-            'category'         => 'nullable|string|max:255',
+            'category_id'      => 'required|exists:policy_categories,id',
             'description'      => 'nullable|string|max:1000',
             'document_code'    => 'nullable|string|max:100',
             'revision_count'   => 'nullable|integer|min:0',
             'effectivity_date' => 'nullable|date',
-            'policy_date' => 'nullable|string|max:100',
+            'policy_date'      => 'nullable|string|max:100',
+        ], [
+            'category_id.required' => 'Please select a policy category.',
+            'category_id.exists' => 'The selected policy category is invalid.',
         ]);
 
         $code = $request->document_code ? trim($request->document_code) : null;
@@ -186,7 +193,7 @@ class PolicyController extends Controller
         $policy->update([
             'title'            => $title,
             'url'              => $request->url ? trim($request->url) : null,
-            'category'         => trim($request->category),
+            'category_id'      => $request->category_id,
             'description'      => trim($request->description),
             'document_code'    => $code,
             'revision_count'   => $rev,

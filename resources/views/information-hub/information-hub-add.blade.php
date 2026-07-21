@@ -176,6 +176,20 @@
                 }
             });
         }
+
+        // Pre-select category if passed in URL query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCategory = urlParams.get('category');
+        if (urlCategory) {
+            categoryInput.value = urlCategory;
+            for (let i = 0; i < categorySelect.options.length; i++) {
+                if (categorySelect.options[i].value === urlCategory) {
+                    categorySelect.selectedIndex = i;
+                    break;
+                }
+            }
+            updateSubCategoryDropdown(urlCategory);
+        }
     });
 </script>
 
