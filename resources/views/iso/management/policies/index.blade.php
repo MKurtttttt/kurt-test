@@ -9,12 +9,20 @@
                 <span class="mr-1">&larr;</span> Back to Information Hub
             </a>
             
-            <a href="{{ route('iso.management.policies.create') }}" 
-               class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold text-white hover:scale-[1.01] hover:shadow transition-all duration-200 focus:outline-none" 
-               style="background-color: #70121D;">
-                <i class="bi bi-plus-lg mr-2 leading-none"></i>
-                <span>Add Policy Document</span>
-            </a>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('iso.management.policy-categories.index') }}" 
+                   class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold bg-white text-[#70121D] border border-[#70121D] hover:bg-gray-50 transition-all duration-200 focus:outline-none shadow-sm">
+                    <i class="bi bi-folder-fill mr-2 leading-none"></i>
+                    <span>Manage Categories</span>
+                </a>
+                
+                <a href="{{ route('iso.management.policies.create') }}" 
+                   class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold text-white hover:scale-[1.01] hover:shadow transition-all duration-200 focus:outline-none" 
+                   style="background-color: #70121D;">
+                    <i class="bi bi-plus-lg mr-2 leading-none"></i>
+                    <span>Add Policy Document</span>
+                </a>
+            </div>
         </div>
 
         <!-- Session Message -->
@@ -90,16 +98,21 @@
                             <!-- Category Filter -->
                             <div>
                                 <label class="block text-xs font-bold text-[#70121D] mb-1.5 uppercase tracking-wider">Category</label>
-                                <input type="hidden" name="category" id="filter-category" value="{{ $category ?? '' }}">
+                                <input type="hidden" name="category" id="filter-category" value="{{ $categoryId ?? '' }}">
                                 <div class="relative custom-dropdown" id="dropdown-category">
                                     <button type="button" class="dropdown-trigger w-full px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white text-gray-700 shadow-sm hover:border-gray-300 transition-all flex items-center justify-between" style="height: 42px;">
-                                        <span class="selected-text font-semibold text-gray-800">{{ ($category ?? '') ?: 'All Categories' }}</span>
+                                        <span class="selected-text font-semibold text-gray-800">
+                                            @php
+                                                $selectedCat = $categories->firstWhere('id', $categoryId);
+                                            @endphp
+                                            {{ $selectedCat ? $selectedCat->name : 'All Categories' }}
+                                        </span>
                                         <i class="bi bi-chevron-down text-gray-400 text-xs transition-transform duration-200"></i>
                                     </button>
                                     <div class="dropdown-menu absolute top-full left-0 w-full mt-1.5 bg-white border border-gray-250 rounded-xl shadow-xl z-[100] hidden max-h-60 overflow-y-auto py-1.5 space-y-0.5 animate-fade-in">
-                                        <div class="dropdown-option px-4 py-2.5 text-sm text-gray-800 hover:bg-red-50 hover:text-[#70121D] cursor-pointer transition-colors {{ empty($category) ? 'font-semibold bg-red-50/40 text-[#70121D]' : '' }}" data-value="">All Categories</div>
+                                        <div class="dropdown-option px-4 py-2.5 text-sm text-gray-800 hover:bg-red-50 hover:text-[#70121D] cursor-pointer transition-colors {{ empty($categoryId) ? 'font-semibold bg-red-50/40 text-[#70121D]' : '' }}" data-value="">All Categories</div>
                                         @foreach($categories as $cat)
-                                            <div class="dropdown-option px-4 py-2.5 text-sm text-gray-800 hover:bg-red-50 hover:text-[#70121D] cursor-pointer transition-colors {{ ($category ?? '') == $cat ? 'font-semibold bg-red-50/40 text-[#70121D]' : '' }}" data-value="{{ $cat }}">{{ $cat }}</div>
+                                            <div class="dropdown-option px-4 py-2.5 text-sm text-gray-800 hover:bg-red-50 hover:text-[#70121D] cursor-pointer transition-colors {{ ($categoryId ?? '') == $cat->id ? 'font-semibold bg-red-50/40 text-[#70121D]' : '' }}" data-value="{{ $cat->id }}">{{ $cat->name }}</div>
                                         @endforeach
                                     </div>
                                 </div>
@@ -177,7 +190,7 @@
                                 </td>
                                 <!-- Category -->
                                 <td class="px-6 py-4 whitespace-nowrap font-semibold text-gray-750 text-xs">
-                                    {{ $policy->category ?: 'General' }}
+                                    {{ $policy->category ? $policy->category->name : 'Unassigned' }}
                                 </td>
                                 <!-- Revision Count -->
                                 <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-gray-700">
