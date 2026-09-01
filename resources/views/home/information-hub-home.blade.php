@@ -79,105 +79,236 @@
                                     <p style="font-size:0.875rem;">No policies available in this category yet.</p>
                                 </div>
                             @else
-                                <p class="text-xs text-gray-400 mb-5 uppercase tracking-widest font-semibold">Browse by Category</p>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 animate-fade-in">
-                                    @foreach ($policyCategories as $catRecord)
-                                        @php
-                                            $categoryName = $catRecord->name;
-                                            $catPolicies = $policies[$categoryName] ?? collect();
-                                            $categoryIcons = [
-                                                'academic'   => 'fa-book-open',
-                                                'admin'      => 'fa-building',
-                                                'research'   => 'fa-magnifying-glass',
-                                                'employment' => 'fa-briefcase',
-                                                'safety'     => 'fa-shield-alt',
-                                                'tech'       => 'fa-microchip',
-                                                'student'    => 'fa-graduation-cap',
-                                                'quality'    => 'fa-square-check',
-                                                'governance' => 'fa-users',
-                                                'default'    => 'fa-file-lines',
-                                            ];
+                                {{-- Category Cards Grid (Default Browse Mode) --}}
+                                <div id="policies-browse-view">
+                                    <p class="text-xs text-gray-400 mb-5 uppercase tracking-widest font-semibold">Browse by Category</p>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 animate-fade-in">
+                                        @foreach ($policyCategories as $catRecord)
+                                            @php
+                                                $categoryName = $catRecord->name;
+                                                $catPolicies = $policies[$categoryName] ?? collect();
+                                                $categoryIcons = [
+                                                    'academic'   => 'fa-book-open',
+                                                    'admin'      => 'fa-building',
+                                                    'research'   => 'fa-magnifying-glass',
+                                                    'employment' => 'fa-briefcase',
+                                                    'safety'     => 'fa-shield-alt',
+                                                    'tech'       => 'fa-microchip',
+                                                    'student'    => 'fa-graduation-cap',
+                                                    'quality'    => 'fa-square-check',
+                                                    'governance' => 'fa-users',
+                                                    'default'    => 'fa-file-lines',
+                                                ];
 
-                                            $catLower = strtolower($categoryName ?? 'uncategorized');
-                                            $iconClass = $categoryIcons['default'];
+                                                $catLower = strtolower($categoryName ?? 'uncategorized');
+                                                $iconClass = $categoryIcons['default'];
 
-                                            $keywordMappings = [
-                                                'academic'   => ['academic'],
-                                                'admin'      => ['admin', 'business', 'finance'],
-                                                'research'   => ['research'],
-                                                'employment' => ['employ', 'human'],
-                                                'safety'     => ['safe', 'security', 'health'],
-                                                'tech'       => ['tech', 'system', 'it'],
-                                                'student'    => ['student', 'education', 'learn'],
-                                                'quality'    => ['quality', 'audit', 'iso', 'compliance', 'qms', 'iqa'],
-                                                'governance' => ['board', 'governance', 'regent'],
-                                            ];
+                                                $keywordMappings = [
+                                                    'academic'   => ['academic'],
+                                                    'admin'      => ['admin', 'business', 'finance'],
+                                                    'research'   => ['research'],
+                                                    'employment' => ['employ', 'human'],
+                                                    'safety'     => ['safe', 'security', 'health'],
+                                                    'tech'       => ['tech', 'system', 'it'],
+                                                    'student'    => ['student', 'education', 'learn'],
+                                                    'quality'    => ['quality', 'audit', 'iso', 'compliance', 'qms', 'iqa'],
+                                                    'governance' => ['board', 'governance', 'regent'],
+                                                ];
 
-                                            foreach ($keywordMappings as $key => $keywords) {
-                                                foreach ($keywords as $kw) {
-                                                    if ($kw === 'it') {
-                                                        if (preg_match('/\bit\b/i', $catLower)) {
-                                                            $iconClass = $categoryIcons[$key];
-                                                            break 2;
-                                                        }
-                                                    } else {
-                                                        if (str_contains($catLower, $kw)) {
-                                                            $iconClass = $categoryIcons[$key];
-                                                            break 2;
+                                                foreach ($keywordMappings as $key => $keywords) {
+                                                    foreach ($keywords as $kw) {
+                                                        if ($kw === 'it') {
+                                                            if (preg_match('/\bit\b/i', $catLower)) {
+                                                                $iconClass = $categoryIcons[$key];
+                                                                break 2;
+                                                            }
+                                                        } else {
+                                                            if (str_contains($catLower, $kw)) {
+                                                                $iconClass = $categoryIcons[$key];
+                                                                break 2;
+                                                            }
                                                         }
                                                     }
                                                 }
-                                            }
 
-                                            $count = count($catPolicies);
-                                            $label = $categoryName ?: 'General';
+                                                $count = count($catPolicies);
+                                                $label = $categoryName ?: 'General';
+                                            @endphp
+                                             <button type="button"
+                                                 class="policy-category-card group relative overflow-hidden rounded-3xl text-left transition-all duration-300 focus:outline-none"
+                                                 onclick="openHomePolicyModal('{{ addslashes($label) }}')"
+                                                 data-category="{{ $label }}">
+                                                 
+                                                 {{-- Card Dot grid pattern --}}
+                                                 <div class="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none" 
+                                                      style="background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px); background-size: 10px 10px;"></div>
 
-                                            $searchHaystack = strtolower($label);
-                                            foreach ($catPolicies as $p) {
-                                                $searchHaystack .= ' ' . strtolower($p->title) . ' ' . strtolower($p->description ?? '') . ' ' . strtolower($p->document_code ?? '');
-                                            }
-                                        @endphp
-                                         <button type="button"
-                                             class="policy-category-card group relative overflow-hidden rounded-3xl text-left transition-all duration-300 focus:outline-none"
-                                             onclick="openHomePolicyModal('{{ addslashes($label) }}')"
-                                             data-category="{{ $label }}"
-                                             data-search="{{ $searchHaystack }}">
-                                             
-                                             {{-- Card Dot grid pattern --}}
-                                             <div class="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none" 
-                                                  style="background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px); background-size: 10px 10px;"></div>
+                                                 {{-- Card Ambient highlight glow --}}
+                                                 <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                                                      style="background: radial-gradient(circle at 80% 20%, rgba(197, 160, 89, 0.15) 0%, transparent 60%);"></div>
 
-                                             {{-- Card Ambient highlight glow --}}
-                                             <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                                                  style="background: radial-gradient(circle at 80% 20%, rgba(197, 160, 89, 0.15) 0%, transparent 60%);"></div>
-
-                                             {{-- Card Body --}}
-                                             <div class="relative z-10 p-5 h-full flex flex-row items-center gap-4" style="box-sizing: border-box;">
-                                                 {{-- Icon --}}
-                                                 <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-105 relative"
-                                                     style="background: linear-gradient(135deg, rgba(197,160,89,0.2) 0%, rgba(197,160,89,0.05) 100%); border: 1px solid rgba(197,160,89,0.3); box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-                                                     <i class="fas {{ $iconClass }} text-lg" style="color: #e6c17a;"></i>
+                                                 {{-- Card Body --}}
+                                                 <div class="relative z-10 p-5 h-full flex flex-row items-center gap-4" style="box-sizing: border-box;">
+                                                     {{-- Icon --}}
+                                                     <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-105 relative"
+                                                         style="background: linear-gradient(135deg, rgba(197,160,89,0.2) 0%, rgba(197,160,89,0.05) 100%); border: 1px solid rgba(197,160,89,0.3); box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+                                                         <i class="fas {{ $iconClass }} text-lg" style="color: #e6c17a;"></i>
+                                                     </div>
+                                                     {{-- Text --}}
+                                                     <div class="flex-1 min-w-0 pr-8">
+                                                         <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wider leading-snug mb-0.5 transition-colors duration-300 group-hover:text-[#e6c17a]" style="color: #ffffff !important; font-family: 'Inter', sans-serif; margin: 0 0 2px;">
+                                                             {{ $label }}
+                                                         </h3>
+                                                         <p class="text-[13px] font-medium flex items-center gap-1.5" style="color: rgba(255,255,255,0.6); margin: 0;">
+                                                             <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#e6c17a] opacity-75"></span>
+                                                             {{ $count }} {{ Str::plural('policy', $count) }}
+                                                         </p>
+                                                     </div>
                                                  </div>
-                                                 {{-- Text --}}
-                                                 <div class="flex-1 min-w-0 pr-8">
-                                                     <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wider leading-snug mb-0.5 transition-colors duration-300 group-hover:text-[#e6c17a]" style="color: #ffffff !important; font-family: 'Inter', sans-serif; margin: 0 0 2px;">
-                                                         {{ $label }}
-                                                     </h3>
-                                                     <p class="text-[13px] font-medium flex items-center gap-1.5" style="color: rgba(255,255,255,0.6); margin: 0;">
-                                                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#e6c17a] opacity-75"></span>
-                                                         {{ $count }} {{ Str::plural('policy', $count) }}
-                                                     </p>
+                                                 {{-- Arrow indicator --}}
+                                                 <div class="absolute right-5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0"
+                                                     style="background: linear-gradient(135deg, #70121D 0%, #4a070f 100%); border: 1px solid rgba(197, 160, 89, 0.4); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                                                     <svg class="w-4 h-4" style="color: #e6c17a;" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+                                                     </svg>
                                                  </div>
-                                             </div>
-                                             {{-- Arrow indicator --}}
-                                             <div class="absolute right-5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0"
-                                                 style="background: linear-gradient(135deg, #70121D 0%, #4a070f 100%); border: 1px solid rgba(197, 160, 89, 0.4); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-                                                 <svg class="w-4 h-4" style="color: #e6c17a;" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
-                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
-                                                 </svg>
-                                             </div>
-                                         </button>
-                                    @endforeach
+                                             </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                {{-- Direct Policy Resource Cards (Search Mode) --}}
+                                <div id="policies-search-view" style="display: none;">
+                                    <div class="ih-cards-grid">
+                                        @foreach ($policyCategories as $catRecord)
+                                            @php
+                                                $catName = $catRecord->name;
+                                                $catPolicies = $policies[$catName] ?? collect();
+                                            @endphp
+                                            @foreach ($catPolicies as $p)
+                                                @php
+                                                    $hasUrl = !empty($p->url) && trim($p->url) !== '';
+                                                    $searchHaystack = strtolower($p->title . ' ' . ($p->description ?? '') . ' ' . ($p->document_code ?? '') . ' ' . $catName . ' ' . ($p->policy_date ?? ''));
+                                                @endphp
+                                                @if ($hasUrl)
+                                                    <a href="{{ $p->url }}" target="_blank"
+                                                        class="ih-resource-card"
+                                                        title="{{ $p->description ?? $p->title }}"
+                                                        data-search="{{ $searchHaystack }}">
+
+                                                        {{-- Thumbnail --}}
+                                                        <div class="ih-card-thumb">
+                                                            <div class="ih-card-thumb-placeholder">
+                                                                <i class="fas fa-file-pdf" style="font-size:2rem; color:rgba(197,160,89,0.4);"></i>
+                                                            </div>
+                                                            {{-- Type badge overlay --}}
+                                                            <span class="ih-type-badge" style="background:rgba(197,160,89,0.12); color:#8a6a1e; border-color:rgba(197,160,89,0.2);">
+                                                                <i class="fas fa-file-pdf" style="font-size:8px;"></i>
+                                                                Document
+                                                            </span>
+                                                        </div>
+
+                                                        {{-- Body --}}
+                                                        <div class="ih-card-body">
+                                                            <p class="ih-card-title">{{ $p->title }}</p>
+                                                            @if ($p->description)
+                                                                <p class="ih-card-desc">{{ $p->description }}</p>
+                                                            @endif
+
+                                                            {{-- Metadata Pills --}}
+                                                            <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px; margin-top:4px;">
+                                                                <span style="font-size:10px; font-weight:700; color:#70121D; background:rgba(112,18,29,0.08); padding:2px 7px; border-radius:5px; white-space:nowrap; border:1px solid rgba(112,18,29,0.12);">
+                                                                    {{ $catName }}
+                                                                </span>
+                                                                @if ($p->document_code)
+                                                                    <span style="font-size:10px; font-weight:600; color:#8a6a1e; background:rgba(197,160,89,0.08); padding:2px 6px; border-radius:5px; text-transform:uppercase; white-space:nowrap;">
+                                                                        Code: {{ $p->document_code }}
+                                                                    </span>
+                                                                @endif
+                                                                @if ($p->revision_count !== null)
+                                                                    <span style="font-size:10px; font-weight:600; color:#8a6a1e; background:rgba(197,160,89,0.08); padding:2px 6px; border-radius:5px; white-space:nowrap;">
+                                                                        Rev: {{ $p->revision_count === 0 ? 'Original' : $p->revision_count }}
+                                                                    </span>
+                                                                @endif
+                                                                @if ($p->effectivity_date)
+                                                                    <span style="font-size:10px; font-weight:600; color:#8a6a1e; background:rgba(197,160,89,0.08); padding:2px 6px; border-radius:5px; white-space:nowrap;">
+                                                                        Effective: {{ \Carbon\Carbon::parse($p->effectivity_date)->format('M d, Y') }}
+                                                                    </span>
+                                                                @endif
+                                                                @if ($p->policy_date)
+                                                                    <span style="font-size:10px; font-weight:600; color:#8a6a1e; background:rgba(197,160,89,0.08); padding:2px 6px; border-radius:5px; white-space:nowrap;">
+                                                                        Year: {{ $p->policy_date }}
+                                                                    </span>
+                                                                @endif
+                                                            </div>
+
+                                                            <div class="ih-card-cta">
+                                                                <i class="fas fa-arrow-up-right-from-square" style="font-size:9px;"></i>
+                                                                Open resource
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                @else
+                                                    <div class="ih-resource-card opacity-75" style="cursor: default;"
+                                                        title="{{ $p->description ?? $p->title }}"
+                                                        data-search="{{ $searchHaystack }}">
+
+                                                        {{-- Thumbnail --}}
+                                                        <div class="ih-card-thumb">
+                                                            <div class="ih-card-thumb-placeholder" style="background: linear-gradient(135deg, rgba(156,163,175,0.08), rgba(156,163,175,0.05));">
+                                                                <i class="fas fa-file-pdf" style="font-size:2rem; color:rgba(156,163,175,0.4);"></i>
+                                                            </div>
+                                                            {{-- Type badge overlay --}}
+                                                            <span class="ih-type-badge" style="background:rgba(156,163,175,0.12); color:#6b7280; border-color:rgba(156,163,175,0.2);">
+                                                                <i class="fas fa-clock" style="font-size:8px;"></i>
+                                                                Pending Link
+                                                            </span>
+                                                        </div>
+
+                                                        {{-- Body --}}
+                                                        <div class="ih-card-body">
+                                                            <p class="ih-card-title" style="color: #6b7280;">{{ $p->title }}</p>
+                                                            @if ($p->description)
+                                                                <p class="ih-card-desc">{{ $p->description }}</p>
+                                                            @endif
+
+                                                            {{-- Metadata Pills --}}
+                                                            <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px; margin-top:4px;">
+                                                                <span style="font-size:10px; font-weight:700; color:#70121D; background:rgba(112,18,29,0.08); padding:2px 7px; border-radius:5px; white-space:nowrap; border:1px solid rgba(112,18,29,0.12);">
+                                                                    {{ $catName }}
+                                                                </span>
+                                                                @if ($p->document_code)
+                                                                    <span style="font-size:10px; font-weight:600; color:#6b7280; background:rgba(156,163,175,0.08); padding:2px 6px; border-radius:5px; text-transform:uppercase; white-space:nowrap;">
+                                                                        Code: {{ $p->document_code }}
+                                                                    </span>
+                                                                @endif
+                                                                @if ($p->revision_count !== null)
+                                                                    <span style="font-size:10px; font-weight:600; color:#6b7280; background:rgba(156,163,175,0.08); padding:2px 6px; border-radius:5px; white-space:nowrap;">
+                                                                        Rev: {{ $p->revision_count === 0 ? 'Original' : $p->revision_count }}
+                                                                    </span>
+                                                                @endif
+                                                                @if ($p->effectivity_date)
+                                                                    <span style="font-size:10px; font-weight:600; color:#6b7280; background:rgba(156,163,175,0.08); padding:2px 6px; border-radius:5px; white-space:nowrap;">
+                                                                        Effective: {{ \Carbon\Carbon::parse($p->effectivity_date)->format('M d, Y') }}
+                                                                    </span>
+                                                                @endif
+                                                                @if ($p->policy_date)
+                                                                    <span style="font-size:10px; font-weight:600; color:#6b7280; background:rgba(156,163,175,0.08); padding:2px 6px; border-radius:5px; white-space:nowrap;">
+                                                                        Year: {{ $p->policy_date }}
+                                                                    </span>
+                                                                @endif
+                                                            </div>
+
+                                                            <div class="ih-card-cta text-gray-400 font-semibold italic" style="color: #9ca3af; background: none; border: none; padding: 0;">
+                                                                <i class="fas fa-exclamation-circle" style="font-size:9px; margin-right: 2px;"></i>
+                                                                Link pending upload
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        @endforeach
+                                    </div>
                                 </div>
                             @endif
                         @else
@@ -568,26 +699,26 @@
 
     function ihRunSearch(term) {
         term = term.toLowerCase().trim();
-        var anyVisible = false;
+
+        var policiesBrowseView = document.getElementById('policies-browse-view');
+        var policiesSearchView = document.getElementById('policies-search-view');
+
+        if (term === '') {
+            if (policiesBrowseView) policiesBrowseView.style.display = 'block';
+            if (policiesSearchView) policiesSearchView.style.display = 'none';
+        } else {
+            if (policiesBrowseView) policiesBrowseView.style.display = 'none';
+            if (policiesSearchView) policiesSearchView.style.display = 'block';
+        }
 
         document.querySelectorAll('.ih-resource-card').forEach(function (card) {
             var haystack = card.getAttribute('data-search') || '';
             var show = term === '' || haystack.includes(term);
             card.style.display = show ? '' : 'none';
-            if (show) anyVisible = true;
-        });
-
-        // Filter category cards under Policies tab
-        document.querySelectorAll('.policy-category-card').forEach(function (card) {
-            var haystack = card.getAttribute('data-search') || '';
-            var show = term === '' || haystack.includes(term);
-            card.style.display = show ? '' : 'none';
-            if (show) anyVisible = true;
         });
 
         // Hide/show entire sections if all their cards are hidden
         document.querySelectorAll('.ih-section').forEach(function (section) {
-            var visibleCards = section.querySelectorAll('.ih-resource-card:not([style*="display: none"]):not([style*="display:none"])');
             var hasVisible = false;
             section.querySelectorAll('.ih-resource-card').forEach(function(c){
                 if (c.style.display !== 'none') hasVisible = true;
@@ -595,7 +726,19 @@
             section.style.display = hasVisible ? '' : 'none';
         });
 
-        noResults.style.display = (term !== '' && !anyVisible) ? 'block' : 'none';
+        // Check active tab visibility
+        var activeTab = document.querySelector('.ih-tab-content:not(.hidden)');
+        var activeHasVisible = false;
+        if (activeTab) {
+            activeTab.querySelectorAll('.ih-resource-card').forEach(function (c) {
+                if (c.style.display !== 'none') activeHasVisible = true;
+            });
+            if (term === '' && activeTab.id === 'ihtab-policies' && policiesBrowseView) {
+                activeHasVisible = true;
+            }
+        }
+
+        noResults.style.display = (term !== '' && !activeHasVisible) ? 'block' : 'none';
     }
 
     searchInput.addEventListener('input', function () { ihRunSearch(this.value); });

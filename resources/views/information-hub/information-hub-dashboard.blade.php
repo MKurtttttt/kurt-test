@@ -1150,14 +1150,18 @@
         for (const [categoryName, categoryPolicies] of Object.entries(policiesData)) {
             const policiesList = Object.values(categoryPolicies);
             policiesList.forEach(p => {
-                const titleLower = p.title.toLowerCase();
+                const titleLower = (p.title || '').toLowerCase();
                 const descLower = (p.description || '').toLowerCase();
+                const codeLower = (p.document_code || '').toLowerCase();
+                const catLower = categoryName.toLowerCase();
+                const dateLower = (p.policy_date || '').toLowerCase();
                 
-                if (titleLower.includes(searchTerm) || descLower.includes(searchTerm)) {
+                if (titleLower.includes(searchTerm) || descLower.includes(searchTerm) || codeLower.includes(searchTerm) || catLower.includes(searchTerm) || dateLower.includes(searchTerm)) {
                     hasResults = true;
                     
                     // Determine matching category icon class
                     const iconClass = getCategoryIcon(categoryName);
+                    const hasUrl = p.url && p.url.trim() !== '';
 
                     resultsHTML += `
                         <div class="link-card bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-row items-center gap-6 md:gap-8">
@@ -1169,14 +1173,26 @@
                                     <h4 class="link-card-title text-lg md:text-2xl font-bold text-red-955 hover:text-red-700 transition leading-snug mb-2 line-clamp-2">
                                         ${highlightText(p.title, searchTerm)}
                                     </h4>
-                                    <p class="text-xs md:text-sm text-gray-500 font-medium mb-4">
+                                    <p class="text-xs md:text-sm text-gray-500 font-medium mb-3">
                                         ${categoryName} &bull; Policy
                                     </p>
+                                    <div class="flex flex-wrap gap-2 mb-3">
+                                        ${p.document_code ? `<span class="text-[11px] font-semibold text-[#8a6a1e] bg-[rgba(197,160,89,0.12)] px-2 py-0.5 rounded uppercase">Code: ${p.document_code}</span>` : ''}
+                                        ${p.revision_count !== null && p.revision_count !== undefined ? `<span class="text-[11px] font-semibold text-[#8a6a1e] bg-[rgba(197,160,89,0.12)] px-2 py-0.5 rounded">Rev: ${p.revision_count === 0 ? 'Original' : p.revision_count}</span>` : ''}
+                                        ${p.effectivity_date ? `<span class="text-[11px] font-semibold text-[#8a6a1e] bg-[rgba(197,160,89,0.12)] px-2 py-0.5 rounded">Effective: ${p.effectivity_date}</span>` : ''}
+                                        ${p.policy_date ? `<span class="text-[11px] font-semibold text-[#8a6a1e] bg-[rgba(197,160,89,0.12)] px-2 py-0.5 rounded">Year: ${p.policy_date}</span>` : ''}
+                                    </div>
                                 </div>
                                 <div>
-                                    <a href="${p.url}" target="_blank" class="inline-flex items-center text-xs md:text-sm font-semibold text-red-700 hover:text-red-900 transition-colors">
-                                        [ Click here to view ]
-                                    </a>
+                                    ${hasUrl ? `
+                                        <a href="${p.url}" target="_blank" class="inline-flex items-center text-xs md:text-sm font-semibold text-red-700 hover:text-red-900 transition-colors">
+                                            [ Click here to view ]
+                                        </a>
+                                    ` : `
+                                        <span class="inline-flex items-center text-xs md:text-sm font-semibold text-gray-400 italic">
+                                            [ Link pending upload ]
+                                        </span>
+                                    `}
                                 </div>
                             </div>
                         </div>
