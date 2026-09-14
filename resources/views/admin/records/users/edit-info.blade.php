@@ -350,19 +350,19 @@
                     <label for="email" class="block text-sm font-semibold text-gray-700">Email</label>
                     <input type="email" id="email" name="email"
                         class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-red-900 focus:border-red-900"
-                        value="{{ old('email', $data->login->email) }}" required>
+                        value="{{ old('email', $data->login->email) }}" autocomplete="off" required>
                 </div>
                 <div class="mt-4">
                     <label for="password" class="block text-sm font-semibold text-gray-700">New Password</label>
                     <input type="password" id="password" name="password"
                         class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-red-900 focus:border-red-900"
-                        placeholder="Leave blank if not changing">
+                        placeholder="Leave blank if not changing" autocomplete="new-password">
                 </div>
                 <div class="mt-4">
                     <label for="password_confirmation" class="block text-sm font-semibold text-gray-700">Confirm New Password</label>
                     <input type="password" id="password_confirmation" name="password_confirmation"
                         class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-red-900 focus:border-red-900"
-                        placeholder="Leave blank if not changing">
+                        placeholder="Leave blank if not changing" autocomplete="new-password">
                 </div>
                 <div class="mt-4">
                     <label for="role" class="block text-sm font-semibold text-gray-700">Role</label>
