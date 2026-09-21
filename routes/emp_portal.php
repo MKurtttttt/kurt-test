@@ -596,6 +596,8 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('iso.idc.reset.system');
     Route::delete('/iso/idc/{ticket}/delete', [IsoDocumentController::class, 'deleteTicket'])
         ->name('iso.idc.delete.ticket');
+    Route::delete('/iso/tickets/{ticket}/documents/{documentId}', [IsoDocumentController::class, 'removeTicketDocument'])
+        ->name('iso.tickets.document.remove');
     
     /*------------------------------------------------------------------
     | 23. ISO Document Management

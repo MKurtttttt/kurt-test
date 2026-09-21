@@ -52,6 +52,7 @@
                                 <th class="px-3 py-2 text-left">Nature of Document Modification</th>
                                 <th class="px-3 py-2 text-left">Source</th>
                                 <th class="px-3 py-2 text-left">Status</th>
+                                <th class="px-3 py-2 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="detail_documents_list">

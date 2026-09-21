@@ -521,6 +521,57 @@ class IsoDocumentController extends Controller
         }
     }
 
+    // ==================================
+    // Remove Individual Document from Ticket
+    // ==================================
+    public function removeTicketDocument(IsoTicket $ticket, $documentId){
+        // Auth check: only IDC Admin, SuperAdmin, or the ticket creator
+        $user = auth()->user();
+        $isIdcAdmin = in_array($user->role, ['IDC Admin', 'SuperAdmin']);
+        $isOwner = ($ticket->created_by === $user->id);
+
+        if (!$isIdcAdmin && !$isOwner) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
+        // Prevent modifying registered tickets
+        if ($ticket->is_registered) {
+            return response()->json(['success' => false, 'message' => 'Cannot remove documents from a registered ticket.'], 403);
+        }
+
+        // Find document belonging to this ticket
+        $document = $ticket->documents()->where('id', $documentId)->first();
+        if (!$document) {
+            return response()->json(['success' => false, 'message' => 'Document not found in this ticket.'], 404);
+        }
+
+        // Ensure ticket has at least one document
+        if ($ticket->documents()->count() <= 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'A ticket must contain at least one document. To remove the entire ticket, please delete the ticket.'
+            ], 422);
+        }
+
+        try {
+            $document->delete();
+
+            // Recalculate ticket status based on remaining documents
+            $this->recalculateTicketStatus($ticket);
+            $ticket->refresh();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Document removed successfully.',
+                'remaining_count' => $ticket->documents()->count(),
+                'ticket_status' => $ticket->status
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Remove document from ticket failed: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to remove document. Please try again.'], 500);
+        }
+    }
+
     public function resetSystem(Request $request){
         // Double check if user is IDC Admin
         $userRole = auth()->user()->role;

@@ -554,7 +554,7 @@ function getStatusColor($status){
                     <span class="inline-block px-2 py-1 text-xs rounded ${getStatusColorJS(doc.status)}">${formatStatusText(doc.status)}</span>
                 </td>
                 <td class="px-3 py-2">
-                    <div class="flex gap-2 justify-center">
+                    <div class="flex gap-2 justify-center items-center">
                         ${isRegistered
                             ? `<span class="text-xs text-gray-500 italic">Locked</span>`
                             : `
@@ -565,6 +565,11 @@ function getStatusColor($status){
                             <button onclick="updateDocStatus(${doc.id}, 'on_hold')"
                                 class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold">
                                 On-Hold
+                            </button>
+                            <button onclick="removeDocFromTicket(${doc.id}, '${escapeForJs(doc.document_code)}', ${ticketId})"
+                                class="w-6 h-6 rounded-full bg-red-50 hover:bg-red-200 text-red-600 hover:text-red-800 flex items-center justify-center font-bold text-sm leading-none transition"
+                                title="Remove document from ticket">
+                                &times;
                             </button>`
                         }
                     </div>
@@ -637,8 +642,42 @@ function getStatusColor($status){
     });
 
     // ============================================
+    // REMOVE ATTACHED DOCUMENT FROM TICKET
+    // ============================================
+    function removeDocFromTicket(documentId, documentCode, ticketId) {
+        if (!confirm(`Are you sure you want to remove document "${documentCode}" from this ticket?\n\nThis action cannot be undone.`)) {
+            return;
+        }
+
+        fetch(`/iso/tickets/${ticketId}/documents/${documentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message || 'Document removed successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error removing document:', error);
+            alert('An error occurred while removing the document. Please try again.');
+        });
+    }
+
+    // ============================================
     // Helper Functions
     // ============================================
+    function escapeForJs(str) {
+        if (!str) return '';
+        return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
     function formatStatusText(status) {
         let text = status.replace(/_/g, ' ');
         text = text.charAt(0).toUpperCase() + text.slice(1);
