@@ -60,10 +60,13 @@ class PolicyController extends Controller
         $categories = PolicyCategory::orderBy('name', 'asc')->get();
         $policyYears = Policy::whereNotNull('policy_date')->pluck('policy_date')->unique()->filter()->sort()->values()->toArray();
 
+        $category = $categoryId;
+
         return view('iso.management.policies.index', compact(
             'policies', 
             'searchQuery', 
             'categoryId', 
+            'category',
             'categories', 
             'revisionFilter', 
             'policyYear', 
