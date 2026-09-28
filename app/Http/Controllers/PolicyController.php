@@ -109,18 +109,21 @@ class PolicyController extends Controller
         $rev = $request->filled('revision_count') ? intval($request->revision_count) : 0;
         $title = trim($request->title);
 
-        // Check for duplicates
-        $duplicateQuery = Policy::query();
+        // Check for duplicates (same title + same code + same revision)
+        $duplicateQuery = Policy::query()
+            ->where('title', $title)
+            ->where('revision_count', $rev);
+
         if ($code) {
-            $duplicateQuery->where('document_code', $code)->where('revision_count', $rev);
+            $duplicateQuery->where('document_code', $code);
         } else {
-            $duplicateQuery->where('title', $title)->where('revision_count', $rev);
+            $duplicateQuery->whereNull('document_code');
         }
 
         if ($duplicateQuery->exists()) {
             return back()->withInput()->withErrors([
-                'document_code' => $code 
-                    ? "A policy with document code '{$code}' and revision '{$rev}' already exists."
+                'title' => $code 
+                    ? "A policy with title '{$title}', document code '{$code}', and revision '{$rev}' already exists."
                     : "A policy with title '{$title}' and revision '{$rev}' already exists."
             ]);
         }
@@ -177,18 +180,21 @@ class PolicyController extends Controller
         $rev = $request->filled('revision_count') ? intval($request->revision_count) : 0;
         $title = trim($request->title);
 
-        // Check for duplicates (excluding the current record)
-        $duplicateQuery = Policy::where('id', '!=', $id);
+        // Check for duplicates (excluding the current record - same title + same code + same revision)
+        $duplicateQuery = Policy::where('id', '!=', $id)
+            ->where('title', $title)
+            ->where('revision_count', $rev);
+
         if ($code) {
-            $duplicateQuery->where('document_code', $code)->where('revision_count', $rev);
+            $duplicateQuery->where('document_code', $code);
         } else {
-            $duplicateQuery->where('title', $title)->where('revision_count', $rev);
+            $duplicateQuery->whereNull('document_code');
         }
 
         if ($duplicateQuery->exists()) {
             return back()->withInput()->withErrors([
-                'document_code' => $code 
-                    ? "A policy with document code '{$code}' and revision '{$rev}' already exists."
+                'title' => $code 
+                    ? "A policy with title '{$title}', document code '{$code}', and revision '{$rev}' already exists."
                     : "A policy with title '{$title}' and revision '{$rev}' already exists."
             ]);
         }

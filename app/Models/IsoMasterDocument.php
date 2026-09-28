@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class IsoMasterDocument extends Model
 {
     protected $fillable = [
-        'document_code', 'document_title', 'source_type', 'specific_type',
+        'document_code', 'document_title', 'revised_document_title', 'source_type', 'specific_type',
         'originating_section', 'current_revision', 'is_original', 'original_document_id',
         'status', 'registered_at', 'superseded_at', 'deleted_at', 'source', 'ticket_id',
         'ticket_document_id',

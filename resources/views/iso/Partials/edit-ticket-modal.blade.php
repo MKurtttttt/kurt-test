@@ -158,9 +158,38 @@
                                         <span id="edit_preview_source"></span>
                                     </div>
                                     <div class="col-span-2">
-                                        <span class="text-gray-600">Title: </span>
-                                        <span id="edit_preview_title"></span>
+                                        <span class="text-gray-600">Original Title: </span>
+                                        <span id="edit_preview_title" class="font-medium text-gray-800"></span>
                                     </div>
+                                </div>
+
+                                <!-- Title update field for REVISION -->
+                                <div id="edit_revision_title_field" class="mt-3 pt-3 border-t border-gray-200" style="display:none;">
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1 flex items-center justify-between">
+                                        <span>Document Title (New Revision) <span class="text-red-500">*</span></span>
+                                        <span id="edit_staged_title_badge" class="inline-flex items-center text-[10px] font-semibold text-amber-800 bg-amber-100 border border-amber-300 rounded px-1.5 py-0.5" style="display:none;">
+                                            Staged by IDC Admin
+                                        </span>
+                                    </label>
+                                    @php
+                                        $isIdcAdmin = in_array(auth()->user()->role ?? '', ['IDC Admin', 'SuperAdmin']);
+                                    @endphp
+                                    <input type="text" id="edit_revision_doc_title" 
+                                        class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 {{ !$isIdcAdmin ? 'bg-gray-100 text-gray-700 cursor-not-allowed' : '' }}"
+                                        placeholder="Enter revised document title..."
+                                        {{ !$isIdcAdmin ? 'readonly' : '' }}>
+                                    @if($isIdcAdmin)
+                                        <small class="text-gray-500 block mt-1">
+                                            Update this if the document title changed for this revision, or leave as is to keep the original title.
+                                        </small>
+                                    @else
+                                        <small class="text-gray-500 block mt-1 flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                            </svg>
+                                            <span>Document titles are managed by IDC Admin in the Document Titles Management module.</span>
+                                        </small>
+                                    @endif
                                 </div>
                             </div>
                         </div>

@@ -1,0 +1,11 @@
+UPDATE iso_master_documents SET registered_at = '2025-05-01', superseded_at = NULL, deleted_at = '2026-02-11', status = 'Deleted' WHERE document_code = 'FM-EAC-PRO-9005' AND current_revision = 0;
+UPDATE iso_master_documents SET registered_at = '2025-05-01', superseded_at = NULL, deleted_at = '2026-02-11', status = 'Deleted' WHERE document_code = 'FM-EAC-PRO-9006' AND current_revision = 0;
+UPDATE iso_master_documents SET registered_at = '2025-05-01', superseded_at = NULL, deleted_at = '2026-02-11', status = 'Deleted' WHERE document_code = 'PD-EAC-PRO-9006' AND current_revision = 0;
+UPDATE iso_master_documents SET registered_at = '2025-05-01', superseded_at = NULL, deleted_at = '2026-04-07', status = 'Deleted' WHERE document_code = 'FM-OOP-1001' AND current_revision = 0;
+UPDATE iso_master_documents SET registered_at = '2025-05-01', superseded_at = '2026-04-22', deleted_at = NULL, status = 'Active' WHERE document_code = '3.RMM-CSD-MCM' AND current_revision = 1;
+UPDATE iso_master_documents SET registered_at = '2025-05-01', superseded_at = '2026-04-22', deleted_at = NULL, status = 'Active' WHERE document_code = '3.RMM-CSD-PCO' AND current_revision = 1;
+UPDATE iso_master_documents SET registered_at = '2025-05-01', superseded_at = NULL, deleted_at = '2026-06-29', status = 'Deleted' WHERE document_code = 'FM-OOP-ITS-1002' AND current_revision = 0;
+UPDATE iso_master_documents SET registered_at = '2025-05-01', superseded_at = NULL, deleted_at = '2026-06-29', status = 'Deleted' WHERE document_code = 'FM-OOP-ITS-1003' AND current_revision = 0;
+UPDATE iso_master_documents SET registered_at = '2025-05-01', superseded_at = NULL, deleted_at = '2026-06-29', status = 'Deleted' WHERE document_code = 'FM-OOP-ITS-1004' AND current_revision = 0;
+UPDATE iso_master_documents SET registered_at = '2025-05-01', superseded_at = NULL, deleted_at = '2026-06-29', status = 'Deleted' WHERE document_code = 'FM-OOP-ITS-1008' AND current_revision = 0;
+UPDATE iso_master_documents SET registered_at = '2025-05-01', superseded_at = NULL, deleted_at = '2026-06-29', status = 'Deleted' WHERE document_code = 'FM-OOP-ITS-1009' AND current_revision = 0;

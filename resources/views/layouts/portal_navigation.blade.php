@@ -8,14 +8,14 @@
             <!-- profile card -->
             <div class="w-[90%] grid grid-cols-[20%_80%] bg-red-800 rounded-md py-2 px-1 text-white border border-white border-opacity-10">
                 <div class="flex justify-center items-center">
-                    @if(Auth::user()->user->profile_picture == '')
+                    @if(!Auth::user()->user || empty(Auth::user()->user->profile_picture))
                     <img src = "{{asset('images/blankdp.jpg')}}" class="w-[35px] h-[35px] rounded-xl ">
                     @else
                     <img src = "{{asset('storage/profile_pictures/' . Auth::user()->user->profile_picture)}}" class="w-[35px] h-[35px] rounded-full">
                     @endif
                 </div>
                 <div class="w-full flex flex-col justify-start items-start">
-                    <h1 class="font-bold text-sm break-words">{{ Auth::user()->user->emp_lname . ', ' . Auth::user()->user->emp_fname . ' ' . Auth::user()->user->emp_mname }}</h1>
+                    <h1 class="font-bold text-sm break-words">{{ Auth::user()->user ? (Auth::user()->user->emp_lname . ', ' . Auth::user()->user->emp_fname . ' ' . Auth::user()->user->emp_mname) : (Auth::user()->name ?? 'User') }}</h1>
                     <h1 class="text-gray-100 text-[0.8rem] break-words">{{ Auth::user()->email }}</h1>
                 </div>
             </div>

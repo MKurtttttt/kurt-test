@@ -598,6 +598,8 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('iso.idc.delete.ticket');
     Route::delete('/iso/tickets/{ticket}/documents/{documentId}', [IsoDocumentController::class, 'removeTicketDocument'])
         ->name('iso.tickets.document.remove');
+    Route::put('/iso/idc/tickets/{ticket}/update-details', [IsoDocumentController::class, 'updateTicketDetailsByAdmin'])
+        ->name('iso.idc.ticket.update-details');
     
     /*------------------------------------------------------------------
     | 23. ISO Document Management
@@ -631,6 +633,14 @@ Route::middleware('auth','revalidate')->group(function () {
         ->name('iso.management.departments.update');
     Route::delete('iso/management/departments/{id}', [IsoManagementController::class, 'departmentsDestroy'])
         ->name('iso.management.departments.destroy');
+
+    // ISO Management - Document Titles for Revision
+    Route::get('iso/management/document-titles', [IsoManagementController::class, 'documentTitlesIndex'])
+        ->name('iso.management.titles.index');
+    Route::put('iso/management/document-titles/{id}', [IsoManagementController::class, 'documentTitlesUpdate'])
+        ->name('iso.management.titles.update');
+    Route::delete('iso/management/document-titles/{id}/clear', [IsoManagementController::class, 'documentTitlesClear'])
+        ->name('iso.management.titles.clear');
 
     // ISO Management - Policy CRUD
     Route::get('iso/management/policies', [PolicyController::class, 'index'])

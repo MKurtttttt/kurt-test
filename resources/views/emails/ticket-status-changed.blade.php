@@ -25,6 +25,13 @@
         .status-approved { background-color: #d1fae5; color: #0a9b1d; }
         .status-on_hold { background-color: #fee2e2; color: #991b1b; }
 
+        /* Documents Table */
+        .doc-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 20px 0; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+        .doc-table th { background-color: #f9fafb; text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb; }
+        .doc-table td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+        .doc-table tr:last-child td { border-bottom: none; }
+        .all-approved-badge { background-color: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 12px 16px; border-radius: 8px; margin: 18px 0; font-size: 13px; font-weight: 600; text-align: center; }
+
         /* Info Grid */
         .info-box { margin: 24px 0; border-top: 1px solid #f3f4f6; padding-top: 20px; }
         .info-row { display: flex; margin-bottom: 12px; font-size: 14px; }
@@ -61,6 +68,40 @@
                     {{ str_replace('_', ' ', $ticket->status) }}
                 </span>
             </div>
+
+            @if ($ticket->status === 'approved')
+                <div class="all-approved-badge">
+                    &#10003; All documents in this ticket have been successfully reviewed and approved.
+                </div>
+            @endif
+
+            @if ($ticket->documents && $ticket->documents->count() > 0)
+                <div style="font-size: 13px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 20px; margin-bottom: 8px;">
+                    Documents in this Ticket ({{ $ticket->documents->count() }})
+                </div>
+                <table class="doc-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($ticket->documents as $doc)
+                            <tr>
+                                <td><strong>{{ $doc->document_code }}</strong></td>
+                                <td>{{ $doc->document_title }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ $doc->status }}">
+                                        {{ str_replace('_', ' ', $doc->status) }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
 
             <div class="info-box">
                 <div class="info-row">

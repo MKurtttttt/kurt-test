@@ -73,14 +73,14 @@
                             <button type="button" 
                                     id="filter-toggle-btn"
                                     onclick="toggleAdvancedFilters()"
-                                    class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:text-[#70121D] hover:border-red-200 transition-all text-sm font-semibold shadow-sm duration-200 {{ (!empty($category) || !empty($revisionFilter) || !empty($policyYear)) ? 'bg-[#70121D]/5 text-[#70121D] border-[#70121D]/30' : '' }}"
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:text-[#70121D] hover:border-red-200 transition-all text-sm font-semibold shadow-sm duration-200 {{ (!empty($categoryId) || !empty($category) || !empty($revisionFilter) || !empty($policyYear)) ? 'bg-[#70121D]/5 text-[#70121D] border-[#70121D]/30' : '' }}"
                                     style="height: 42px;">
                                 <i class="bi bi-sliders text-base leading-none"></i>
                                 <span>Filters</span>
                             </button>
                             
                             <!-- Clear Button if filters active -->
-                            @if(!empty($query) || !empty($category) || !empty($revisionFilter) || !empty($policyYear))
+                            @if(!empty($query) || !empty($categoryId) || !empty($category) || !empty($revisionFilter) || !empty($policyYear))
                                 <a href="{{ route('iso.management.policies.index') }}" 
                                    class="inline-flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold border border-gray-200 transition-all shadow-sm" 
                                    style="height: 42px;"
@@ -93,7 +93,7 @@
 
                     <!-- Collapsible Advanced Filters Section -->
                     <div id="advanced-filters-panel" 
-                         class="{{ (!empty($category) || !empty($revisionFilter) || !empty($policyYear)) ? '' : 'hidden' }} mt-4 p-5 bg-gray-50/50 rounded-2xl border border-gray-200/50">
+                         class="{{ (!empty($categoryId) || !empty($category) || !empty($revisionFilter) || !empty($policyYear)) ? '' : 'hidden' }} mt-4 p-5 bg-gray-50/50 rounded-2xl border border-gray-200/50">
                         <div class="advanced-filters-grid">
                             <!-- Category Filter -->
                             <div>
@@ -202,7 +202,17 @@
                                 </td>
                                 <!-- Effectivity Date -->
                                 <td class="px-6 py-4 font-medium text-gray-600 whitespace-nowrap">
-                                    {{ $policy->effectivity_date ? \Carbon\Carbon::parse($policy->effectivity_date)->format('M j, Y') : 'N/A' }}
+                                    @php
+                                        $formattedEffectivity = 'N/A';
+                                        if (!empty($policy->effectivity_date)) {
+                                            try {
+                                                $formattedEffectivity = \Carbon\Carbon::parse($policy->effectivity_date)->format('M j, Y');
+                                            } catch (\Exception $e) {
+                                                $formattedEffectivity = $policy->effectivity_date;
+                                            }
+                                        }
+                                    @endphp
+                                    {{ $formattedEffectivity }}
                                 </td>
                                 <!-- Policy Date -->
                                 <td class="px-6 py-4 text-center font-medium text-gray-600 whitespace-nowrap">
@@ -248,8 +258,8 @@
             @if($policies->hasPages())
                 <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
                     {{ $policies->appends([
-                        'query' => $query,
-                        'category' => $category,
+                        'query' => $query ?? '',
+                        'category' => $categoryId ?? $category ?? '',
                         'revision_filter' => $revisionFilter ?? '',
                         'policy_year' => $policyYear ?? ''
                     ])->links() }}

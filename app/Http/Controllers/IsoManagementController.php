@@ -340,4 +340,151 @@ class IsoManagementController extends Controller
         return redirect()->route('iso.management.departments.index')
             ->with('success', 'Department deleted successfully.');
     }
+
+    // ==================================
+    // Document Titles Management (Specifically for Revision)
+    // ==================================
+    public function documentTitlesIndex(Request $request)
+    {
+        $this->authorizeManagement();
+
+        $query = IsoMasterDocument::where('status', 'Active');
+
+        $searchQuery = $request->input('query');
+        $officeFilter = $request->input('office');
+        $revisionFilter = $request->input('has_staged_title');
+
+        if (!empty($searchQuery)) {
+            $query->where(function ($q) use ($searchQuery) {
+                $q->where('document_code', 'LIKE', "%{$searchQuery}%")
+                  ->orWhere('document_title', 'LIKE', "%{$searchQuery}%")
+                  ->orWhere('revised_document_title', 'LIKE', "%{$searchQuery}%");
+            });
+        }
+
+        if (!empty($officeFilter)) {
+            $query->where('originating_section', $officeFilter);
+        }
+
+        if ($revisionFilter === 'yes') {
+            $query->whereNotNull('revised_document_title');
+        } elseif ($revisionFilter === 'no') {
+            $query->whereNull('revised_document_title');
+        }
+
+        $documents = $query->orderBy('originating_section', 'asc')
+            ->orderBy('document_code', 'asc')
+            ->paginate(20)
+            ->withQueryString();
+
+        // Check for in-flight active tickets for documents on the current page
+        $docCodes = $documents->pluck('document_code')->filter()->unique();
+        $activeTicketsByCode = \App\Models\IsoTicketDocument::whereIn('document_code', $docCodes)
+            ->whereHas('ticket', function ($q) {
+                $q->whereIn('status', ['pending', 'submitted_to_idc', 'with_qmr', 'on_hold']);
+            })
+            ->with('ticket:id,ticket_number,status,originating_section')
+            ->get()
+            ->keyBy('document_code');
+
+        // Get distinct active originating sections for filter dropdown
+        $offices = IsoMasterDocument::where('status', 'Active')
+            ->whereNotNull('originating_section')
+            ->where('originating_section', '!=', '')
+            ->distinct()
+            ->orderBy('originating_section', 'asc')
+            ->pluck('originating_section');
+
+        return view('iso.management.titles.index', compact('documents', 'offices', 'searchQuery', 'officeFilter', 'revisionFilter', 'activeTicketsByCode'))
+            ->with('query', $searchQuery);
+    }
+
+    public function documentTitlesUpdate(Request $request, $id)
+    {
+        $this->authorizeManagement();
+
+        $request->validate([
+            'revised_document_title' => 'required|string|max:255',
+        ]);
+
+        $document = IsoMasterDocument::findOrFail($id);
+
+        if ($document->status !== 'Active') {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only active documents can have a revision title staged.',
+                ], 422);
+            }
+            return redirect()->back()
+                ->with('error', 'Only active documents can have a revision title staged.');
+        }
+
+        $newTitle = trim($request->revised_document_title);
+
+        // If the new title is identical to the current active title, clear staged title
+        if (strtolower($newTitle) === strtolower($document->document_title)) {
+            $document->update([
+                'revised_document_title' => null,
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "The revision title is identical to the current active title. Staged revision title was cleared.",
+                    'revised_title' => null,
+                ]);
+            }
+
+            return redirect()->back()
+                ->with('success', "The revision title is identical to the current active title. Staged revision title was cleared.");
+        }
+
+        $document->update([
+            'revised_document_title' => $newTitle,
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Revision title for {$document->document_code} updated successfully.",
+                'revised_title' => $newTitle,
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('success', "Revision title for {$document->document_code} updated successfully.");
+    }
+
+    public function documentTitlesClear(Request $request, $id)
+    {
+        $this->authorizeManagement();
+
+        $document = IsoMasterDocument::findOrFail($id);
+
+        if ($document->status !== 'Active') {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only active documents can have a revision title cleared.',
+                ], 422);
+            }
+            return redirect()->back()
+                ->with('error', 'Only active documents can have a revision title cleared.');
+        }
+
+        $document->update([
+            'revised_document_title' => null,
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Staged revision title for {$document->document_code} cleared.",
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('success', "Staged revision title for {$document->document_code} cleared.");
+    }
 }

@@ -236,7 +236,7 @@
             </div>
             <div class="logout">
                 <div class="dropdown-container">
-                    @if (Auth::user()->user->profile_picture)
+                    @if (Auth::user()->user && Auth::user()->user->profile_picture)
                         <button class="dropdown-btn">
                             <img src="{{asset('storage/profile_pictures/' . Auth::user()->user->profile_picture)}}" class ="w-11 h-11 rounded-full" alt="User Icon" >
                         </button>

@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use App\Mail\TicketStatusChanged;
+use App\Mail\DocumentStatusUpdated;
 
 class IsoDocumentController extends Controller 
 {
@@ -42,7 +44,7 @@ class IsoDocumentController extends Controller
         $this->searchFilter($query, $search);
 
         // Execute the query with document count and ordering
-        $tickets = $query->with('documents', 'creator.user')
+        $tickets = $query->with(['documents.revisingMasterDocument', 'creator.user'])
             ->withCount('documents')
             ->orderBy('created_at','desc')
             ->get();
@@ -100,7 +102,7 @@ class IsoDocumentController extends Controller
                 'specific_type',
                 'status',
                 'revising_master_document_id'
-            );
+            )->with('revisingMasterDocument');
         }]);
 
         // Return the ticket data as JSON for the model
@@ -163,12 +165,34 @@ class IsoDocumentController extends Controller
         // Delete all existing documents for the current ticket
         $ticket->documents()->delete();
 
+        $isIdcAdmin = in_array(auth()->user()->role ?? '', ['IDC Admin', 'SuperAdmin']);
+
         // Recreate documents with the new list
         foreach ($documents as $document){
+            $docTitle = trim($document['title'] ?? '');
+
+            // For deletions, title MUST be the master document's original title
+            if ($document['classification'] === 'deletion' && !empty($document['revisingMasterId'])) {
+                $masterDoc = IsoMasterDocument::find($document['revisingMasterId']);
+                if ($masterDoc) {
+                    $docTitle = $masterDoc->document_title;
+                }
+            } elseif ($document['classification'] === 'revision' && !empty($document['revisingMasterId'])) {
+                $masterDoc = IsoMasterDocument::find($document['revisingMasterId']);
+                if ($masterDoc) {
+                    if (!$isIdcAdmin) {
+                        // Regular employee: enforce title from master (staged revision title if set, else original title)
+                        $docTitle = (!empty($masterDoc->revised_document_title) && trim($masterDoc->revised_document_title) !== '')
+                            ? trim($masterDoc->revised_document_title)
+                            : $masterDoc->document_title;
+                    }
+                }
+            }
+
             IsoTicketDocument::create([
                 'ticket_id' => $ticket->id,
                 'document_code' => $document['code'],
-                'document_title'=> $document['title'],
+                'document_title'=> $docTitle,
                 'classification'=> $document['classification'],
                 'source_type'=> $document['source'],
                 'specific_type'=> $document['specificType'],
@@ -250,12 +274,34 @@ class IsoDocumentController extends Controller
             'created_by' => auth()->id()
         ]);
         
+        $isIdcAdmin = in_array(auth()->user()->role ?? '', ['IDC Admin', 'SuperAdmin']);
+        
         // Save each document
         foreach($documents as $document){
+            $docTitle = trim($document['title'] ?? '');
+
+            // For deletions, title MUST be the master document's original title
+            if ($document['classification'] === 'deletion' && !empty($document['revisingMasterId'])) {
+                $masterDoc = IsoMasterDocument::find($document['revisingMasterId']);
+                if ($masterDoc) {
+                    $docTitle = $masterDoc->document_title;
+                }
+            } elseif ($document['classification'] === 'revision' && !empty($document['revisingMasterId'])) {
+                $masterDoc = IsoMasterDocument::find($document['revisingMasterId']);
+                if ($masterDoc) {
+                    if (!$isIdcAdmin) {
+                        // Regular employee: enforce title from master (staged revision title if set, else original title)
+                        $docTitle = (!empty($masterDoc->revised_document_title) && trim($masterDoc->revised_document_title) !== '')
+                            ? trim($masterDoc->revised_document_title)
+                            : $masterDoc->document_title;
+                    }
+                }
+            }
+
             IsoTicketDocument::create([
                 'ticket_id'=> $ticket->id,
                 'document_code' => $document['code'],
-                'document_title'=> $document['title'],
+                'document_title'=> $docTitle,
                 'classification' => $document['classification'],
                 'source_type' => $document['source'],
                 'specific_type' => $document['specificType'],
@@ -339,7 +385,7 @@ class IsoDocumentController extends Controller
         ], $statusCounts);
 
         // Start building the query - IDC should see all the tickets
-        $query = IsoTicket::with(['documents', 'creator.user']);
+        $query = IsoTicket::with(['documents.revisingMasterDocument', 'creator.user']);
 
         // Build query
         if ($statusFilter !== 'all'){
@@ -403,7 +449,8 @@ class IsoDocumentController extends Controller
             'status' => 'required|in:approved,on_hold'
         ]);
 
-        $document = IsoTicketDocument::findorFail($documentId);
+        $document = IsoTicketDocument::findOrFail($documentId);
+        $oldDocStatus = $document->status;
         $document->status = $request->status;
 
         // Auto-set registered_at when approved
@@ -415,9 +462,23 @@ class IsoDocumentController extends Controller
 
         // Check if we need to auto-update each ticket status
         $ticket = $document->ticket;
-        $this->recalculateTicketStatus($ticket);
+        $oldTicketStatus = $ticket->status;
+
+        // Recalculate ticket status without sending ticket-level notification immediately
+        $this->recalculateTicketStatus($ticket, false);
 
         $ticket->refresh();
+
+        $changedBy = 'IDC Admin - ' . (auth()->user()->name ?? 'Administrator');
+
+        // Notification routing:
+        // 1. If the ticket just became fully approved (all documents approved), send the complete ticket approval notification.
+        // 2. Otherwise (partial approval or document on-hold), send the document-specific update notification.
+        if ($ticket->status === 'approved' && $oldTicketStatus !== 'approved') {
+            $this->sendTicketStatusNotification($ticket, $oldTicketStatus, $changedBy);
+        } else {
+            $this->sendDocumentStatusNotification($document, $oldDocStatus, $changedBy);
+        }
 
         return response()->json([
             'success' => true,
@@ -426,7 +487,7 @@ class IsoDocumentController extends Controller
         ]);
     }
 
-    public function recalculateTicketStatus($ticket){
+    public function recalculateTicketStatus($ticket, $sendNotification = true){
         $documents = $ticket->documents;
         $oldStatus = $ticket->status;
 
@@ -439,11 +500,11 @@ class IsoDocumentController extends Controller
             $ticket->status = 'on_hold';
             $ticket->save();
 
-            if($oldStatus !== 'on_hold'){
+            if($sendNotification && $oldStatus !== 'on_hold'){
                 $this->sendTicketStatusNotification(
                     $ticket,
                     $oldStatus,
-                    'IDC Admin - ' . auth()->user()->name
+                    'IDC Admin - ' . (auth()->user()->name ?? 'Administrator')
                 );
             }
             return;
@@ -457,11 +518,11 @@ class IsoDocumentController extends Controller
         if ($allApproved && $documents->count() > 0){
             $ticket->status = 'approved';
             $ticket->save();
-            if($oldStatus !== 'approved'){
+            if($sendNotification && $oldStatus !== 'approved'){
                 $this->sendTicketStatusNotification(
                     $ticket,
                     $oldStatus,
-                    'IDC Admin - ' . auth()->user()->name
+                    'IDC Admin - ' . (auth()->user()->name ?? 'Administrator')
                 );
             }
             return;
@@ -469,19 +530,45 @@ class IsoDocumentController extends Controller
     }
 
     private function sendTicketStatusNotification($ticket, $oldStatus, $changedBy){
-        // Email the Document Handler (Ticket owner)
-        Mail::to($ticket->creator->email)
-            ->send(new TicketStatusChanged($ticket, $oldStatus, $changedBy));
-        // Delay for the free trial of Mailtrap
-        usleep(500000);
+        if (!$ticket || !$ticket->creator || empty($ticket->creator->email)) {
+            return;
+        }
 
-        // Email all the IDC Admins
-        $idcAdmins = User::where('role', 'IDC Admin')->get();
-        foreach ($idcAdmins as $admin){
-            Mail::to($admin->email)
+        try {
+            // Email the Document Handler (Ticket owner)
+            Mail::to($ticket->creator->email)
                 ->send(new TicketStatusChanged($ticket, $oldStatus, $changedBy));
+            
             // Delay for the free trial of Mailtrap
             usleep(500000);
+
+            // Email all the IDC Admins
+            $idcAdmins = User::where('role', 'IDC Admin')->get();
+            foreach ($idcAdmins as $admin){
+                if (!empty($admin->email)) {
+                    Mail::to($admin->email)
+                        ->send(new TicketStatusChanged($ticket, $oldStatus, $changedBy));
+                    // Delay for the free trial of Mailtrap
+                    usleep(500000);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error("Failed to send TicketStatusChanged email: " . $e->getMessage());
+        }
+    }
+
+    private function sendDocumentStatusNotification(IsoTicketDocument $document, $oldDocStatus, $changedBy){
+        $ticket = $document->ticket;
+        if (!$ticket || !$ticket->creator || empty($ticket->creator->email)) {
+            return;
+        }
+
+        try {
+            // Email the Document Handler with partial status update
+            Mail::to($ticket->creator->email)
+                ->send(new DocumentStatusUpdated($document, $ticket, $oldDocStatus, $changedBy));
+        } catch (\Throwable $e) {
+            Log::error("Failed to send DocumentStatusUpdated email: " . $e->getMessage());
         }
     }
 
@@ -572,6 +659,125 @@ class IsoDocumentController extends Controller
         }
     }
 
+    // ==================================
+    // Update Ticket & Document Details by IDC Admin
+    // ==================================
+    public function updateTicketDetailsByAdmin(Request $request, IsoTicket $ticket){
+        // Auth check: only IDC Admin or SuperAdmin
+        $userRole = auth()->user()->role;
+        if (!in_array($userRole, ['IDC Admin', 'SuperAdmin'])) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
+        // Prevent modifying registered tickets
+        if ($ticket->is_registered) {
+            return response()->json(['success' => false, 'message' => 'Cannot modify a registered ticket.'], 403);
+        }
+
+        $validated = $request->validate([
+            'originating_section' => 'nullable|string|max:255',
+            'documents'           => 'required',
+        ]);
+
+        $documents = is_array($validated['documents']) 
+            ? $validated['documents'] 
+            : json_decode($validated['documents'], true);
+
+        if (!is_array($documents) || count($documents) === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'A ticket must contain at least one document.'
+            ], 422);
+        }
+
+        // Validate each document item
+        foreach ($documents as $index => $doc) {
+            $code = trim($doc['document_code'] ?? $doc['code'] ?? '');
+            $title = trim($doc['document_title'] ?? $doc['title'] ?? '');
+            $classification = strtolower(trim($doc['classification'] ?? ''));
+
+            if (empty($code)) {
+                return response()->json(['success' => false, 'message' => "Document #" . ($index + 1) . " requires a Document Code."], 422);
+            }
+            if (empty($title)) {
+                return response()->json(['success' => false, 'message' => "Document #" . ($index + 1) . " requires a Document Title."], 422);
+            }
+            if (!in_array($classification, ['addition', 'revision', 'deletion'])) {
+                return response()->json(['success' => false, 'message' => "Invalid modification type on document #" . ($index + 1) . "."], 422);
+            }
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // 1. Update originating section if provided (SharePoint link & message remain untouched)
+            if (!empty($validated['originating_section'])) {
+                $ticket->update([
+                    'originating_section' => trim($validated['originating_section'])
+                ]);
+            }
+
+            // 2. Track retained document IDs
+            $retainedIds = [];
+
+            foreach ($documents as $doc) {
+                $docId = $doc['id'] ?? null;
+                $code = trim($doc['document_code'] ?? $doc['code'] ?? '');
+                $title = trim($doc['document_title'] ?? $doc['title'] ?? '');
+                $classification = strtolower(trim($doc['classification'] ?? ''));
+                $sourceType = trim($doc['source_type'] ?? $doc['source'] ?? 'forms');
+                $specificType = isset($doc['specific_type']) ? trim($doc['specific_type']) : ($doc['specificType'] ?? null);
+
+                if ($docId && $ticketDoc = $ticket->documents()->where('id', $docId)->first()) {
+                    $updateData = [
+                        'document_code'  => $code,
+                        'document_title' => $title,
+                        'classification' => $classification,
+                        'source_type'    => $sourceType,
+                        'specific_type'  => $specificType ?: null,
+                    ];
+                    if (isset($doc['revising_master_document_id']) || isset($doc['revisingMasterId'])) {
+                        $updateData['revising_master_document_id'] = $doc['revising_master_document_id'] ?? $doc['revisingMasterId'] ?? null;
+                    }
+                    $ticketDoc->update($updateData);
+                    $retainedIds[] = $ticketDoc->id;
+                } else {
+                    $newDoc = $ticket->documents()->create([
+                        'document_code'  => $code,
+                        'document_title' => $title,
+                        'classification' => $classification,
+                        'source_type'    => $sourceType,
+                        'specific_type'  => $specificType ?: null,
+                        'status'         => 'pending',
+                        'revising_master_document_id' => $doc['revising_master_document_id'] ?? $doc['revisingMasterId'] ?? null,
+                    ]);
+                    $retainedIds[] = $newDoc->id;
+                }
+            }
+
+            // 3. Remove any documents not in the retained list
+            $ticket->documents()->whereNotIn('id', $retainedIds)->delete();
+
+            // 4. Recalculate ticket status
+            $this->recalculateTicketStatus($ticket);
+
+            DB::commit();
+
+            $ticket->refresh();
+            $ticket->load('documents.revisingMasterDocument');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ticket and document details updated successfully.',
+                'ticket'  => $ticket,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Update ticket details by admin failed: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to update ticket details. Please try again.'], 500);
+        }
+    }
+
     public function resetSystem(Request $request){
         // Double check if user is IDC Admin
         $userRole = auth()->user()->role;
@@ -614,7 +820,7 @@ class IsoDocumentController extends Controller
 
         $documents = IsoMasterDocument::where('originating_section', $office)
             ->where('status', 'Active')
-            ->select('id', 'document_code', 'document_title', 'source_type', 'specific_type')
+            ->select('id', 'document_code', 'document_title', 'revised_document_title', 'source_type', 'specific_type')
             ->orderBy('document_code')
             ->get();
             
@@ -675,12 +881,14 @@ class IsoDocumentController extends Controller
                         $originalDoc->update([
                             'status' => 'Superseded',
                             'superseded_at'=> $document->registered_at,
+                            'revised_document_title' => null,
                         ]);
                         $originalDoc->timestamps = true; //This too
 
                         $masterDoc = IsoMasterDocument::create([
                             'document_code' => $originalDoc->document_code,
                             'document_title' => $document->document_title,
+                            'revised_document_title' => null,
                             'source_type' => $document->source_type,
                             'specific_type' => $document->specific_type,
                             'originating_section' => $ticket->originating_section,

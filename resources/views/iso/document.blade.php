@@ -661,19 +661,41 @@ function getStatusColor($status){
     document.getElementById('existing_doc_select').addEventListener('change', (e)=>{
         const selectedOption = e.target.options[e.target.selectedIndex];
         const preview = document.getElementById('selected_doc_preview');
+        const revTitleField = document.getElementById('revision_title_field');
+        const revTitleInput = document.getElementById('revision_doc_title');
+        const classification = document.getElementById('doc_classification').value;
 
         if(selectedOption.value){
             const specificType = selectedOption.dataset.specificType || null;
+            const originalTitle = selectedOption.dataset.title;
+            const revisedTitle = selectedOption.dataset.revisedTitle;
+            const effectiveTitle = (revisedTitle && revisedTitle.trim()) ? revisedTitle.trim() : originalTitle;
+
             // show document preview with data from option
             document.getElementById('preview_code').textContent = selectedOption.dataset.code;
-            document.getElementById('preview_title').textContent = selectedOption.dataset.title;
+            document.getElementById('preview_title').textContent = originalTitle;
             document.getElementById('preview_source').textContent = getSourceLabel(
                 selectedOption.dataset.source,
                 specificType
             );
             preview.style.display = 'block';
+
+            const hasStaged = !!(revisedTitle && revisedTitle.trim() && revisedTitle.trim() !== originalTitle);
+            const stagedBadge = document.getElementById('staged_title_badge');
+            if(stagedBadge) stagedBadge.style.display = hasStaged ? 'inline-flex' : 'none';
+
+            if(classification === 'revision' && revTitleField && revTitleInput){
+                revTitleField.style.display = 'block';
+                revTitleInput.value = effectiveTitle || '';
+            } else if(revTitleField){
+                revTitleField.style.display = 'none';
+            }
         } else{
             preview.style.display = 'none';
+            const stagedBadge = document.getElementById('staged_title_badge');
+            if(stagedBadge) stagedBadge.style.display = 'none';
+            if(revTitleField) revTitleField.style.display = 'none';
+            if(revTitleInput) revTitleInput.value = '';
         }
     });
 
@@ -731,15 +753,23 @@ function getStatusColor($status){
             const sourceLabel = getSourceLabel(doc.source, doc.specificType);
             const classLabel = doc.classification.charAt(0).toUpperCase() + doc.classification.slice(1);
 
+            const hasRevisedTitle = doc.classification === 'revision' && doc.originalTitle && doc.originalTitle !== doc.title;
+
             row.innerHTML = `
-                <td class="px-3 py-2">${doc.code}</td>
-                <td class="px-3 py-2">${doc.title}</td>
+                <td class="px-3 py-2">${escapeHtml(doc.code)}</td>
+                <td class="px-3 py-2">
+                    <div class="font-medium text-gray-900">${escapeHtml(doc.title)}</div>
+                    ${hasRevisedTitle ? `
+                        <div class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 mt-0.5 inline-flex items-center gap-1">
+                            <span class="font-semibold">Original:</span> ${escapeHtml(doc.originalTitle)}
+                        </div>` : ''}
+                </td>
                 <td class="px-3 py-2">
                     <span class="inline-block px-2 py-1 text-xs rounded ${getClassificationColor(doc.classification)}">
                         ${classLabel}
                     </span>
                 </td>
-                <td class="px-2 py-2">${sourceLabel}</td>
+                <td class="px-2 py-2">${escapeHtml(sourceLabel)}</td>
                 <td class="px-2 py-2 text-center">
                     <button type="button" onclick="removeDocument(${doc.id})" class="text-red-600 hover:text-red-800 text-sm">
                      Remove
@@ -855,15 +885,23 @@ function getStatusColor($status){
                 const classLabel = doc.classification.charAt(0).toUpperCase() + doc.classification.slice(1);
                 const sourceLabel = getSourceLabel(doc.source_type, doc.specific_type);
                 
+                const hasRevisedTitle = doc.classification === 'revision' && doc.revising_master_document && doc.revising_master_document.document_title && doc.revising_master_document.document_title !== doc.document_title;
+
                 row.innerHTML = `
-                    <td class="px-3 py-2">${doc.document_code}</td>
-                    <td class="px-3 py-2">${doc.document_title}</td>
+                    <td class="px-3 py-2">${escapeHtml(doc.document_code)}</td>
+                    <td class="px-3 py-2">
+                        <div class="font-medium text-gray-900">${escapeHtml(doc.document_title)}</div>
+                        ${hasRevisedTitle ? `
+                            <div class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 mt-0.5 inline-flex items-center gap-1">
+                                <span class="font-semibold">Original:</span> ${escapeHtml(doc.revising_master_document.document_title)}
+                            </div>` : ''}
+                    </td>
                     <td class="px-3 py-2">
                         <span class="inline-block px-2 py-1 text-xs rounded ${getClassificationColor(doc.classification)}">
                             ${classLabel}
                         </span>
                     </td>
-                    <td class="px-3 py-2">${sourceLabel}</td>
+                    <td class="px-3 py-2">${escapeHtml(sourceLabel)}</td>
 
                     <td class="px-3 py-2">
                         <span class="inline-block px-2 py-1 text-xs rounded ${getStatusColorJS(doc.status)}">
@@ -1068,19 +1106,40 @@ function getStatusColor($status){
     document.getElementById('edit_existing_doc_select').addEventListener('change',(e)=>{
         const selectedOption = e.target.options[e.target.selectedIndex];
         const preview = document.getElementById('edit_selected_doc_preview');
+        const revTitleField = document.getElementById('edit_revision_title_field');
+        const revTitleInput = document.getElementById('edit_revision_doc_title');
+        const classification = document.getElementById('edit_doc_classification').value;
 
         if(selectedOption.value){
             const specificType = selectedOption.dataset.specificType || null;
+            const originalTitle = selectedOption.dataset.title;
+            const revisedTitle = selectedOption.dataset.revisedTitle;
+            const effectiveTitle = (revisedTitle && revisedTitle.trim()) ? revisedTitle.trim() : originalTitle;
 
             document.getElementById('edit_preview_code').textContent = selectedOption.dataset.code;
-            document.getElementById('edit_preview_title').textContent = selectedOption.dataset.title;
+            document.getElementById('edit_preview_title').textContent = originalTitle;
             document.getElementById('edit_preview_source').textContent = getSourceLabel(
                 selectedOption.dataset.source,
                 specificType
             );
             preview.style.display = 'block';
+
+            const hasStaged = !!(revisedTitle && revisedTitle.trim() && revisedTitle.trim() !== originalTitle);
+            const editStagedBadge = document.getElementById('edit_staged_title_badge');
+            if(editStagedBadge) editStagedBadge.style.display = hasStaged ? 'inline-flex' : 'none';
+
+            if(classification === 'revision' && revTitleField && revTitleInput){
+                revTitleField.style.display = 'block';
+                revTitleInput.value = effectiveTitle || '';
+            } else if(revTitleField){
+                revTitleField.style.display = 'none';
+            }
         } else{
             preview.style.display = 'none';
+            const editStagedBadge = document.getElementById('edit_staged_title_badge');
+            if(editStagedBadge) editStagedBadge.style.display = 'none';
+            if(revTitleField) revTitleField.style.display = 'none';
+            if(revTitleInput) revTitleInput.value = '';
         }
     });
     
@@ -1156,6 +1215,7 @@ function getStatusColor($status){
                 editDocuments = ticket.documents.map(doc => ({
                     code: doc.document_code,
                     title: doc.document_title,
+                    originalTitle: doc.revising_master_document ? doc.revising_master_document.document_title : null,
                     classification: doc.classification,
                     source: doc.source_type,
                     specificType: doc.specific_type,
@@ -1217,15 +1277,23 @@ function getStatusColor($status){
             const sourceLabel = getSourceLabel(doc.source, doc.specificType);
             const classLabel = doc.classification.charAt(0).toUpperCase() + doc.classification.slice(1);
 
+            const hasRevisedTitle = doc.classification === 'revision' && doc.originalTitle && doc.originalTitle !== doc.title;
+
             row.innerHTML = `
-                <td class="px-3 py-2">${doc.code}</td>
-                <td class="px-3 py-2">${doc.title}</td>
+                <td class="px-3 py-2">${escapeHtml(doc.code)}</td>
+                <td class="px-3 py-2">
+                    <div class="font-medium text-gray-900">${escapeHtml(doc.title)}</div>
+                    ${hasRevisedTitle ? `
+                        <div class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 mt-0.5 inline-flex items-center gap-1">
+                            <span class="font-semibold">Original:</span> ${escapeHtml(doc.originalTitle)}
+                        </div>` : ''}
+                </td>
                 <td class="px-3 py-2">
                     <span class="inline-block px-2 py-1 text-xs rounded ${getClassificationColor(doc.classification)}">
                         ${classLabel}
                     </span>
                 </td>
-                <td class="px-2 py-2">${sourceLabel}</td>
+                <td class="px-2 py-2">${escapeHtml(sourceLabel)}</td>
                 <td class="px-2 py-2 text-center">
                     <button type="button" onclick="removeDocument('${doc.id}', true)" class="text-red-600 hover:text-red-800 text-sm">
                         Remove
@@ -1430,6 +1498,10 @@ function getStatusColor($status){
         document.getElementById('specific_type_section').style.display = 'none';
         document.getElementById('custom_source_section').style.display = 'none';
         document.getElementById('selected_doc_preview').style.display = 'none';
+        const revTitleField = document.getElementById('revision_title_field');
+        if (revTitleField) revTitleField.style.display = 'none';
+        const revTitleInput = document.getElementById('revision_doc_title');
+        if (revTitleInput) revTitleInput.value = '';
         //Document Autofill
         const docCodeInput = document.getElementById('doc_code');
         docCodeInput.value = '';
@@ -1450,6 +1522,10 @@ function getStatusColor($status){
         document.getElementById('edit_specific_type_section').style.display = 'none';
         document.getElementById('edit_custom_source_section').style.display = 'none';
         document.getElementById('edit_selected_doc_preview').style.display = 'none';
+        const editRevTitleField = document.getElementById('edit_revision_title_field');
+        if (editRevTitleField) editRevTitleField.style.display = 'none';
+        const editRevTitleInput = document.getElementById('edit_revision_doc_title');
+        if (editRevTitleInput) editRevTitleInput.value = '';
     }
     // Formatting Status Texts
     function formatStatusText(status){
@@ -1533,9 +1609,12 @@ function getStatusColor($status){
                 availableDocs.forEach(doc => {
                     const option = document.createElement('option');
                     option.value = doc.id;
-                    option.textContent = `${doc.document_code} | ${doc.document_title}`;
+                    const hasRevisedTitle = !!doc.revised_document_title && doc.revised_document_title !== doc.document_title;
+                    const displayTitle = hasRevisedTitle ? doc.revised_document_title : doc.document_title;
+                    option.textContent = `${doc.document_code} | ${displayTitle}` + (hasRevisedTitle ? ' (Revised Title)' : '');
                     option.dataset.code = doc.document_code;
                     option.dataset.title = doc.document_title;
+                    option.dataset.revisedTitle = doc.revised_document_title || '';
                     option.dataset.source = doc.source_type;
                     option.dataset.specificType = doc.specific_type ?? '';
                     selectElement.appendChild(option);
@@ -1613,9 +1692,31 @@ function getStatusColor($status){
             return;
         }
 
+        let originalTitle = selectedOption.dataset.title;
+        let title = originalTitle;
+
+        if(classification === 'revision'){
+            // Default to staged revised title if set by IDC Admin, otherwise use original title
+            const stagedTitle = (selectedOption.dataset.revisedTitle && selectedOption.dataset.revisedTitle.trim())
+                ? selectedOption.dataset.revisedTitle.trim()
+                : null;
+
+            title = stagedTitle || originalTitle;
+
+            // Only IDC Admin / SuperAdmin can manually type a different revised title in this modal
+            const isIdcAdmin = {{ in_array(auth()->user()->role ?? '', ['IDC Admin', 'SuperAdmin']) ? 'true' : 'false' }};
+            if(isIdcAdmin){
+                const revisedTitleInput = document.getElementById(`${prefix}revision_doc_title`);
+                if(revisedTitleInput && revisedTitleInput.value.trim()){
+                    title = revisedTitleInput.value.trim();
+                }
+            }
+        }
+
         const doc = {
             code: selectedOption.dataset.code,
-            title: selectedOption.dataset.title,
+            title: title,
+            originalTitle: originalTitle,
             classification: classification,
             source: selectedOption.dataset.source,
             specificType: selectedOption.dataset.specificType || null,
@@ -1626,8 +1727,7 @@ function getStatusColor($status){
             editDocuments.push(doc);
             selectedOption.remove();
             updateEditDocumentsList();
-            document.getElementById('edit_existing_doc_select').value = '';
-            document.getElementById('edit_selected_doc_preview').style.display = 'none';
+            clearEditDocumentForm();
         } else{
             documents.push(doc);
             selectedOption.remove();
@@ -1664,6 +1764,16 @@ function getStatusColor($status){
             console.error('Error removing document:', error);
             alert('An error occurred while removing the document. Please try again.');
         });
+    }
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
     function escapeForJs(str) {

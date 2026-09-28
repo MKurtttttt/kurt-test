@@ -432,6 +432,26 @@ function getStatusColor($status){
         box-shadow: 0 0 8px rgba(239, 68, 68, 0.45);
     }
 
+    /* ── Edit Ticket Details button in action bar ── */
+    .edit-ticket-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border: 1.5px solid #3b82f6;
+        border-radius: 8px;
+        color: #2563eb;
+        background: white;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.18s, color 0.18s, border-color 0.18s;
+    }
+    .edit-ticket-btn:hover {
+        background: #2563eb;
+        color: white;
+    }
+
     /* ── Delete Ticket button in action bar ── */
     .delete-ticket-btn {
         display: inline-flex;
@@ -451,6 +471,20 @@ function getStatusColor($status){
         background: #ef4444;
         color: white;
     }
+
+    /* ── Edit Document Card in Edit Mode ── */
+    .edit-doc-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1rem 1.1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .edit-doc-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
 </style>
 
 <script>
@@ -462,6 +496,7 @@ function getStatusColor($status){
         if(errorElement) errorElement.style.display = 'none';
     }, 5000);
 
+    // ============================================
     // ============================================
     // COMBINED VIEW DETAILS + CHANGE STATUS MODAL
     // ============================================
@@ -476,17 +511,652 @@ function getStatusColor($status){
     const closeDetailsBtn = document.getElementById('close_details_modal');
     const statusForm = document.getElementById('status_form');
     const deleteTicketBtn = document.getElementById('delete_ticket_btn');
+    const editTicketBtn = document.getElementById('edit_ticket_btn');
+    const cancelEditTicketBtn = document.getElementById('cancel_edit_ticket_btn');
+    const saveEditTicketBtn = document.getElementById('save_edit_ticket_btn');
+    const ticketViewModeContainer = document.getElementById('ticket_view_mode_container');
+    const ticketEditModeContainer = document.getElementById('ticket_edit_mode_container');
+    const modalActionBar = document.getElementById('modal_action_bar');
+    const editTicketClusterDropdown = document.getElementById('edit_ticket_cluster');
+    const editTicketOfficeDropdown = document.getElementById('edit_ticket_office');
+
+    // Specific Office options loaded dynamically from database
+    @php
+        $dbDepartments = \App\Models\Departments::orderBy('code', 'asc')->get();
+        $jsOptions = [];
+        foreach ($dbDepartments as $d) {
+            $parts = explode('-', $d->code);
+            $cluster = strtolower($parts[0]);
+            $formatted = "({$d->code}) {$d->dept}";
+            $jsOptions[$cluster][] = $formatted;
+        }
+    @endphp
+    const specificOfficeOptions = @json($jsOptions);
+
+    const sourceTypeOptions = {
+        eoms: [
+            { value: '4.1', label: '4.1 Interested Parties' },
+            { value: '4.2', label: '4.2 Risk Assessment' },
+            { value: '7.4', label: '7.4 Communication' },
+            { value: '8.1', label: '8.1 EOMS Plan' }
+        ],
+        records: [
+            { value: '3.0', label: '3.0 Records Retention Schedule' },
+            { value: '4.0', label: '4.0 Definition and Records Series Title' }
+        ]
+    };
+
     let currentTicketId = null;
+    let currentTicketData = null;
+    let currentEditDocsList = [];
+
+    // Helper to find cluster key from office full name
+    function findClusterByOffice(officeName) {
+        if (!officeName) return null;
+        for (const [cluster, offices] of Object.entries(specificOfficeOptions)) {
+            if (offices.includes(officeName)) {
+                return cluster;
+            }
+        }
+        // Fallback: match cluster code inside parentheses e.g. (AAC-SOC) -> aac
+        const match = officeName.match(/\(([^)-]+)/);
+        if (match) {
+            const clusterCode = match[1].toLowerCase();
+            if (specificOfficeOptions[clusterCode]) {
+                return clusterCode;
+            }
+        }
+        return null;
+    }
+
+    // ======================================
+    // Document Prefix Functions & Helpers
+    // ======================================
+    function getOfficeCode(officeValue) {
+        if (!officeValue) return null;
+        const match = officeValue.match(/\(([^)]+)\)/);
+        return match ? match[1] : officeValue;
+    }
+
+    function generateDocCodePrefix(source, officeValue, specificType) {
+        const officeCode = getOfficeCode(officeValue);
+        if (!source || !officeCode) return '';
+
+        switch (source) {
+            case 'forms':
+                return `FM-${officeCode}`;
+            case 'procedures':
+                return `PD-${officeCode}`;
+            case 'eoms':
+                return specificType ? `${specificType} ${officeCode}` : '';
+            case 'records':
+                if (!specificType) return '';
+                let cleanSpec = specificType.replace(/0+$/, '');
+                if (!cleanSpec.endsWith('.')) cleanSpec += '.';
+                return `${cleanSpec}RMM-${officeCode}`;
+            case 'others':
+                return null; // Skip autofill for others
+            default:
+                return '';
+        }
+    }
+
+    function extractSuffixFromDocCode(currentCode, source, officeValue, specificType) {
+        if (!currentCode) return '';
+
+        // 1. If code starts with the generated prefix from the specified office
+        const prefix = generateDocCodePrefix(source, officeValue, specificType);
+        if (prefix && currentCode.startsWith(prefix)) {
+            return currentCode.slice(prefix.length);
+        }
+
+        // 2. Standard pattern: hyphen or space followed by digits e.g. -001, -1105, -2023
+        const numMatch = currentCode.match(/([-\s]\d[A-Za-z0-9-_]*)$/);
+        if (numMatch) {
+            return numMatch[1];
+        }
+
+        return '';
+    }
+
+    function attachDocCodeProtected(inputElement) {
+        inputElement.addEventListener('keydown', (e) => {
+            const prefix = inputElement.dataset.prefix || '';
+            if (!prefix) return;
+            if ((e.key === 'Backspace' || e.key === 'Delete') && inputElement.selectionStart <= prefix.length) {
+                e.preventDefault();
+            }
+        });
+
+        inputElement.addEventListener('input', () => {
+            const prefix = inputElement.dataset.prefix || '';
+            if (prefix && !inputElement.value.startsWith(prefix)) {
+                inputElement.value = prefix;
+            }
+        });
+    }
+
+    function updateCardDocCodePrefix(card, newOfficeValue) {
+        const codeInput = card.querySelector('.edit-doc-code');
+        const sourceSelect = card.querySelector('.edit-doc-source');
+        const specElem = card.querySelector('.edit-doc-specific');
+
+        if (!codeInput || !sourceSelect) return;
+
+        const source = sourceSelect.value;
+        const specificType = specElem ? specElem.value : '';
+        const newPrefix = generateDocCodePrefix(source, newOfficeValue, specificType);
+
+        // If source is 'others', skip autofill and clear prefix protection
+        if (newPrefix === null) {
+            codeInput.dataset.prefix = '';
+            return;
+        }
+
+        // Incomplete prefix (e.g. no office or eoms/records without specificType selected yet)
+        if (!newPrefix) return;
+
+        const currentVal = codeInput.value;
+        const oldPrefix = codeInput.dataset.prefix || '';
+
+        let suffix = '';
+        if (oldPrefix && currentVal.startsWith(oldPrefix)) {
+            suffix = currentVal.slice(oldPrefix.length);
+        } else {
+            suffix = extractSuffixFromDocCode(currentVal, source, newOfficeValue, specificType);
+        }
+
+        codeInput.value = newPrefix + suffix;
+        codeInput.dataset.prefix = newPrefix;
+    }
+
+    window.handleEditDocSpecificChange = function(specElem) {
+        const card = specElem.closest('.edit-doc-card');
+        if (!card) return;
+        const currentOffice = editTicketOfficeDropdown ? editTicketOfficeDropdown.value : '';
+        updateCardDocCodePrefix(card, currentOffice);
+        syncEditDocsFromInputs();
+    };
+
+    // Cluster dropdown change listener
+    if (editTicketClusterDropdown && editTicketOfficeDropdown) {
+        editTicketClusterDropdown.addEventListener('change', () => {
+            const cluster = editTicketClusterDropdown.value;
+            editTicketOfficeDropdown.innerHTML = '<option value="">Select Office...</option>';
+
+            if (cluster && specificOfficeOptions[cluster]) {
+                const offices = specificOfficeOptions[cluster];
+                offices.forEach(office => {
+                    const option = document.createElement('option');
+                    option.value = office;
+                    option.textContent = office;
+                    editTicketOfficeDropdown.appendChild(option);
+                });
+                editTicketOfficeDropdown.disabled = false;
+                editTicketOfficeDropdown.classList.remove('opacity-50', 'cursor-not-allowed');
+
+                if (offices.length === 1) {
+                    editTicketOfficeDropdown.value = offices[0];
+                    editTicketOfficeDropdown.dispatchEvent(new Event('change'));
+                }
+            } else {
+                editTicketOfficeDropdown.innerHTML = '<option value="">Select Cluster first...</option>';
+                editTicketOfficeDropdown.disabled = true;
+                editTicketOfficeDropdown.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        });
+
+        editTicketOfficeDropdown.addEventListener('change', () => {
+            const newOffice = editTicketOfficeDropdown.value;
+            if (!newOffice) return;
+
+            const cards = document.querySelectorAll('#edit_documents_list_container .edit-doc-card');
+            cards.forEach(card => {
+                updateCardDocCodePrefix(card, newOffice);
+            });
+
+            syncEditDocsFromInputs();
+        });
+    }
+
+    // Helper to switch to View Mode
+    function showTicketViewMode() {
+        if (ticketViewModeContainer) ticketViewModeContainer.style.display = 'block';
+        if (ticketEditModeContainer) ticketEditModeContainer.style.display = 'none';
+        if (modalActionBar) {
+            modalActionBar.style.display = (currentTicketData && !currentTicketData.isRegistered) ? 'flex' : 'none';
+        }
+    }
+
+    // Helper to enter Edit Mode
+    function enterTicketEditMode() {
+        if (!currentTicketData || currentTicketData.isRegistered) return;
+
+        // Deep copy of documents array
+        currentEditDocsList = JSON.parse(JSON.stringify(currentTicketData.documents));
+
+        const currentOffice = currentTicketData.section || '';
+        const currentCluster = findClusterByOffice(currentOffice);
+
+        if (editTicketClusterDropdown && editTicketOfficeDropdown) {
+            if (currentCluster) {
+                editTicketClusterDropdown.value = currentCluster;
+                editTicketOfficeDropdown.innerHTML = '<option value="">Select Office...</option>';
+
+                if (specificOfficeOptions[currentCluster]) {
+                    specificOfficeOptions[currentCluster].forEach(office => {
+                        const option = document.createElement('option');
+                        option.value = office;
+                        option.textContent = office;
+                        editTicketOfficeDropdown.appendChild(option);
+                    });
+                    editTicketOfficeDropdown.disabled = false;
+                    editTicketOfficeDropdown.classList.remove('opacity-50', 'cursor-not-allowed');
+                    editTicketOfficeDropdown.value = currentOffice;
+                }
+            } else {
+                editTicketClusterDropdown.value = '';
+                editTicketOfficeDropdown.innerHTML = '<option value="">Select Cluster first...</option>';
+                if (currentOffice) {
+                    // Support legacy/custom office values
+                    const customOption = document.createElement('option');
+                    customOption.value = currentOffice;
+                    customOption.textContent = `${currentOffice} (Current)`;
+                    customOption.selected = true;
+                    editTicketOfficeDropdown.appendChild(customOption);
+                    editTicketOfficeDropdown.disabled = false;
+                    editTicketOfficeDropdown.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    editTicketOfficeDropdown.disabled = true;
+                    editTicketOfficeDropdown.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        }
+
+        renderEditDocumentsList();
+
+        if (ticketViewModeContainer) ticketViewModeContainer.style.display = 'none';
+        if (ticketEditModeContainer) ticketEditModeContainer.style.display = 'block';
+        if (modalActionBar) modalActionBar.style.display = 'none';
+    }
+
+    // Generate specific type field HTML based on source
+    function getSpecificTypeFieldHtml(source, specificType) {
+        if (source === 'eoms') {
+            return `
+                <div class="edit-doc-specific-wrapper">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">
+                        Specific Type <span class="text-red-500">*</span>
+                    </label>
+                    <select class="edit-doc-specific w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        onchange="handleEditDocSpecificChange(this)">
+                        <option value="">Select Specific Type...</option>
+                        <option value="4.1" ${specificType === '4.1' ? 'selected' : ''}>4.1 Interested Parties</option>
+                        <option value="4.2" ${specificType === '4.2' ? 'selected' : ''}>4.2 Risk Assessment</option>
+                        <option value="7.4" ${specificType === '7.4' ? 'selected' : ''}>7.4 Communication</option>
+                        <option value="8.1" ${specificType === '8.1' ? 'selected' : ''}>8.1 EOMS Plan</option>
+                    </select>
+                </div>
+            `;
+        } else if (source === 'records') {
+            return `
+                <div class="edit-doc-specific-wrapper">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">
+                        Specific Type <span class="text-red-500">*</span>
+                    </label>
+                    <select class="edit-doc-specific w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        onchange="handleEditDocSpecificChange(this)">
+                        <option value="">Select Specific Type...</option>
+                        <option value="3.0" ${(specificType === '3.0' || specificType === '3') ? 'selected' : ''}>3.0 Records Retention Schedule</option>
+                        <option value="4.0" ${(specificType === '4.0' || specificType === '4') ? 'selected' : ''}>4.0 Definition and Records Series Title</option>
+                    </select>
+                </div>
+            `;
+        } else if (source === 'others') {
+            return `
+                <div class="edit-doc-specific-wrapper">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">
+                        Specify Type <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" class="edit-doc-specific w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        value="${escapeHtml(specificType || '')}" placeholder="Enter custom source type...">
+                </div>
+            `;
+        } else {
+            return `
+                <div class="edit-doc-specific-wrapper" style="display:none;"></div>
+            `;
+        }
+    }
+
+    // Render documents list inside edit mode
+    function renderEditDocumentsList() {
+        const container = document.getElementById('edit_documents_list_container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const docCountBadge = document.getElementById('edit_doc_count');
+        if (docCountBadge) docCountBadge.textContent = currentEditDocsList.length;
+
+        const currentOffice = editTicketOfficeDropdown ? editTicketOfficeDropdown.value : (currentTicketData?.section || '');
+
+        currentEditDocsList.forEach((doc, index) => {
+            const card = document.createElement('div');
+            card.className = 'edit-doc-card';
+            card.dataset.index = index;
+
+            const removeBtnHtml = currentEditDocsList.length > 1
+                ? `<button type="button" onclick="removeDocFromEditList(${index})"
+                       class="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-lg transition font-medium cursor-pointer"
+                       title="Remove this document from ticket">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                       Remove
+                   </button>`
+                : `<span class="text-xs text-gray-400 italic">Minimum 1 document required</span>`;
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between pb-2 mb-3 border-b border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-800 font-bold text-xs flex items-center justify-center">${index + 1}</span>
+                        <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Document #${index + 1}</span>
+                        ${!doc.id ? `<span class="text-[11px] text-green-600 font-medium bg-green-50 px-1.5 py-0.5 rounded">New</span>` : ''}
+                    </div>
+                    ${removeBtnHtml}
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">
+                            Document Code <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" class="edit-doc-code w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            value="${escapeHtml(doc.document_code || '')}" placeholder="e.g. FM-AAC-SOC-001" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">
+                            Document Title <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" class="edit-doc-title w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            value="${escapeHtml(doc.document_title || '')}" placeholder="e.g. Quality Manual" required>
+                        ${(doc.classification === 'revision' && doc.revising_master_document && doc.revising_master_document.document_title && doc.revising_master_document.document_title !== doc.document_title)
+                            ? `<div class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-0.5 mt-1 inline-flex items-center gap-1">
+                                <span class="font-semibold">Original Title:</span> ${escapeHtml(doc.revising_master_document.document_title)}
+                               </div>`
+                            : ''}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">
+                            Nature of Modification <span class="text-red-500">*</span>
+                        </label>
+                        <select class="edit-doc-classification w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            <option value="addition" ${doc.classification === 'addition' ? 'selected' : ''}>Addition (Add new Document)</option>
+                            <option value="revision" ${doc.classification === 'revision' ? 'selected' : ''}>Revision (Update an Existing Document)</option>
+                            <option value="deletion" ${doc.classification === 'deletion' ? 'selected' : ''}>Deletion (Delete an Existing Document)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">
+                            Source Document <span class="text-red-500">*</span>
+                        </label>
+                        <select class="edit-doc-source w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            onchange="handleEditDocSourceChange(this)">
+                            <option value="forms" ${doc.source_type === 'forms' ? 'selected' : ''}>Forms</option>
+                            <option value="procedures" ${doc.source_type === 'procedures' ? 'selected' : ''}>Procedures</option>
+                            <option value="eoms" ${doc.source_type === 'eoms' ? 'selected' : ''}>EOMS Manual</option>
+                            <option value="records" ${doc.source_type === 'records' ? 'selected' : ''}>Records Management Manual</option>
+                            <option value="others" ${doc.source_type === 'others' ? 'selected' : ''}>Others</option>
+                        </select>
+                    </div>
+                    ${getSpecificTypeFieldHtml(doc.source_type, doc.specific_type)}
+                </div>
+            `;
+            container.appendChild(card);
+
+            // Set prefix dataset and attach protection
+            const codeInput = card.querySelector('.edit-doc-code');
+            if (codeInput) {
+                if (doc.source_type === 'others') {
+                    codeInput.dataset.prefix = '';
+                } else {
+                    const expectedPrefix = generateDocCodePrefix(doc.source_type, currentOffice, doc.specific_type);
+                    if (expectedPrefix && doc.document_code && doc.document_code.startsWith(expectedPrefix)) {
+                        codeInput.dataset.prefix = expectedPrefix;
+                    } else {
+                        const suffix = extractSuffixFromDocCode(doc.document_code, doc.source_type, currentOffice, doc.specific_type);
+                        if (suffix && expectedPrefix) {
+                            codeInput.dataset.prefix = expectedPrefix;
+                        } else {
+                            codeInput.dataset.prefix = expectedPrefix || '';
+                        }
+                    }
+                }
+                attachDocCodeProtected(codeInput);
+            }
+        });
+    }
+
+    // Toggle specific type input when source changes
+    window.handleEditDocSourceChange = function(selectElem) {
+        const card = selectElem.closest('.edit-doc-card');
+        if (!card) return;
+        const specificWrapper = card.querySelector('.edit-doc-specific-wrapper');
+        if (!specificWrapper) return;
+
+        const source = selectElem.value;
+        if (source === 'eoms') {
+            specificWrapper.style.display = 'block';
+            specificWrapper.innerHTML = `
+                <label class="block text-xs font-semibold text-gray-600 mb-1">
+                    Specific Type <span class="text-red-500">*</span>
+                </label>
+                <select class="edit-doc-specific w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    onchange="handleEditDocSpecificChange(this)">
+                    <option value="">Select Specific Type...</option>
+                    <option value="4.1">4.1 Interested Parties</option>
+                    <option value="4.2">4.2 Risk Assessment</option>
+                    <option value="7.4">7.4 Communication</option>
+                    <option value="8.1">8.1 EOMS Plan</option>
+                </select>
+            `;
+        } else if (source === 'records') {
+            specificWrapper.style.display = 'block';
+            specificWrapper.innerHTML = `
+                <label class="block text-xs font-semibold text-gray-600 mb-1">
+                    Specific Type <span class="text-red-500">*</span>
+                </label>
+                <select class="edit-doc-specific w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    onchange="handleEditDocSpecificChange(this)">
+                    <option value="">Select Specific Type...</option>
+                    <option value="3.0">3.0 Records Retention Schedule</option>
+                    <option value="4.0">4.0 Definition and Records Series Title</option>
+                </select>
+            `;
+        } else if (source === 'others') {
+            specificWrapper.style.display = 'block';
+            specificWrapper.innerHTML = `
+                <label class="block text-xs font-semibold text-gray-600 mb-1">
+                    Specify Type <span class="text-red-500">*</span>
+                </label>
+                <input type="text" class="edit-doc-specific w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    placeholder="Enter custom source type...">
+            `;
+        } else {
+            specificWrapper.style.display = 'none';
+            specificWrapper.innerHTML = '';
+        }
+
+        const currentOffice = editTicketOfficeDropdown ? editTicketOfficeDropdown.value : '';
+        updateCardDocCodePrefix(card, currentOffice);
+        syncEditDocsFromInputs();
+    };
+
+    // Add new document to edit list
+    window.addDocToEditList = function() {
+        syncEditDocsFromInputs();
+        const currentOffice = editTicketOfficeDropdown ? editTicketOfficeDropdown.value : '';
+        const defaultPrefix = generateDocCodePrefix('forms', currentOffice, null) || '';
+
+        currentEditDocsList.push({
+            id: null,
+            document_code: defaultPrefix,
+            document_title: '',
+            classification: 'addition',
+            source_type: 'forms',
+            specific_type: ''
+        });
+        renderEditDocumentsList();
+    };
+
+    // Sync input values into currentEditDocsList state
+    function syncEditDocsFromInputs() {
+        const cards = document.querySelectorAll('#edit_documents_list_container .edit-doc-card');
+        cards.forEach((card, idx) => {
+            if (currentEditDocsList[idx]) {
+                const codeInput = card.querySelector('.edit-doc-code');
+                const titleInput = card.querySelector('.edit-doc-title');
+                const classSelect = card.querySelector('.edit-doc-classification');
+                const sourceSelect = card.querySelector('.edit-doc-source');
+                const specElem = card.querySelector('.edit-doc-specific');
+
+                if (codeInput) currentEditDocsList[idx].document_code = codeInput.value.trim();
+                if (titleInput) currentEditDocsList[idx].document_title = titleInput.value.trim();
+                if (classSelect) currentEditDocsList[idx].classification = classSelect.value;
+                if (sourceSelect) currentEditDocsList[idx].source_type = sourceSelect.value;
+                if (specElem) currentEditDocsList[idx].specific_type = specElem.value.trim();
+                else currentEditDocsList[idx].specific_type = '';
+            }
+        });
+    }
+
+    // Remove single document from edit list
+    window.removeDocFromEditList = function(index) {
+        if (currentEditDocsList.length <= 1) {
+            alert('A ticket must contain at least one document.');
+            return;
+        }
+        syncEditDocsFromInputs();
+        const docCode = currentEditDocsList[index]?.document_code || `Document #${index + 1}`;
+        if (!confirm(`Are you sure you want to remove "${docCode}" from this ticket?\n\nThis will take effect when you click "Save Changes".`)) {
+            return;
+        }
+        currentEditDocsList.splice(index, 1);
+        renderEditDocumentsList();
+    };
+
+    // Save changes via AJAX
+    function saveEditTicketMode() {
+        if (!currentTicketId) return;
+
+        const officeSelect = document.getElementById('edit_ticket_office');
+        const newSection = officeSelect ? officeSelect.value.trim() : '';
+        if (!newSection) {
+            alert('Please select an Originating Cluster and Specific Office.');
+            if (officeSelect) officeSelect.focus();
+            return;
+        }
+
+        syncEditDocsFromInputs();
+
+        if (currentEditDocsList.length === 0) {
+            alert('A ticket must have at least one document.');
+            return;
+        }
+
+        for (let i = 0; i < currentEditDocsList.length; i++) {
+            const doc = currentEditDocsList[i];
+            if (!doc.document_code || !doc.document_code.trim()) {
+                alert(`Document #${i + 1} requires a Document Code.`);
+                return;
+            }
+            if (!doc.document_title || !doc.document_title.trim()) {
+                alert(`Document #${i + 1} requires a Document Title.`);
+                return;
+            }
+            if (!['addition', 'revision', 'deletion'].includes(doc.classification)) {
+                alert(`Document #${i + 1} has an invalid modification type.`);
+                return;
+            }
+            if (doc.source_type === 'others' && (!doc.specific_type || !doc.specific_type.trim())) {
+                alert(`Document #${i + 1} requires specifying the Custom Type when "Others" is selected.`);
+                return;
+            }
+        }
+
+        const saveBtn = document.getElementById('save_edit_ticket_btn');
+        const originalText = saveBtn ? saveBtn.innerHTML : 'Save Changes';
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Saving...</span>
+            `;
+        }
+
+        fetch(`/iso/idc/tickets/${currentTicketId}/update-details`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                originating_section: newSection,
+                documents: currentEditDocsList
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalText;
+            }
+
+            if (data.success) {
+                alert(data.message || 'Ticket details updated successfully!');
+                sessionStorage.setItem('reopen_ticket_id', currentTicketId);
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to update ticket details.'));
+            }
+        })
+        .catch(error => {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalText;
+            }
+            console.error('Update ticket details error:', error);
+            alert('An error occurred while updating ticket details. Please try again.');
+        });
+    }
+
+    // Bind action bar buttons
+    if (editTicketBtn) {
+        editTicketBtn.addEventListener('click', enterTicketEditMode);
+    }
+    if (cancelEditTicketBtn) {
+        cancelEditTicketBtn.addEventListener('click', showTicketViewMode);
+    }
+    if (saveEditTicketBtn) {
+        saveEditTicketBtn.addEventListener('click', saveEditTicketMode);
+    }
 
     // Close modal
     closeDetailsBtn.addEventListener('click', () => {
         detailsModal.classList.remove('active');
+        showTicketViewMode();
     });
 
     // Close when clicking outside
     detailsModal.addEventListener('click', (e) => {
         if (e.target === detailsModal) {
             detailsModal.classList.remove('active');
+            showTicketViewMode();
         }
     });
 
@@ -519,6 +1189,23 @@ function getStatusColor($status){
             return;
         }
 
+        // Store ticket data
+        currentTicketData = {
+            id: ticketId,
+            number: ticketNumber,
+            section: section,
+            status: status,
+            created: created,
+            creator: creator,
+            sharepoint: sharepoint,
+            message: message,
+            documents: ticketDocuments,
+            isRegistered: isRegistered
+        };
+
+        // Reset to View Mode
+        showTicketViewMode();
+
         // Fill modal with ticket data
         document.getElementById('detail_ticket_number').textContent = ticketNumber;
         document.getElementById('detail_section').textContent = section;
@@ -543,13 +1230,20 @@ function getStatusColor($status){
             row.className = 'border-t';
             const classLabel = doc.classification.charAt(0).toUpperCase() + doc.classification.slice(1);
             const sourceLabel = getSourceLabel(doc.source_type, doc.specific_type);
+            const hasRevisedTitle = doc.classification === 'revision' && doc.revising_master_document && doc.revising_master_document.document_title && doc.revising_master_document.document_title !== doc.document_title;
             row.innerHTML = `
-                <td class="px-3 py-2">${doc.document_code}</td>
-                <td class="px-3 py-2">${doc.document_title}</td>
+                <td class="px-3 py-2">${escapeHtml(doc.document_code)}</td>
+                <td class="px-3 py-2">
+                    <div class="font-medium text-gray-900">${escapeHtml(doc.document_title)}</div>
+                    ${hasRevisedTitle ? `
+                        <div class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 mt-1 inline-flex items-center gap-1">
+                            <span class="font-semibold">Original:</span> ${escapeHtml(doc.revising_master_document.document_title)}
+                        </div>` : ''}
+                </td>
                 <td class="px-3 py-2">
                     <span class="inline-block px-2 py-1 text-xs rounded ${getClassificationColor(doc.classification)}">${classLabel}</span>
                 </td>
-                <td class="px-3 py-2">${sourceLabel}</td>
+                <td class="px-3 py-2">${escapeHtml(sourceLabel)}</td>
                 <td class="px-3 py-2">
                     <span class="inline-block px-2 py-1 text-xs rounded ${getStatusColorJS(doc.status)}">${formatStatusText(doc.status)}</span>
                 </td>
@@ -565,11 +1259,6 @@ function getStatusColor($status){
                             <button onclick="updateDocStatus(${doc.id}, 'on_hold')"
                                 class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold">
                                 On-Hold
-                            </button>
-                            <button onclick="removeDocFromTicket(${doc.id}, '${escapeForJs(doc.document_code)}', ${ticketId})"
-                                class="w-6 h-6 rounded-full bg-red-50 hover:bg-red-200 text-red-600 hover:text-red-800 flex items-center justify-center font-bold text-sm leading-none transition"
-                                title="Remove document from ticket">
-                                &times;
                             </button>`
                         }
                     </div>
@@ -590,14 +1279,14 @@ function getStatusColor($status){
             changeStatusSection.style.display = 'none';
         }
 
-
-        // Show / hide Delete Ticket button + action bar
-        const modalActionBar = document.getElementById('modal_action_bar');
+        // Show / hide Delete Ticket and Edit Ticket button + action bar
         if (!isRegistered) {
-            deleteTicketBtn.style.display = 'flex';
+            if (deleteTicketBtn) deleteTicketBtn.style.display = 'inline-flex';
+            if (editTicketBtn) editTicketBtn.style.display = 'inline-flex';
             if (modalActionBar) modalActionBar.style.display = 'flex';
         } else {
-            deleteTicketBtn.style.display = 'none';
+            if (deleteTicketBtn) deleteTicketBtn.style.display = 'none';
+            if (editTicketBtn) editTicketBtn.style.display = 'none';
             if (modalActionBar) modalActionBar.style.display = 'none';
         }
 
@@ -674,6 +1363,16 @@ function getStatusColor($status){
     // ============================================
     // Helper Functions
     // ============================================
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     function escapeForJs(str) {
         if (!str) return '';
         return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
@@ -883,4 +1582,14 @@ function getStatusColor($status){
         document.body.appendChild(form);
         form.submit();
     });
+
+    // Auto-reopen ticket modal if reloaded after editing
+    const reopenTicketId = sessionStorage.getItem('reopen_ticket_id');
+    if (reopenTicketId) {
+        sessionStorage.removeItem('reopen_ticket_id');
+        const targetBtn = document.querySelector(`.view-details-btn[data-ticket-id="${reopenTicketId}"]`);
+        if (targetBtn) {
+            targetBtn.click();
+        }
+    }
 </script>

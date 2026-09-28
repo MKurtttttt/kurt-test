@@ -18,24 +18,47 @@
                 </div>
             @endif
             <!-- Header -->
-            <div class="w-[95%] px-4 flex my-4 items-center">
-                <img src="{{ asset('images/icons/portal_nav/iso-title.png') }}" class="w-[100px] h-[100px] mr-4"/>
-                <div class="w-full flex flex-col justify-center">
-                    <h1 class="text-[1.5rem] font-bold leading-tight text-purple-700">Document Management System</h1>
-                    <span class="text-gray-500 text-sm">Registered Documents Dashboard</span>
+            <div class="w-[95%] px-4 flex my-4 items-center justify-between">
+                <!-- Branding / Title -->
+                <div class="flex items-center shrink-0">
+                    <img src="{{ asset('images/icons/portal_nav/iso-title.png') }}" 
+                         class="w-[100px] h-[100px] mr-4 shrink-0" 
+                         style="width: 100px !important; height: 100px !important; min-width: 100px !important; max-width: 100px !important; min-height: 100px !important; max-height: 100px !important; object-fit: contain;" 
+                         alt="ISO Logo" />
+                    <div class="flex flex-col justify-center">
+                        <h1 class="text-[1.5rem] font-bold leading-tight text-purple-700">Document Management System</h1>
+                        <span class="text-gray-500 text-sm">Registered Documents Dashboard</span>
+                    </div>
                 </div>
-                <div class="w-full flex gap-4">
+
+                <!-- Navigation Action Buttons (Balanced 2x2 Grid) -->
+                <div class="shrink-0" style="display: grid; grid-template-columns: auto auto; gap: 10px; width: max-content;">
+                    <!-- Manage Document Titles -->
+                    <a href="{{ route('iso.management.titles.index') }}" 
+                       style="background-color: #4338ca !important; color: #ffffff !important;"
+                       class="hover:opacity-90 px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center shadow-sm transition whitespace-nowrap">
+                        <span style="color: #ffffff !important;">Manage Document Titles</span>
+                    </a>
+
                     <!-- Manage Departments -->
-                    <a href="{{ route('iso.management.departments.index') }}" class="bg-red-900 hover:bg-red-800 text-white px-4 py-2 rounded-lg font-semibold flex items-center">
-                        <span>Manage Departments</span>
+                    <a href="{{ route('iso.management.departments.index') }}" 
+                       style="background-color: #800000 !important; color: #ffffff !important;"
+                       class="hover:opacity-90 px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center shadow-sm transition whitespace-nowrap">
+                        <span style="color: #ffffff !important;">Manage Departments</span>
                     </a>
+
                     <!-- Switch to IDC Admin Dashboard -->
-                    <a href="{{ route('iso.idc.dashboard') }}" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold">
-                        Switch to IDC Admin Dashboard
+                    <a href="{{ route('iso.idc.dashboard') }}" 
+                       style="background-color: #a855f7 !important; color: #ffffff !important;"
+                       class="hover:opacity-90 px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center shadow-sm transition whitespace-nowrap">
+                        <span style="color: #ffffff !important;">Switch to IDC Admin Dashboard</span>
                     </a>
+
                     <!-- Switch to Document Handler Dashboard -->
-                    <a href="{{ route('iso.document') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">
-                        Switch to Document Handler
+                    <a href="{{ route('iso.document') }}" 
+                       style="background-color: #2563eb !important; color: #ffffff !important;"
+                       class="hover:opacity-90 px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center shadow-sm transition whitespace-nowrap">
+                        <span style="color: #ffffff !important;">Switch to Document Handler</span>
                     </a>
                 </div>
             </div>
