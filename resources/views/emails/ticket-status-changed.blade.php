@@ -112,10 +112,10 @@
                     <span class="info-label">Originating Dept.:</span>
                     <span class="info-value">{{ $ticket->originating_section }}</span>
                 </div>
-                @if ($ticket->creator->name)
+                @if ($ticket->creator && $ticket->creator->name)
                     <div class="info-row">
                         <span class="info-label">Ticket Owner:</span>
-                        <span class="info-value">{{ $ticket->creator->name}}</span>
+                        <span class="info-value">{{ $ticket->creator->name }}</span>
                     </div>
                 @endif
                 @if ($changedBy)

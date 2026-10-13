@@ -451,13 +451,13 @@ class IsoDocumentController extends Controller
 
         $document = IsoTicketDocument::findOrFail($documentId);
         $oldDocStatus = $document->status;
-        $document->status = $request->status;
 
         // Auto-set registered_at when approved
         if($request->status === 'approved'){
             $document->registered_at = now();
         }
 
+        $document->status = $request->status;
         $document->save();
 
         // Check if we need to auto-update each ticket status
@@ -527,48 +527,99 @@ class IsoDocumentController extends Controller
             }
             return;
         }
+
+        // If previously on_hold but no documents are on_hold anymore, restore to submitted_to_idc
+        if ($oldStatus === 'on_hold') {
+            $ticket->status = 'submitted_to_idc';
+            $ticket->save();
+
+            if($sendNotification && $oldStatus !== 'submitted_to_idc'){
+                $this->sendTicketStatusNotification(
+                    $ticket,
+                    $oldStatus,
+                    'IDC Admin - ' . (auth()->user()->name ?? 'Administrator')
+                );
+            }
+            return;
+        }
     }
 
     private function sendTicketStatusNotification($ticket, $oldStatus, $changedBy){
-        if (!$ticket || !$ticket->creator || empty($ticket->creator->email)) {
+        if (!$ticket) {
             return;
         }
 
-        try {
-            // Email the Document Handler (Ticket owner)
-            Mail::to($ticket->creator->email)
-                ->send(new TicketStatusChanged($ticket, $oldStatus, $changedBy));
-            
-            // Delay for the free trial of Mailtrap
-            usleep(500000);
+        $sentEmails = [];
 
-            // Email all the IDC Admins
+        // 1. Email the Document Handler (Ticket owner) if available
+        if ($ticket->creator && !empty($ticket->creator->email)) {
+            $creatorEmail = trim($ticket->creator->email);
+            try {
+                Mail::to($creatorEmail)
+                    ->send(new TicketStatusChanged($ticket, $oldStatus, $changedBy));
+                $sentEmails[] = strtolower($creatorEmail);
+            } catch (\Throwable $e) {
+                Log::error("Failed to send TicketStatusChanged email to ticket creator ({$creatorEmail}): " . $e->getMessage());
+            }
+        }
+
+        // 2. Email all IDC Admins individually so one failure never blocks others
+        try {
             $idcAdmins = User::where('role', 'IDC Admin')->get();
             foreach ($idcAdmins as $admin){
-                if (!empty($admin->email)) {
-                    Mail::to($admin->email)
-                        ->send(new TicketStatusChanged($ticket, $oldStatus, $changedBy));
-                    // Delay for the free trial of Mailtrap
-                    usleep(500000);
+                $adminEmail = trim($admin->email ?? '');
+                if (!empty($adminEmail) && !in_array(strtolower($adminEmail), $sentEmails)) {
+                    try {
+                        Mail::to($adminEmail)
+                            ->send(new TicketStatusChanged($ticket, $oldStatus, $changedBy));
+                        $sentEmails[] = strtolower($adminEmail);
+                    } catch (\Throwable $e) {
+                        Log::error("Failed to send TicketStatusChanged email to IDC Admin ({$adminEmail}): " . $e->getMessage());
+                    }
                 }
             }
         } catch (\Throwable $e) {
-            Log::error("Failed to send TicketStatusChanged email: " . $e->getMessage());
+            Log::error("Failed to retrieve or email IDC Admins in sendTicketStatusNotification: " . $e->getMessage());
         }
     }
 
     private function sendDocumentStatusNotification(IsoTicketDocument $document, $oldDocStatus, $changedBy){
         $ticket = $document->ticket;
-        if (!$ticket || !$ticket->creator || empty($ticket->creator->email)) {
+        if (!$ticket) {
             return;
         }
 
+        $sentEmails = [];
+
+        // 1. Email the Document Handler (Ticket creator) with partial status update
+        if ($ticket->creator && !empty($ticket->creator->email)) {
+            $creatorEmail = trim($ticket->creator->email);
+            try {
+                Mail::to($creatorEmail)
+                    ->send(new DocumentStatusUpdated($document, $ticket, $oldDocStatus, $changedBy));
+                $sentEmails[] = strtolower($creatorEmail);
+            } catch (\Throwable $e) {
+                Log::error("Failed to send DocumentStatusUpdated email to ticket creator ({$creatorEmail}): " . $e->getMessage());
+            }
+        }
+
+        // 2. Also notify IDC Admins so they are aware of partial document status updates
         try {
-            // Email the Document Handler with partial status update
-            Mail::to($ticket->creator->email)
-                ->send(new DocumentStatusUpdated($document, $ticket, $oldDocStatus, $changedBy));
+            $idcAdmins = User::where('role', 'IDC Admin')->get();
+            foreach ($idcAdmins as $admin){
+                $adminEmail = trim($admin->email ?? '');
+                if (!empty($adminEmail) && !in_array(strtolower($adminEmail), $sentEmails)) {
+                    try {
+                        Mail::to($adminEmail)
+                            ->send(new DocumentStatusUpdated($document, $ticket, $oldDocStatus, $changedBy));
+                        $sentEmails[] = strtolower($adminEmail);
+                    } catch (\Throwable $e) {
+                        Log::error("Failed to send DocumentStatusUpdated email to IDC Admin ({$adminEmail}): " . $e->getMessage());
+                    }
+                }
+            }
         } catch (\Throwable $e) {
-            Log::error("Failed to send DocumentStatusUpdated email: " . $e->getMessage());
+            Log::error("Failed to retrieve or email IDC Admins in sendDocumentStatusNotification: " . $e->getMessage());
         }
     }
 
